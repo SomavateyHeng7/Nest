@@ -1,0 +1,55 @@
+import {
+  Wifi,
+  Snowflake,
+  UtensilsCrossed,
+  WashingMachine,
+  Laptop,
+  Building2,
+  Waves,
+  Car,
+  Coffee,
+  Trees,
+  Fan,
+  Sailboat,
+  ShowerHead,
+  Dumbbell,
+  ShieldCheck,
+  ArrowUpDown,
+  Bus,
+  Bike,
+  Sunset,
+  Circle,
+  type LucideIcon,
+} from "lucide-react";
+
+const amenityIcons: Record<string, LucideIcon> = {
+  Wifi: Wifi,
+  "Air conditioning": Snowflake,
+  Kitchen: UtensilsCrossed,
+  Washer: WashingMachine,
+  Workspace: Laptop,
+  "Rooftop access": Building2,
+  "Private pool": Waves,
+  Pool: Waves,
+  "Free parking": Car,
+  "Breakfast included": Coffee,
+  Garden: Trees,
+  "Fan cooling": Fan,
+  "River view": Waves,
+  "Kayak included": Sailboat,
+  "Hammock deck": Trees,
+  "Beach access": Waves,
+  "Outdoor shower": ShowerHead,
+  Gym: Dumbbell,
+  Elevator: ArrowUpDown,
+  "24h security": ShieldCheck,
+  "Airport shuttle": Bus,
+  "Bicycle rental": Bike,
+  "Sea view": Sunset,
+  Terrace: Sunset,
+};
+
+export function AmenityIcon({ amenity, className }: { amenity: string; className?: string }) {
+  const Icon = amenityIcons[amenity] ?? Circle;
+  return <Icon className={className} />;
+}
