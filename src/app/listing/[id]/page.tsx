@@ -17,6 +17,7 @@ import {
   Zap,
 } from "lucide-react";
 
+import { SaveButton } from "@/components/activity/save-button";
 import { AmenityIcon } from "@/components/listing/amenity-icon";
 import { BookingSidebar } from "@/components/listing/booking-sidebar";
 import { OwnerDescription } from "@/components/listing/owner-text";
@@ -72,10 +73,13 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
   return (
     <StayDraftProvider listing={listing}>
     <div className="mx-auto max-w-7xl px-4 pt-6 pb-28 sm:px-6 lg:pb-24">
-      <Link href="/listing" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ChevronLeft className="size-4" />
-        {d.listing.allStays}
-      </Link>
+      <div className="flex items-center justify-between gap-4">
+        <Link href="/listing" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="size-4" />
+          {d.listing.allStays}
+        </Link>
+        <SaveButton listing={listing} variant="labelled" />
+      </div>
 
       <div className="mt-3 flex flex-col gap-2">
         <p className="text-xs font-semibold tracking-wider text-accent-terracotta uppercase">{d.propertyType[listing.type]}</p>

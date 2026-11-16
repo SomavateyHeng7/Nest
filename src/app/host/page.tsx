@@ -5,9 +5,10 @@ import { BedDouble, CalendarCheck, Inbox, Percent, Plus, Wallet } from "lucide-r
 
 import { BookingRequests } from "@/components/dashboard/booking-requests";
 import { OwnerShell } from "@/components/dashboard/owner-nav";
+import { OwnerViewings } from "@/components/dashboard/owner-viewings";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { StatTile } from "@/components/ui/stat-tile";
-import { monthlyIncome, ownerBookings, ownerListingIds, ownerListingStatus } from "@/data/dashboard";
+import { monthlyIncome, ownerBookings, ownerListingIds, ownerListingStatus, ownerViewings } from "@/data/dashboard";
 import { getListingById } from "@/data/listings";
 import { getI18n } from "@/i18n/server";
 import { formatUSD } from "@/lib/pricing";
@@ -46,13 +47,16 @@ export default async function HostPage() {
       </div>
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_360px]">
-        <section className="min-w-0">
+        <div className="min-w-0">
+        <section>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
             <h2 className="font-semibold">{o.requestsTitle}</h2>
             <span className="text-sm text-muted-foreground">{o.requestsNote}</span>
           </div>
           <BookingRequests bookings={[...pending, ...upcoming]} />
         </section>
+        <OwnerViewings viewings={ownerViewings} />
+        </div>
 
         <section className="min-w-0">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">

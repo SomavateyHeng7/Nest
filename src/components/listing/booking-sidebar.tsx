@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertCircle, CalendarDays, ChevronDown, MessageCircle, Minus, Plus, ShieldCheck } from "lucide-react";
 
+import { ViewingRequest } from "@/components/activity/viewing-request";
 import { StayCalendar } from "@/components/listing/stay-calendar";
 import { useStayDraft } from "@/components/listing/stay-draft";
 import { StayLengthPicker } from "@/components/listing/stay-length-picker";
@@ -163,6 +164,7 @@ export function BookingSidebar() {
         </dl>
       </div>
 
+      <ViewingRequest listing={listing} />
       <Button variant="outline" className="h-11 gap-2" nativeButton={false} render={<Link href="/messages" />}>
         <MessageCircle className="size-4" />
         {d.book.message(ownerFirst)}

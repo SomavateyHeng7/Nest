@@ -57,7 +57,7 @@ export async function Footer() {
         ))}
       </div>
       <div className="border-t border-border">
-        <p className="mx-auto max-w-7xl px-4 py-5 text-xs text-muted-foreground sm:px-6">{d.footer.legal}</p>
+        <p className="mx-auto max-w-7xl px-4 py-5 text-xs text-muted-foreground sm:px-6">{d.footer.legal(new Date().getFullYear())}</p>
       </div>
     </footer>
   );

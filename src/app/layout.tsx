@@ -4,8 +4,12 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { ActivityProvider } from "@/components/activity/activity-provider";
 import { CompareProvider } from "@/components/compare/compare-provider";
 import { CompareTray } from "@/components/compare/compare-tray";
+import { ConnectionStatus } from "@/components/layout/connection-status";
+import { SiteOnly } from "@/components/layout/site-only";
+import { Toaster } from "@/components/ui/toast";
 import { LocaleProvider } from "@/i18n/client";
 import { getI18n } from "@/i18n/server";
 
@@ -53,12 +57,18 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <LocaleProvider initialLocale={locale}>
-            <CompareProvider>
-              <Navbar />
-              <main className="flex-1">{children}</main>
-              <Footer />
-              <CompareTray />
-            </CompareProvider>
+            <ActivityProvider>
+              <CompareProvider>
+                <Navbar />
+                <main className="flex-1">{children}</main>
+                <SiteOnly>
+                  <Footer />
+                  <CompareTray />
+                </SiteOnly>
+                <Toaster />
+                <ConnectionStatus />
+              </CompareProvider>
+            </ActivityProvider>
           </LocaleProvider>
         </ThemeProvider>
       </body>

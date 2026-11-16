@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, MessageCircle, X } from "lucide-react";
+import { ArrowLeft, Menu, MessageCircle, X } from "lucide-react";
 
 import { Logo } from "@/components/brand/logo";
 import { LanguageSwitch, PreferencesPanel, ThemeMenu } from "@/components/layout/preferences";
@@ -24,6 +24,29 @@ export function Navbar() {
   ];
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+
+  if (pathname.startsWith("/admin")) {
+    return (
+      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
+        <div className="flex h-14 items-center justify-between gap-4 px-4 sm:px-6">
+          <Link href="/admin" aria-label={d.admin.eyebrow} className="flex items-center gap-2.5">
+            <Logo />
+            <span className="rounded-md bg-dark-forest px-1.5 py-0.5 text-[11px] font-semibold tracking-wide text-background uppercase">
+              {d.admin.staff}
+            </span>
+          </Link>
+          <div className="flex items-center gap-1">
+            <LanguageSwitch className="mr-1" />
+            <ThemeMenu />
+            <Button variant="ghost" className="h-9 gap-1.5 px-3" nativeButton={false} render={<Link href="/" />}>
+              <ArrowLeft className="size-4" />
+              <span className="hidden sm:inline">{d.admin.backToSite}</span>
+            </Button>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">

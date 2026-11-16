@@ -5,6 +5,7 @@ import Link from "next/link";
 import { isAfter, parseISO } from "date-fns";
 import { Bath, BedDouble, Check, Plus, Ruler, Star } from "lucide-react";
 
+import { SaveButton } from "@/components/activity/save-button";
 import { useCompare } from "@/components/compare/compare-provider";
 import { VerifiedBadge } from "@/components/listing/verified-badge";
 import { isFullyVerified } from "@/data/listings";
@@ -45,21 +46,24 @@ export function ListingCard({
         />
         <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
           <VerifiedBadge full={isFullyVerified(listing)} />
-          {showCompare && (
-            <button
-              type="button"
-              onClick={() => toggle(listing.id)}
-              disabled={!selected && isFull}
-              aria-pressed={selected}
-              className={cn(
-                "relative z-10 inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm transition-colors disabled:opacity-60",
-                selected ? "bg-dark-forest text-background" : "bg-background/95 text-foreground hover:bg-background"
-              )}
-            >
-              {selected ? <Check className="size-3.5" /> : <Plus className="size-3.5" />}
-              {selected ? d.card.comparing : d.card.compare}
-            </button>
-          )}
+          <span className="flex items-center gap-1.5">
+            {showCompare && (
+              <button
+                type="button"
+                onClick={() => toggle(listing.id)}
+                disabled={!selected && isFull}
+                aria-pressed={selected}
+                className={cn(
+                  "relative z-10 inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm transition-colors disabled:opacity-60",
+                  selected ? "bg-dark-forest text-background" : "bg-background/95 text-foreground hover:bg-background"
+                )}
+              >
+                {selected ? <Check className="size-3.5" /> : <Plus className="size-3.5" />}
+                {selected ? d.card.comparing : d.card.compare}
+              </button>
+            )}
+            <SaveButton listing={listing} />
+          </span>
         </div>
         <span
           className="absolute bottom-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm"

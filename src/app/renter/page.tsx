@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { differenceInCalendarDays, parseISO } from "date-fns";
-import { CalendarPlus, KeyRound, MessageCircle, Receipt } from "lucide-react";
+import { KeyRound, MessageCircle, Receipt } from "lucide-react";
 
+import { ExtendStay } from "@/components/activity/extend-stay";
+import { RenterViewings, SavedHomes } from "@/components/activity/renter-sections";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
 import { currentUser, stays } from "@/data/dashboard";
@@ -118,10 +120,7 @@ export default async function RenterPage() {
                   <MessageCircle className="size-4" />
                   {r.messageOwner}
                 </Button>
-                <Button variant="outline" className="h-9 gap-1.5 px-3">
-                  <CalendarPlus className="size-4" />
-                  {r.extend}
-                </Button>
+                <ExtendStay stay={active} listing={activeListing} />
                 <Button variant="outline" className="h-9 gap-1.5 px-3">
                   <KeyRound className="size-4" />
                   {r.checkIn}
@@ -131,6 +130,8 @@ export default async function RenterPage() {
           </div>
         </section>
       )}
+
+      <RenterViewings />
 
       <section className="mt-10">
         <h2 className="font-semibold">{r.upcoming}</h2>
@@ -153,6 +154,8 @@ export default async function RenterPage() {
           ))}
         </div>
       </section>
+
+      <SavedHomes />
 
       <div className="mt-12 flex flex-col items-start justify-between gap-4 rounded-2xl bg-dark-forest p-6 text-background sm:flex-row sm:items-center dark:bg-card dark:text-foreground">
         <div>

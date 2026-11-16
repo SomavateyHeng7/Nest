@@ -75,7 +75,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
               aria-selected={method === m}
               onClick={() => setMethod(m)}
               className={cn(
-                "flex-1 rounded-lg py-2 text-sm font-medium capitalize transition-colors",
+                "flex-1 rounded-lg py-2 text-sm font-medium transition-colors",
                 method === m ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
               )}
             >
@@ -128,7 +128,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         </p>
       </div>
 
-      <div className="relative hidden min-h-[560px] overflow-hidden rounded-3xl lg:block">
+      <div className="relative hidden min-h-[560px] overflow-hidden rounded-3xl lg:order-first lg:block">
         <Image src={listings[2].images[0]} alt={a.imageAlt} fill sizes="50vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
         <div className="absolute inset-x-8 bottom-8 text-white">
