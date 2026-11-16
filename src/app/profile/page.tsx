@@ -1,60 +1,95 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { CircleCheck, Landmark } from "lucide-react";
 
-import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
+import { PreferencesPanel } from "@/components/layout/preferences";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { currentUser } from "@/data/dashboard";
+import { getI18n } from "@/i18n/server";
 
-export default function ProfilePage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const { d } = await getI18n();
+  return { title: d.profile.title };
+}
+
+export default async function ProfilePage() {
+  const { d } = await getI18n();
+  const p = d.profile;
+  const checks = (["phone", "email", "identity"] as const).filter((k) => currentUser.verification[k]);
+
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Your profile</h1>
-      <DashboardTabs />
+    <div className="mx-auto max-w-4xl px-4 pt-8 pb-24 sm:px-6">
+      <h1 className="font-heading text-3xl font-semibold tracking-tight text-dark-forest">{p.title}</h1>
 
-      <Card>
-        <CardContent className="flex flex-col gap-6">
-          <div className="flex items-center gap-4">
-            <Avatar className="size-16">
-              <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
-              <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="font-heading text-lg font-semibold text-foreground">{currentUser.name}</p>
-                {currentUser.isSuperhost && <Badge variant="secondary">Superhost</Badge>}
-              </div>
-              <p className="text-sm text-muted-foreground">Member since {currentUser.joinedYear}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-foreground">Full name</span>
-              <Input defaultValue={currentUser.name} />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-foreground">Email</span>
-              <Input defaultValue={currentUser.email} type="email" />
-            </label>
-          </div>
-
+      <div className="mt-8 grid gap-6 md:grid-cols-[260px_1fr]">
+        <aside className="flex h-fit flex-col items-center gap-3 rounded-2xl border border-border bg-card p-6 text-center">
+          <Avatar className="size-24">
+            <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
+            <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+          </Avatar>
           <div>
-            <Button className="bg-accent-terracotta text-white hover:bg-accent-terracotta/90">
-              Save changes
-            </Button>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Demo only — changes here aren&apos;t saved anywhere.
-            </p>
+            <p className="text-lg font-semibold">{currentUser.name}</p>
+            <p className="text-sm text-muted-foreground">{p.since(currentUser.joinedYear)}</p>
           </div>
-        </CardContent>
-      </Card>
+          <ul className="mt-2 flex w-full flex-col gap-2 border-t border-border pt-4 text-left text-sm">
+            {checks.map((k) => (
+              <li key={k} className="flex items-center gap-2">
+                <CircleCheck className="size-4 shrink-0 text-success" />
+                {p.verifiedItem(p.checks[k])}
+              </li>
+            ))}
+          </ul>
+        </aside>
 
-      <Button variant="outline" className="w-fit" nativeButton={false} render={<Link href="/" />}>
-        Log out
-      </Button>
+        <div className="flex flex-col gap-6">
+          <section className="rounded-2xl border border-border bg-card p-6">
+            <h2 className="font-semibold">{p.personal}</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium">{p.fullName}</span>
+                <Input defaultValue={currentUser.name} className="h-10" />
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium">{p.phone}</span>
+                <Input defaultValue={currentUser.phone} type="tel" className="h-10" />
+              </label>
+              <label className="flex flex-col gap-1.5 sm:col-span-2">
+                <span className="text-sm font-medium">{p.email}</span>
+                <Input defaultValue={currentUser.email} type="email" className="h-10" />
+              </label>
+            </div>
+            <Button className="mt-5 h-10 bg-accent-terracotta px-4 text-white hover:bg-terracotta-strong">
+              {d.common.saveChanges}
+            </Button>
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card p-6">
+            <h2 className="font-semibold">{p.preferences}</h2>
+            <p className="text-sm text-muted-foreground">{p.preferencesSub}</p>
+            <PreferencesPanel className="mt-4 max-w-sm" />
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card p-6">
+            <h2 className="font-semibold">{p.payouts}</h2>
+            <p className="text-sm text-muted-foreground">{p.payoutsSub}</p>
+            <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-muted/60 px-4 py-3">
+              <span className="flex items-center gap-3 text-sm">
+                <Landmark className="size-5 text-primary-sage" />
+                {currentUser.payoutMethod}
+              </span>
+              <Button variant="outline" className="h-8 px-3">
+                {d.common.change}
+              </Button>
+            </div>
+          </section>
+
+          <Button variant="outline" className="h-10 w-fit px-4" nativeButton={false} render={<Link href="/" />}>
+            {d.common.logOut}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

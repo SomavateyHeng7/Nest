@@ -1,35 +1,107 @@
-import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
-import { EarningsChart } from "@/components/dashboard/earnings-chart";
-import { ReservationRow } from "@/components/dashboard/reservation-row";
-import { StatTile } from "@/components/ui/stat-tile";
-import { getTotalEarned, getUpcomingPayout, monthlyEarnings, reservations } from "@/data/dashboard";
+import type { Metadata } from "next";
+import { differenceInCalendarDays, parseISO } from "date-fns";
+import { Info } from "lucide-react";
 
-export default function EarningPage() {
-  const totalEarned = getTotalEarned();
-  const upcomingPayout = getUpcomingPayout();
-  const thisMonth = monthlyEarnings[monthlyEarnings.length - 1];
+import { EarningsChart } from "@/components/dashboard/earnings-chart";
+import { OwnerShell } from "@/components/dashboard/owner-nav";
+import { StatusBadge } from "@/components/dashboard/status-badge";
+import { StatTile } from "@/components/ui/stat-tile";
+import { currentUser, monthlyIncome, ownerBookings } from "@/data/dashboard";
+import { getListingById } from "@/data/listings";
+import { getI18n } from "@/i18n/server";
+import { formatUSD, placementFee, placementFeeTiers } from "@/lib/pricing";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { d } = await getI18n();
+  return { title: d.income.title };
+}
+
+export default async function EarningPage() {
+  const { d, range, lt } = await getI18n();
+  const i = d.income;
+
+  const rent = monthlyIncome.reduce((s, m) => s + m.rent, 0);
+  const fees = monthlyIncome.reduce((s, m) => s + m.fees, 0);
+  const booked = ownerBookings.filter((b) => b.status !== "declined" && b.status !== "pending");
+  const upcomingPayout = ownerBookings
+    .filter((b) => b.status === "confirmed")
+    .reduce((s, b) => {
+      const nights = differenceInCalendarDays(parseISO(b.moveOut), parseISO(b.moveIn));
+      return s + b.firstMonthRent - placementFee(b.firstMonthRent, nights, b.rentTotal).fee;
+    }, 0);
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Earnings</h1>
-      <DashboardTabs />
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatTile label="Total earned" value={`$${totalEarned}`} hint="Last 6 months" />
-        <StatTile label="Upcoming payout" value={`$${upcomingPayout}`} hint="From confirmed reservations" />
-        <StatTile label="This month" value={`$${thisMonth?.amount ?? 0}`} hint={thisMonth?.month} />
+    <OwnerShell title={i.title} description={i.sub(currentUser.payoutMethod)}>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatTile label={i.rentReceived} value={formatUSD(rent)} hint={i.last6} />
+        <StatTile label={i.fees} value={formatUSD(fees)} hint={i.feesHint(((fees / rent) * 100).toFixed(0))} />
+        <StatTile label={i.payout} value={formatUSD(rent - fees)} hint={i.payoutHint} />
+        <StatTile label={i.nextPayout} value={formatUSD(upcomingPayout)} hint={i.nextPayoutHint} />
       </div>
 
-      <EarningsChart data={monthlyEarnings} />
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_340px]">
+        <EarningsChart data={monthlyIncome} />
 
-      <section className="flex flex-col gap-3">
-        <h2 className="font-medium text-foreground">Payout history</h2>
-        <div className="flex flex-col gap-3">
-          {reservations.map((reservation) => (
-            <ReservationRow key={reservation.id} reservation={reservation} />
-          ))}
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <p className="font-semibold">{i.howTitle}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{i.howBody}</p>
+          <ul className="mt-4 flex flex-col gap-2">
+            {placementFeeTiers.map((t) => (
+              <li key={t.minMonths} className="flex items-center justify-between gap-3 rounded-xl bg-muted/60 px-3.5 py-2.5 text-sm">
+                <span>{i.tierStay(d.fees.tierLabel(t.minMonths, t.maxMonths))}</span>
+                <span className="font-semibold tabular">{d.fees.ofOneMonth(t.rate * 100)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 flex gap-2 text-xs text-muted-foreground">
+            <Info className="mt-0.5 size-3.5 shrink-0" />
+            {i.agentNote}
+          </p>
+        </div>
+      </div>
+
+      <section className="mt-10">
+        <h2 className="font-semibold">{i.table}</h2>
+        <div className="mt-3 overflow-x-auto rounded-2xl border border-border bg-card">
+          <table className="w-full min-w-[760px] text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/50 text-left text-xs text-muted-foreground">
+                <th className="px-4 py-3 font-medium">{i.cols.renter}</th>
+                <th className="px-4 py-3 font-medium">{i.cols.property}</th>
+                <th className="px-4 py-3 font-medium">{i.cols.stay}</th>
+                <th className="px-4 py-3 text-right font-medium">{i.cols.total}</th>
+                <th className="px-4 py-3 text-right font-medium">{i.cols.fee}</th>
+                <th className="px-4 py-3 text-right font-medium">{i.cols.receive}</th>
+                <th className="px-4 py-3 font-medium">{i.cols.status}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {booked.map((b) => {
+                const listing = getListingById(b.listingId);
+                const nights = differenceInCalendarDays(parseISO(b.moveOut), parseISO(b.moveIn));
+                const { fee, tier } = placementFee(b.firstMonthRent, nights, b.rentTotal);
+                return (
+                  <tr key={b.id} className="border-b border-border last:border-0">
+                    <td className="px-4 py-3 font-medium">{b.renterName}</td>
+                    <td className="max-w-48 truncate px-4 py-3 text-muted-foreground" lang={listing ? lt(listing).lang : undefined}>
+                      {listing ? lt(listing).text : null}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{range(b.moveIn, b.moveOut)}</td>
+                    <td className="px-4 py-3 text-right tabular">{formatUSD(b.rentTotal)}</td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap text-muted-foreground tabular">
+                      −{formatUSD(fee)} <span className="text-xs">({tier.rate * 100}%)</span>
+                    </td>
+                    <td className="px-4 py-3 text-right font-semibold tabular">{formatUSD(b.rentTotal - fee)}</td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={b.status} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </section>
-    </div>
+    </OwnerShell>
   );
 }

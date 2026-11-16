@@ -1,60 +1,38 @@
-import { Suspense } from "react";
-import Link from "next/link";
+import type { Metadata } from "next";
 
-import { HomeListings } from "@/components/listing/home-listings";
-import { ListingFilterBar } from "@/components/listing/listing-filter-bar";
+import { ListingBrowser, type BrowserFilters } from "@/components/listing/listing-browser";
 import { listings } from "@/data/listings";
-import { ANYWHERE } from "@/lib/destinations";
+import { getI18n } from "@/i18n/server";
+import { ANYWHERE, cities, propertyTypes } from "@/lib/destinations";
+import { firstParam, parseStay } from "@/lib/search-params";
+import type { PropertyType } from "@/types/listing";
 
-export default async function ListingsIndexPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const params = await searchParams;
+export async function generateMetadata(): Promise<Metadata> {
+  const { d } = await getI18n();
+  return { title: d.nav.findStay };
+}
 
-  const destination = typeof params.destination === "string" ? params.destination : undefined;
-  const guests = typeof params.guests === "string" ? Number(params.guests) : undefined;
+export default async function ListingsPage(props: PageProps<"/listing">) {
+  const params = await props.searchParams;
 
-  const filtered = listings.filter((listing) => {
-    if (destination && destination !== ANYWHERE && listing.city !== destination) return false;
-    if (guests && guests > 1 && listing.guests < guests) return false;
-    return true;
-  });
+  const city = firstParam(params.city);
+  const type = firstParam(params.type) as PropertyType | undefined;
 
-  const hasFilters = Boolean(destination) || Boolean(guests && guests > 1);
+  const initial: BrowserFilters = {
+    city: city && cities.includes(city) ? city : ANYWHERE,
+    district: "",
+    moveIn: firstParam(params.moveIn) ?? "",
+    stay: parseStay(firstParam(params.stay)) ?? { amount: 1, unit: "months" },
+    types: type && propertyTypes.includes(type) ? [type] : [],
+    maxMonthly: 1500,
+    minBedrooms: 0,
+    billsIncluded: false,
+    fullyVerifiedOnly: false,
+    furnishedOnly: false,
+  };
 
-  return (
-    <div>
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 pt-10 sm:px-6">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold text-foreground">
-            {destination && destination !== ANYWHERE ? `Stays in ${destination}` : "All stays in Cambodia"}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {filtered.length} {filtered.length === 1 ? "place" : "places"} to stay
-            {guests && guests > 1 ? ` for ${guests} guests` : ""}
-          </p>
-        </div>
+  // Keyed on the query so a new search from the navbar/hero resets filter state.
+  const key = JSON.stringify(params);
 
-        <Suspense fallback={<div className="h-14 rounded-xl border border-border bg-card" />}>
-          <ListingFilterBar />
-        </Suspense>
-      </div>
-
-      {filtered.length === 0 && hasFilters ? (
-        <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6">
-          <p className="text-sm text-muted-foreground">
-            No stays match those filters yet.{" "}
-            <Link href="/listing" className="text-primary-sage underline underline-offset-4">
-              Clear filters
-            </Link>{" "}
-            to see everything.
-          </p>
-        </div>
-      ) : (
-        <HomeListings listings={filtered} />
-      )}
-    </div>
-  );
+  return <ListingBrowser key={key} listings={listings} initial={initial} />;
 }

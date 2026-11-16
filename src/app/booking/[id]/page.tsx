@@ -1,92 +1,123 @@
+import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { addDays, parseISO } from "date-fns";
+import { BadgeCheck, ChevronLeft } from "lucide-react";
 
 import { BookingConfirm } from "@/components/booking/booking-confirm";
-import { getListingById } from "@/data/listings";
+import { CheckoutDates } from "@/components/booking/checkout-dates";
+import { getListingById, isFullyVerified } from "@/data/listings";
+import { getI18n } from "@/i18n/server";
+import { formatUSD, quoteStay, stayToNights } from "@/lib/pricing";
+import { firstParam, parseStay } from "@/lib/search-params";
 
-const SERVICE_FEE_RATE = 0.12;
-const CLEANING_FEE = 10;
-
-function defaultDate(offsetDays: number) {
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
-  return d.toISOString().slice(0, 10);
-}
-
-function nightsBetween(checkIn: string, checkOut: string) {
-  const diff = (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86_400_000;
-  return Math.max(1, Math.round(diff));
+export async function generateMetadata(): Promise<Metadata> {
+  const { d } = await getI18n();
+  return { title: d.checkout.title };
 }
 
 export default async function BookingPage(props: PageProps<"/booking/[id]">) {
   const { id } = await props.params;
   const searchParams = await props.searchParams;
   const listing = getListingById(id);
+  if (!listing) notFound();
 
-  if (!listing) {
-    notFound();
-  }
+  const { d, t, date, lt } = await getI18n();
+  const c = d.checkout;
 
-  const checkIn = typeof searchParams.checkIn === "string" ? searchParams.checkIn : defaultDate(7);
-  const checkOut = typeof searchParams.checkOut === "string" ? searchParams.checkOut : defaultDate(10);
-  const guests = typeof searchParams.guests === "string" ? Number(searchParams.guests) : 2;
+  const moveIn = firstParam(searchParams.moveIn) ?? listing.availableFrom;
+  const stay = parseStay(firstParam(searchParams.stay)) ?? { amount: 1, unit: "months" as const };
+  const guests = Math.max(1, Number(firstParam(searchParams.guests)) || 1);
 
-  const nights = nightsBetween(checkIn, checkOut);
-  const subtotal = nights * listing.pricePerNight;
-  const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE);
-  const total = subtotal + serviceFee + CLEANING_FEE;
+  const nights = stayToNights(stay);
+  const quote = quoteStay(listing.pricing, nights);
+  const moveOut = addDays(parseISO(moveIn), nights);
+  const ownerFirstName = listing.owner.name.split(" ")[0];
+  const rateLabel = d.rate[quote.tier](formatUSD(quote.rate));
+  const firstRent = quote.dueAtBooking - quote.deposit;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Confirm and pay</h1>
+    <div className="mx-auto max-w-6xl px-4 pt-6 pb-24 sm:px-6">
+      <Link
+        href={`/listing/${listing.id}`}
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ChevronLeft className="size-4" />
+        {c.backToListing}
+      </Link>
+      <h1 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-dark-forest">{c.title}</h1>
 
-      <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-        <BookingConfirm listing={listing} checkIn={checkIn} checkOut={checkOut} guests={guests} total={total} />
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px]">
+        <BookingConfirm ownerFirstName={ownerFirstName} listingTitle={lt(listing).text} dueAtBooking={quote.dueAtBooking} />
 
-        <div className="flex flex-col gap-4 rounded-xl border border-border p-4">
-          <div className="flex gap-3">
-            <div className="relative size-20 shrink-0 overflow-hidden rounded-lg">
-              <Image src={listing.images[0]} alt={listing.title} fill className="object-cover" />
+        <aside className="h-fit rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-24">
+          <div className="flex gap-4">
+            <div className="relative size-24 shrink-0 overflow-hidden rounded-xl">
+              <Image src={listing.images[0]} alt={lt(listing).text} fill sizes="96px" className="object-cover" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-sm leading-snug font-semibold" lang={lt(listing).lang}>
+                {lt(listing).text}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {t(listing.district)}, {t(listing.city)}
+              </p>
+              {isFullyVerified(listing) && (
+                <span className="flex items-center gap-1 text-xs font-semibold text-dark-forest">
+                  <BadgeCheck className="size-3.5 text-primary-sage" />
+                  {d.verified.full}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-5 text-sm">
+            <div>
+              <dt className="text-xs text-muted-foreground">{d.book.moveIn}</dt>
+              <dd className="font-medium">{date(moveIn, "EEE, MMM d, yyyy")}</dd>
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">{listing.title}</p>
-              <p className="text-sm text-muted-foreground">
-                {listing.city}, {listing.province}
-              </p>
+              <dt className="text-xs text-muted-foreground">{c.moveOut}</dt>
+              <dd className="font-medium">{date(moveOut, "EEE, MMM d, yyyy")}</dd>
             </div>
-          </div>
+            <div>
+              <dt className="text-xs text-muted-foreground">{c.length}</dt>
+              <dd className="font-medium">{d.stay.format(stay)}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted-foreground">{c.guests}</dt>
+              <dd className="font-medium">{guests}</dd>
+            </div>
+          </dl>
+          <CheckoutDates listing={listing} moveIn={moveIn} stay={stay} guests={guests} />
 
-          <div className="flex flex-col gap-2 text-sm">
-            <div className="flex justify-between text-muted-foreground">
-              <span>Dates</span>
-              <span>
-                {checkIn} → {checkOut}
-              </span>
+          <dl className="mt-5 flex flex-col gap-2 border-t border-border pt-5 text-sm">
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">{c.rentWith(rateLabel)}</dt>
+              <dd className="tabular">{formatUSD(quote.rentTotal)}</dd>
             </div>
-            <div className="flex justify-between text-muted-foreground">
-              <span>Guests</span>
-              <span>{guests}</span>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">{d.book.serviceFee}</dt>
+              <dd className="font-medium text-success">$0</dd>
             </div>
-            <div className="flex justify-between text-muted-foreground">
-              <span>
-                ${listing.pricePerNight} x {nights} night{nights > 1 ? "s" : ""}
-              </span>
-              <span>${subtotal}</span>
+            {quote.deposit > 0 && (
+              <div className="flex justify-between gap-3">
+                <dt className="text-muted-foreground">{d.book.deposit}</dt>
+                <dd className="tabular">{formatUSD(quote.deposit)}</dd>
+              </div>
+            )}
+            <div className="mt-2 flex justify-between gap-3 border-t border-border pt-3 text-base font-semibold">
+              <dt>{d.book.dueWhenAccepted}</dt>
+              <dd className="tabular">{formatUSD(quote.dueAtBooking)}</dd>
             </div>
-            <div className="flex justify-between text-muted-foreground">
-              <span>Cleaning fee</span>
-              <span>${CLEANING_FEE}</span>
-            </div>
-            <div className="flex justify-between text-muted-foreground">
-              <span>Service fee</span>
-              <span>${serviceFee}</span>
-            </div>
-            <div className="mt-2 flex justify-between border-t border-border pt-2 font-medium text-foreground">
-              <span>Total</span>
-              <span>${total}</span>
-            </div>
-          </div>
-        </div>
+            {quote.laterPayments > 0 && firstRent < quote.rentTotal && (
+              <p className="text-xs text-muted-foreground">
+                {c.remaining(formatUSD(quote.rentTotal - firstRent), quote.laterPayments)}
+              </p>
+            )}
+          </dl>
+        </aside>
       </div>
     </div>
   );

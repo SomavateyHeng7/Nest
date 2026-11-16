@@ -4,56 +4,116 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Nest brand palette
+ * forest  #294236  — primary brand, headings, primary actions
+ * sage    #6B8F71  — supportive accents, verified states
+ * cream   #F7F3EA  — page background
+ * clay    #C9825A  — the single "do it" accent (book, request, save)
+ */
 :root {
-  --color-primary-sage: #6B8F71;
-  --color-dark-forest: #294236;
-  --color-background-cream: #F7F3EA;
-  --color-surface-white: #FFFFFF;
-  --color-accent-terracotta: #C9825A;
-  --color-text-charcoal: #252525;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --brand-forest: #294236;
+  --brand-sage: #6b8f71;
+  --brand-cream: #f7f3ea;
+  --brand-clay: #c9825a;
+  --brand-clay-strong: #b06c45;
+  --brand-surface: #ffffff;
+  --brand-ink: #1f2a24;
+
+  --background: #f7f3ea;
+  --foreground: #1f2a24;
+  --card: #ffffff;
+  --card-foreground: #1f2a24;
+  --popover: #ffffff;
+  --popover-foreground: #1f2a24;
+  --primary: #294236;
+  --primary-foreground: #f7f3ea;
+  --secondary: #ece6d8;
+  --secondary-foreground: #294236;
+  --muted: #efe9dd;
+  --muted-foreground: #646a63;
+  --accent: #e4ece5;
+  --accent-foreground: #294236;
+  --destructive: #b4412f;
+  --success: #3f7a4f;
+  --warning: #b7791f;
+  --border: #e3dccd;
+  --input: #d9d1c0;
+  --ring: #6b8f71;
+  --chart-1: #294236;
+  --chart-2: #6b8f71;
+  --chart-3: #c9825a;
+  --chart-4: #a7b8a3;
+  --chart-5: #e2c2a8;
+  --radius: 0.75rem;
+  --sidebar: #fbf9f4;
+  --sidebar-foreground: #1f2a24;
+  --sidebar-primary: #294236;
+  --sidebar-primary-foreground: #f7f3ea;
+  --sidebar-accent: #ece6d8;
+  --sidebar-accent-foreground: #294236;
+  --sidebar-border: #e3dccd;
+  --sidebar-ring: #6b8f71;
+}
+
+.dark {
+  --brand-surface: #18231d;
+  --brand-ink: #eee9de;
+  --brand-forest: #a9c8ae;
+  --brand-sage: #8fb596;
+  --brand-clay: #d8956d;
+  --brand-clay-strong: #e3a681;
+
+  --background: #111915;
+  --foreground: #eee9de;
+  --card: #18231d;
+  --card-foreground: #eee9de;
+  --popover: #1b2721;
+  --popover-foreground: #eee9de;
+  --primary: #a9c8ae;
+  --primary-foreground: #111915;
+  --secondary: #223029;
+  --secondary-foreground: #eee9de;
+  --muted: #1e2a24;
+  --muted-foreground: #a3aba3;
+  --accent: #23332a;
+  --accent-foreground: #d6e6d8;
+  --destructive: #e07a66;
+  --success: #7fbf8e;
+  --warning: #e0b05c;
+  --border: rgb(255 255 255 / 0.09);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #8fb596;
+  --chart-1: #a9c8ae;
+  --chart-2: #6b8f71;
+  --chart-3: #d8956d;
+  --chart-4: #4f6b55;
+  --chart-5: #8a6a55;
+  --sidebar: #141e19;
+  --sidebar-foreground: #eee9de;
+  --sidebar-primary: #a9c8ae;
+  --sidebar-primary-foreground: #111915;
+  --sidebar-accent: #223029;
+  --sidebar-accent-foreground: #eee9de;
+  --sidebar-border: rgb(255 255 255 / 0.09);
+  --sidebar-ring: #8fb596;
 }
 
 @theme inline {
-  --color-primary-sage: #6B8F71;
-  --color-dark-forest: #294236;
-  --color-background-cream: #F7F3EA;
-  --color-surface-white: #FFFFFF;
-  --color-accent-terracotta: #C9825A;
-  --color-text-charcoal: #252525;
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
+  --color-primary-sage: var(--brand-sage);
+  --color-dark-forest: var(--brand-forest);
+  --color-background-cream: var(--brand-cream);
+  --color-surface-white: var(--brand-surface);
+  --color-accent-terracotta: var(--brand-clay);
+  --color-terracotta-strong: var(--brand-clay-strong);
+  --color-text-charcoal: var(--brand-ink);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --font-sans: var(--font-geist-sans), var(--font-khmer), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-fraunces), var(--font-khmer), ui-serif, Georgia, serif;
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -94,48 +154,6 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-body {
-  background: var(--color-background-cream);
-  color: var(--color-text-charcoal);
-}
-
-.dark {
-  --color-background-cream: #294236;
-  --color-text-charcoal: #F7F3EA;
-  --color-surface-white: #1E2F27;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -145,5 +163,42 @@ body {
   }
   html {
     @apply font-sans;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  /*
+   * Khmer script stacks vowels and subscript consonants above and below the
+   * line, so tight Latin leading clips it. Loosen line-height and drop the
+   * letter-spacing/italic treatments that only make sense for Latin.
+   */
+  html:lang(km) {
+    line-height: 1.7;
+  }
+  html:lang(km) :is(h1, h2, h3, p, span, a, button, label, li, dt, dd, td, th) {
+    letter-spacing: normal !important;
+  }
+  html:lang(km) :is(h1, h2, h3) {
+    line-height: 1.4 !important;
+  }
+  html:lang(km) .italic {
+    font-style: normal;
+  }
+  html:lang(km) .uppercase {
+    text-transform: none;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -1,127 +1,176 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Star } from "lucide-react";
+import { AlertCircle, CalendarDays, ChevronDown, MessageCircle, Minus, Plus, ShieldCheck } from "lucide-react";
 
+import { StayCalendar } from "@/components/listing/stay-calendar";
+import { useStayDraft } from "@/components/listing/stay-draft";
+import { StayLengthPicker } from "@/components/listing/stay-length-picker";
+import { useProblemText } from "@/components/listing/use-problem-text";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import type { Listing } from "@/types/listing";
+import { useI18n } from "@/i18n/client";
+import { formatUSD, quoteStay } from "@/lib/pricing";
+import { serializeStay } from "@/lib/search-params";
+import { cn } from "@/lib/utils";
 
-const SERVICE_FEE_RATE = 0.12;
-const CLEANING_FEE = 10;
-
-function defaultDate(offsetDays: number) {
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
-  return d.toISOString().slice(0, 10);
-}
-
-export function BookingSidebar({ listing }: { listing: Listing }) {
+export function BookingSidebar() {
   const router = useRouter();
-  const [checkIn, setCheckIn] = useState(defaultDate(7));
-  const [checkOut, setCheckOut] = useState(defaultDate(10));
-  const [guests, setGuests] = useState(2);
+  const { d, date } = useI18n();
+  const { listing, moveIn, stay, setStay, guests, setGuests, nights, moveOut, problem } = useStayDraft();
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  const nights = useMemo(() => {
-    const diff = (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86_400_000;
-    return Math.max(1, Math.round(diff));
-  }, [checkIn, checkOut]);
+  const quote = quoteStay(listing.pricing, nights);
+  const ownerFirst = listing.owner.name.split(" ")[0];
 
-  const subtotal = nights * listing.pricePerNight;
-  const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE);
-  const total = subtotal + serviceFee + CLEANING_FEE;
+  const problemText = useProblemText();
 
-  function handleReserve() {
-    const params = new URLSearchParams({
-      checkIn,
-      checkOut,
-      guests: String(guests),
-    });
+  function handleRequest() {
+    const params = new URLSearchParams({ moveIn, stay: serializeStay(stay), guests: String(guests) });
     router.push(`/booking/${listing.id}?${params.toString()}`);
   }
 
   return (
-    <Card className="sticky top-24 ring-foreground/10">
-      <CardContent className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3 lg:sticky lg:top-24">
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-lg shadow-black/[0.04]">
         <div className="flex items-baseline justify-between">
-          <p className="text-lg">
-            <span className="font-semibold">${listing.pricePerNight}</span>{" "}
-            <span className="text-sm text-muted-foreground">/ night</span>
+          <p>
+            <span className="text-2xl font-semibold tabular">{formatUSD(listing.pricing.monthly)}</span>
+            <span className="text-sm text-muted-foreground"> {d.common.perMonth}</span>
           </p>
-          <span className="flex items-center gap-1 text-sm text-muted-foreground">
-            <Star className="size-3.5 fill-current text-accent-terracotta" />
-            {listing.rating.toFixed(2)} · {listing.reviewCount} reviews
-          </span>
+          <p className="text-sm text-muted-foreground tabular">
+            {formatUSD(listing.pricing.nightly)} {d.common.perNight}
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 rounded-lg border border-border p-1">
-          <label className="flex flex-col gap-0.5 px-2 py-1">
-            <span className="text-xs font-medium text-muted-foreground">Check in</span>
-            <Input
-              type="date"
-              value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
-              className="h-auto border-0 p-0 text-sm shadow-none focus-visible:ring-0"
-            />
-          </label>
-          <label className="flex flex-col gap-0.5 border-l border-border px-2 py-1">
-            <span className="text-xs font-medium text-muted-foreground">Check out</span>
-            <Input
-              type="date"
-              value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
-              className="h-auto border-0 p-0 text-sm shadow-none focus-visible:ring-0"
-            />
-          </label>
-          <label className="col-span-2 flex flex-col gap-0.5 border-t border-border px-2 py-1">
-            <span className="text-xs font-medium text-muted-foreground">Guests</span>
-            <Input
-              type="number"
-              min={1}
-              max={listing.guests}
-              value={guests}
-              onChange={(e) => setGuests(Number(e.target.value))}
-              className="h-auto border-0 p-0 text-sm shadow-none focus-visible:ring-0"
-            />
-          </label>
+        <div className="mt-4 overflow-hidden rounded-xl border border-input">
+          <button
+            type="button"
+            onClick={() => setPickerOpen((v) => !v)}
+            aria-expanded={pickerOpen}
+            aria-label={d.book.chooseMoveIn}
+            className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left hover:bg-muted/50"
+          >
+            <span>
+              <span className="block text-xs font-semibold">{d.book.moveIn}</span>
+              <span className="flex items-center gap-1.5 text-sm">
+                <CalendarDays className="size-3.5 text-primary-sage" />
+                {moveIn ? date(moveIn, "EEE, MMM d, yyyy") : d.book.chooseDate}
+              </span>
+            </span>
+            <ChevronDown className={cn("size-4 text-muted-foreground transition-transform", pickerOpen && "rotate-180")} />
+          </button>
+          {pickerOpen && (
+            <div className="border-t border-input p-2">
+              <StayCalendar
+                months={1}
+                onComplete={() => setPickerOpen(false)}
+                className="[&_[data-slot=calendar]]:border-0 [&_[data-slot=calendar]]:p-0"
+              />
+              <div className="mt-2 flex items-center justify-between">
+                <a
+                  href="#availability"
+                  className="text-xs font-medium text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                >
+                  {d.book.seeCalendar}
+                </a>
+                <Button variant="outline" className="h-8 px-3" onClick={() => setPickerOpen(false)}>
+                  {d.book.done}
+                </Button>
+              </div>
+            </div>
+          )}
+          <div className="border-t border-input px-3 py-2.5">
+            <span className="mb-1.5 block text-xs font-semibold">{d.book.stayLength}</span>
+            <StayLengthPicker value={stay} onChange={setStay} compact />
+          </div>
+          <div className="flex items-center justify-between border-t border-input px-3 py-2.5">
+            <span>
+              <span className="block text-xs font-semibold">{d.book.guests}</span>
+              <span className="text-sm text-muted-foreground">{d.common.upTo(listing.maxGuests)}</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <button
+                type="button"
+                aria-label={d.book.fewerGuests}
+                disabled={guests <= 1}
+                onClick={() => setGuests(guests - 1)}
+                className="grid size-7 place-items-center rounded-full border border-input disabled:opacity-40"
+              >
+                <Minus className="size-3.5" />
+              </button>
+              <span className="w-4 text-center text-sm font-semibold tabular">{guests}</span>
+              <button
+                type="button"
+                aria-label={d.book.moreGuests}
+                disabled={guests >= listing.maxGuests}
+                onClick={() => setGuests(guests + 1)}
+                className="grid size-7 place-items-center rounded-full border border-input disabled:opacity-40"
+              >
+                <Plus className="size-3.5" />
+              </button>
+            </span>
+          </div>
         </div>
+
+        {moveOut && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {d.book.moveOutOn(d.stay.format(stay), date(moveOut, "EEE, MMM d, yyyy"))}
+          </p>
+        )}
+
+        {problem && (
+          <p className="mt-3 flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-sm text-foreground">
+            <AlertCircle className="mt-0.5 size-4 shrink-0 text-warning" />
+            {problemText(problem)}
+          </p>
+        )}
 
         <Button
-          size="lg"
-          className="h-11 w-full bg-accent-terracotta text-white hover:bg-accent-terracotta/90"
-          onClick={handleReserve}
+          className="mt-4 h-12 w-full bg-accent-terracotta text-base text-white hover:bg-terracotta-strong"
+          disabled={Boolean(problem)}
+          onClick={handleRequest}
         >
-          Reserve
+          {d.book.request}
         </Button>
-        <p className="text-center text-xs text-muted-foreground">You won&apos;t be charged yet</p>
+        <p className="mt-2 text-center text-xs text-muted-foreground">{d.book.notCharged(ownerFirst)}</p>
 
-        <Separator />
+        <dl className="mt-5 flex flex-col gap-2 border-t border-border pt-4 text-sm">
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted-foreground">{d.book.rent(d.rate[quote.tier](formatUSD(quote.rate)))}</dt>
+            <dd className="tabular">{formatUSD(quote.rentTotal)}</dd>
+          </div>
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted-foreground">{d.book.serviceFee}</dt>
+            <dd className="font-medium text-success">$0</dd>
+          </div>
+          {quote.deposit > 0 && (
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">{d.book.deposit}</dt>
+              <dd className="tabular">{formatUSD(quote.deposit)}</dd>
+            </div>
+          )}
+          <div className="mt-1 flex justify-between gap-3 border-t border-border pt-3 font-semibold">
+            <dt>{d.book.dueWhenAccepted}</dt>
+            <dd className="tabular">{formatUSD(quote.dueAtBooking)}</dd>
+          </div>
+          {quote.laterPayments > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {d.book.laterPayments(quote.laterPayments, formatUSD(listing.pricing.monthly))}
+            </p>
+          )}
+        </dl>
+      </div>
 
-        <div className="flex flex-col gap-2 text-sm">
-          <div className="flex justify-between text-muted-foreground">
-            <span>
-              ${listing.pricePerNight} x {nights} night{nights > 1 ? "s" : ""}
-            </span>
-            <span>${subtotal}</span>
-          </div>
-          <div className="flex justify-between text-muted-foreground">
-            <span>Cleaning fee</span>
-            <span>${CLEANING_FEE}</span>
-          </div>
-          <div className="flex justify-between text-muted-foreground">
-            <span>Service fee</span>
-            <span>${serviceFee}</span>
-          </div>
-          <Separator />
-          <div className="flex justify-between font-medium text-foreground">
-            <span>Total</span>
-            <span>${total}</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      <Button variant="outline" className="h-11 gap-2" nativeButton={false} render={<Link href="/messages" />}>
+        <MessageCircle className="size-4" />
+        {d.book.message(ownerFirst)}
+      </Button>
+      <p className="flex items-start gap-2 px-1 text-xs text-muted-foreground">
+        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary-sage" />
+        {d.book.protection}
+      </p>
+    </div>
   );
 }

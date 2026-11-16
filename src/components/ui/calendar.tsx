@@ -10,6 +10,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { format } from "date-fns"
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "lucide-react"
 
 function Calendar({
@@ -184,7 +185,9 @@ function CalendarDayButton({
   className,
   day,
   modifiers,
-  locale,
+  // Accepted so it isn't forwarded to the DOM; no longer used for data-day.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  locale: _locale,
   ...props
 }: React.ComponentProps<typeof DayButton> & { locale?: Partial<Locale> }) {
   const defaultClassNames = getDefaultClassNames()
@@ -198,7 +201,9 @@ function CalendarDayButton({
     <Button
       variant="ghost"
       size="icon"
-      data-day={day.date.toLocaleDateString(locale?.code)}
+      // ISO date, not toLocaleDateString: Node and browsers format some locales (e.g. km) differently,
+      // which caused a hydration mismatch.
+      data-day={format(day.date, "yyyy-MM-dd")}
       data-selected-single={
         modifiers.selected &&
         !modifiers.range_start &&

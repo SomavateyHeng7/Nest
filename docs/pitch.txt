@@ -1,0 +1,33 @@
+One-line pitch: Nest makes flexible residential rentals simple, helping people find, compare, and book verified homes, rooms, and condos in Cambodia from days to months.
+
+Problem & who has it:
+Finding a reliable place to stay in Cambodia for a few days, weeks, or months is fragmented. Renters rely on Facebook, classifieds, agents, and hotel platforms, making it difficult to compare properties, verify listings, check availability, and book with confidence. Property owners also struggle to monetize vacant rooms and units. Our target users are travelers, students, professionals, families, and property owners.
+
+Your solution / what you'll build:
+Nest is a Cambodia-first marketplace for flexible residential stays. Renters can discover verified condos, rooms, apartments, service apartments, and homes, compare prices and amenities, check availability, and book for the period they need. Property owners can list their properties, manage availability, receive bookings, and track their income through one platform.
+
+Why now? What changed that makes this possible?
+More people are looking for flexible living options, while Cambodia has a growing supply of condos, apartments, rooms, and residential properties. However, rental discovery and booking remain fragmented across social media, classified platforms, agents, and accommodation platforms. At the same time, AI and vibe-coding significantly reduce the cost and time required to build and test a marketplace, allowing us to validate the idea quickly with real users.
+
+Why are you the right fit for this?
+We have strong technical experience combined with an entrepreneurial mindset. We understand software development, cloud technologies, backend systems, and modern web applications, which allows us to build and improve the product ourselves. With AI-assisted development, we can move quickly from an idea to a working MVP, test it with real users, and continuously improve it based on their feedback.
+At the same time, we study current market needs, customer behavior, and business trends. We do not want to build technology for the sake of technology. We want to use technology to solve real problems, make everyday life easier, and create practical value for both customers and businesses.
+Our technical background helps us turn ideas into products quickly, while our entrepreneurial mindset helps us understand the market, validate the business model, and adapt to customer needs. In the long term, we believe our platform can create opportunities for property owners, support local businesses, and contribute to the growth of the local economy.
+
+Domain expertise / unfair advantage
+Our advantage is that we are building for the Cambodian rental market from the ground up. We understand local rental behavior, communication, payment methods, property verification, and flexible rental needs, while having the technical ability to build and iterate the product ourselves. This lets us test quickly with real users and adapt Nest based on how the local market actually behaves. As we grow, our verified property network, rental data, and transaction history can become a long-term competitive advantage.
+
+Technical Background: Technical team
+
+Progress so far:
+We are currently at the early validation stage. We have defined the core problem, target users, MVP scope, business model, and initial competitive landscape. Our next step is to build the MVP and validate it with renters and property owners in Phnom Penh.
+
+Competitors/alternatives - what do you understand that they don’t?
+Our alternatives include Khmer24, Realestate.com.kh, Airbnb, Facebook rental groups, and traditional real-estate agents. We believe the gap is between property discovery and actual rental booking. Classifieds and social media provide listings but often require manual communication and negotiation, while hotel platforms focus mainly on short stays. Nest focuses specifically on flexible residential rentals, combining verified properties, availability, transparent pricing, booking, payment, and renter-owner communication in one experience.
+
+How will this make money?
+Nest charges a one-time placement fee per completed booking, deducted from the first month’s rent. There is no recurring commission.
+The fee scales with term: 50% of one month’s rent for stays of one to three months, 75% for four to six months, and 100% for seven to twelve months. Renters pay nothing. This sits below the customary agent commission of one full month’s rent, and applies to the shorter durations agents rarely service.
+
+What are your goals for the program?
+Our primary goal is to turn Nest from an idea into a validated MVP. We want to launch the core renter and owner journeys, onboard our first properties, test real rental demand, and collect feedback from both sides of the marketplace. We also want to validate our pricing and commission model, identify our strongest initial market segment, and finish the program with evidence that we are solving a real problem rather than simply building another property listing platform.

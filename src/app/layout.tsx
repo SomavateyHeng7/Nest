@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist, Geist_Mono, Kantumruy_Pro } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { CompareProvider } from "@/components/compare/compare-provider";
+import { CompareTray } from "@/components/compare/compare-tray";
+import { LocaleProvider } from "@/i18n/client";
+import { getI18n } from "@/i18n/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,29 +19,47 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Nest Cambodia — Find your stay",
-  description:
-    "Browse apartments, villas, guesthouses, and riverside bungalows across Cambodia.",
-};
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  axes: ["opsz"],
+});
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+// Geist and Fraunces have no Khmer glyphs; Kantumruy Pro covers Khmer script and
+// is listed after them in the font stacks so Latin text keeps its look.
+const kantumruy = Kantumruy_Pro({
+  variable: "--font-khmer",
+  subsets: ["khmer"],
+  weight: ["400", "500", "600", "700"],
+});
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { d } = await getI18n();
+  return {
+    title: { default: d.meta.title, template: "%s · Nest" },
+    description: d.meta.description,
+  };
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const { locale } = await getI18n();
+
   return (
     <html
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${kantumruy.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+      <body className="flex min-h-full flex-col">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <LocaleProvider initialLocale={locale}>
+            <CompareProvider>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <CompareTray />
+            </CompareProvider>
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>
