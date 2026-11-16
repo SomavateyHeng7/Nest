@@ -3,11 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { BadgeCheck, CalendarDays, Check, MessageCircle, Wallet } from "lucide-react";
 
-import { FeeCalculator } from "@/components/owners/fee-calculator";
-import { Button } from "@/components/ui/button";
-import { listings } from "@/data/listings";
+import { FeeCalculator } from "@/features/owner/components/fee-calculator";
+import { Button } from "@/shared/ui/button";
+import { listings } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { placementFeeTiers } from "@/lib/pricing";
+import { placementFeeTiers } from "@/features/stays/lib/pricing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();

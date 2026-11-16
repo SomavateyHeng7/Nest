@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CircleCheck, Landmark } from "lucide-react";
 
-import { PreferencesPanel } from "@/components/layout/preferences";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { currentUser } from "@/data/dashboard";
+import { PreferencesPanel } from "@/shared/layout/preferences";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { currentUser } from "@/features/account/current-user";
 import { getI18n } from "@/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {

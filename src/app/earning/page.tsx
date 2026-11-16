@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import { differenceInCalendarDays, parseISO } from "date-fns";
 import { Info } from "lucide-react";
 
-import { EarningsChart } from "@/components/dashboard/earnings-chart";
-import { OwnerShell } from "@/components/dashboard/owner-nav";
-import { StatusBadge } from "@/components/dashboard/status-badge";
-import { StatTile } from "@/components/ui/stat-tile";
-import { currentUser, monthlyIncome, ownerBookings } from "@/data/dashboard";
-import { getListingById } from "@/data/listings";
+import { EarningsChart } from "@/features/owner/components/earnings-chart";
+import { OwnerShell } from "@/features/owner/components/owner-nav";
+import { StatusBadge } from "@/features/booking/components/status-badge";
+import { StatTile } from "@/shared/ui/stat-tile";
+import { currentUser } from "@/features/account/current-user";
+import { monthlyIncome } from "@/features/owner/data";
+import { ownerBookings } from "@/features/booking/data";
+import { getListingById } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD, placementFee, placementFeeTiers } from "@/lib/pricing";
+import { formatUSD, placementFee, placementFeeTiers } from "@/features/stays/lib/pricing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();

@@ -1,6 +1,6 @@
-import type { DurationUnit, RateTier, StayLength } from "@/lib/pricing";
-import type { BookingStatus, StayStatus } from "@/types/dashboard";
-import type { PropertyType } from "@/types/listing";
+import type { DurationUnit, RateTier, StayLength } from "@/features/stays/lib/pricing";
+import type { BookingStatus, StayStatus } from "@/features/booking/types";
+import type { PropertyType } from "@/features/listings/types";
 
 type Status = StayStatus | BookingStatus | "live" | "paused" | "in-review";
 
@@ -846,7 +846,7 @@ export const en = {
     staff: "Staff",
     backToSite: "Back to site",
     demoNote: "Prototype — you’re viewing as Nest staff. Actions only change this screen.",
-    nav: { overview: "Overview", verifications: "Verifications", bookings: "Bookings", users: "Users", reports: "Reports" },
+    nav: { overview: "Overview", applications: "Host applications", verifications: "Verifications", bookings: "Bookings", users: "Users", reports: "Reports" },
     sample: "Sample data",
     asTable: "View as table",
     asChart: "View as chart",
@@ -863,6 +863,7 @@ export const en = {
       replyHint: "Target: under 6 hours",
       hours: (h: number) => `${h} h`,
       attention: "Needs attention",
+      attentionApplications: (n: number) => `${n} host ${n === 1 ? "application" : "applications"} waiting for review`,
       attentionVerifications: (n: number) => `${n} listings waiting for verification`,
       attentionReports: (n: number, high: number) => `${n} open reports · ${high} high priority`,
       attentionRequests: (n: number) => `${n} booking requests waiting on owners`,
@@ -883,6 +884,48 @@ export const en = {
       colStep: "Step",
       colCount: "Count",
       colShare: "Share",
+    },
+    applications: {
+      title: "Host applications",
+      sub: "People applying to list on Nest. Check who they are before they can publish anything.",
+      tabs: { pending: "Pending", info: "Needs info", approved: "Approved", rejected: "Rejected" },
+      search: "Search by name, phone or email",
+      type: { owner: "Property owner", agent: "Agent / broker", manager: "Property manager" },
+      properties: (n: number) => `${n} ${n === 1 ? "property" : "properties"}`,
+      applied: (rel: string) => `Applied ${rel}`,
+      review: "Review",
+      details: "Details",
+      dialogTitle: "Review host application",
+      about: "About the applicant",
+      noNote: "No note added.",
+      plans: (n: number, city: string) => `Plans to list ${n} in ${city}`,
+      checks: { phone: "Phone number", identity: "ID document", selfie: "Selfie match", payout: "Payout account" },
+      idType: { "national-id": "National ID", passport: "Passport" },
+      phoneOk: "Verified",
+      phoneNo: "Not verified",
+      payoutOptional: "Can be added later",
+      approveCheck: "Approve",
+      askAgain: "Ask to re-upload",
+      flagsTitle: "Check before approving",
+      flags: {
+        "duplicate-phone": "This phone number is also used by another account.",
+        "agent-no-authority": "Applying for other people’s properties — authority from the owners hasn’t been shown.",
+        "name-mismatch": "The name on the ID differs from the account name.",
+      },
+      needsAll: "To approve this host, the phone must be verified and the ID document and selfie match approved.",
+      afterApprove: "Approved hosts can create listings. Each listing still goes through verification before it goes live.",
+      reasonLabel: "Message to the applicant",
+      infoReasons: ["Please re-upload a clearer photo of your ID", "Please add a selfie holding your ID", "Please show you’re allowed to rent this property out"],
+      rejectReasons: ["We couldn’t verify your identity", "Details don’t match your ID", "We can’t accept this type of property yet"],
+      approve: "Approve host",
+      requestInfo: "Request info",
+      reject: "Reject",
+      approvedOn: (when: string) => `Approved ${when}`,
+      rejectedOn: (when: string) => `Rejected ${when}`,
+      infoSentOn: (when: string) => `Info requested ${when}`,
+      reopen: "Move back to pending",
+      empty: "No applications here.",
+      close: "Close",
     },
     verify: {
       title: "Verifications",
@@ -960,6 +1003,10 @@ export const en = {
       empty: "No reports here.",
     },
     toast: {
+      hostApproved: (name: string) => `${name} approved as a host`,
+      hostRejected: (name: string) => `${name}’s application rejected`,
+      hostInfo: (name: string) => `Asked ${name} for more information`,
+      hostReopened: (name: string) => `${name}’s application moved back to pending`,
       docApproved: "Document approved",
       docRequested: (name: string) => `Asked ${name} to re-upload`,
       visitScheduled: (when: string) => `Visit scheduled for ${when}`,

@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import { Fraunces, Geist, Geist_Mono, Kantumruy_Pro } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
-import { ActivityProvider } from "@/components/activity/activity-provider";
-import { CompareProvider } from "@/components/compare/compare-provider";
-import { CompareTray } from "@/components/compare/compare-tray";
-import { ConnectionStatus } from "@/components/layout/connection-status";
-import { SiteOnly } from "@/components/layout/site-only";
-import { Toaster } from "@/components/ui/toast";
+import { ThemeProvider } from "@/shared/theme-provider";
+import { Navbar } from "@/shared/layout/navbar";
+import { Footer } from "@/shared/layout/footer";
+import { ActivityProvider } from "@/features/renter/components/activity-provider";
+import { CompareProvider } from "@/features/compare/components/compare-provider";
+import { CompareTray } from "@/features/compare/components/compare-tray";
+import { ConnectionStatus } from "@/shared/layout/connection-status";
+import { SiteOnly } from "@/shared/layout/site-only";
+import { Toaster } from "@/shared/ui/toast";
 import { LocaleProvider } from "@/i18n/client";
 import { getI18n } from "@/i18n/server";
+import { SITE_NAME, SITE_URL } from "@/shared/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,10 +39,20 @@ const kantumruy = Kantumruy_Pro({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { d } = await getI18n();
+  const { d, locale } = await getI18n();
   return {
-    title: { default: d.meta.title, template: "%s · Nest" },
+    metadataBase: new URL(SITE_URL),
+    title: { default: d.meta.title, template: `%s · ${SITE_NAME}` },
     description: d.meta.description,
+    applicationName: SITE_NAME,
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      title: d.meta.title,
+      description: d.meta.description,
+      locale: locale === "km" ? "km_KH" : "en_US",
+    },
+    twitter: { card: "summary_large_image", title: d.meta.title, description: d.meta.description },
   };
 }
 

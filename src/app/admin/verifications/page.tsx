@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { AdminHeader } from "@/components/admin/admin-header";
-import { VerificationQueue } from "@/components/admin/verification-queue";
+import { AdminHeader } from "@/features/admin/components/admin-header";
+import { VerificationQueue } from "@/features/admin/components/verification-queue";
 import { getI18n } from "@/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {

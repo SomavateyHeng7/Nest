@@ -19,10 +19,10 @@ import {
   X,
 } from "lucide-react";
 
-import { HeroSearch } from "@/components/listing/hero-search";
-import { ListingCard } from "@/components/listing/listing-card";
-import { Button } from "@/components/ui/button";
-import { listings } from "@/data/listings";
+import { HeroSearch } from "@/features/listings/components/hero-search";
+import { ListingCard } from "@/features/listings/components/listing-card";
+import { Button } from "@/shared/ui/button";
+import { listings } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
 
 const segmentMeta = [

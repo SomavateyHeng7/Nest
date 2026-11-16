@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import "./globals.css";
-import { ErrorScreen } from "@/components/errors/error-screen";
+import { ErrorScreen } from "@/shared/errors/error-screen";
 import { dictionaries } from "@/i18n";
 import { LOCALE_COOKIE, isLocale, type Locale } from "@/i18n/config";
 

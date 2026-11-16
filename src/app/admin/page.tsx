@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Flag, Inbox, TrendingUp } from "lucide-react";
+import { ArrowRight, BadgeCheck, Flag, Inbox, TrendingUp, UserPlus } from "lucide-react";
 
-import { AdminHeader } from "@/components/admin/admin-header";
-import { BarList } from "@/components/admin/bar-list";
-import { StatTile } from "@/components/ui/stat-tile";
-import { adminBookings, funnel, platformKpis, reports, stayMix, verificationQueue } from "@/data/admin";
+import { AdminHeader } from "@/features/admin/components/admin-header";
+import { BarList } from "@/features/admin/components/bar-list";
+import { StatTile } from "@/shared/ui/stat-tile";
+import { adminBookings, funnel, hostApplications, platformKpis, reports, stayMix, verificationQueue } from "@/features/admin/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD } from "@/lib/pricing";
+import { formatUSD } from "@/features/stays/lib/pricing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();
@@ -23,7 +23,10 @@ export default async function AdminOverview() {
   const pendingRequests = adminBookings.filter((b) => b.status === "pending").length;
   const highReports = reports.filter((r) => r.severity === "high").length;
 
+  const pendingApplications = hostApplications.filter((a) => a.status === "pending").length;
+
   const attention = [
+    { href: "/admin/applications", icon: UserPlus, text: o.attentionApplications(pendingApplications) },
     { href: "/admin/verifications", icon: BadgeCheck, text: o.attentionVerifications(verificationQueue.length) },
     { href: "/admin/reports", icon: Flag, text: o.attentionReports(reports.length, highReports), urgent: highReports > 0 },
     { href: "/admin/bookings", icon: Inbox, text: o.attentionRequests(pendingRequests) },
@@ -55,7 +58,7 @@ export default async function AdminOverview() {
 
       <section className="mt-8">
         <h2 className="mb-3 font-semibold">{o.attention}</h2>
-        <ul className="grid gap-3 md:grid-cols-3">
+        <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {attention.map(({ href, icon: Icon, text, urgent }) => (
             <li key={href}>
               <Link

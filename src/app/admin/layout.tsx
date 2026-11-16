@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Info } from "lucide-react";
 
-import { AdminNav } from "@/components/admin/admin-nav";
+import { AdminNav } from "@/features/admin/components/admin-nav";
 import { getI18n } from "@/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-import { ListingBrowser, type BrowserFilters } from "@/components/listing/listing-browser";
-import { listings } from "@/data/listings";
+import { ListingBrowser, type BrowserFilters } from "@/features/listings/components/listing-browser";
+import { listings } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { ANYWHERE, cities, propertyTypes } from "@/lib/destinations";
-import { firstParam, parseStay } from "@/lib/search-params";
-import type { PropertyType } from "@/types/listing";
+import { ANYWHERE, cities, propertyTypes } from "@/features/listings/lib/destinations";
+import { firstParam, parseISODate, parseStay } from "@/features/stays/lib/search-params";
+import type { PropertyType } from "@/features/listings/types";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();
@@ -21,7 +21,7 @@ export default async function ListingsPage(props: PageProps<"/listing">) {
   const initial: BrowserFilters = {
     city: city && cities.includes(city) ? city : ANYWHERE,
     district: "",
-    moveIn: firstParam(params.moveIn) ?? "",
+    moveIn: parseISODate(firstParam(params.moveIn)) ?? "",
     stay: parseStay(firstParam(params.stay)) ?? { amount: 1, unit: "months" },
     types: type && propertyTypes.includes(type) ? [type] : [],
     maxMonthly: 1500,

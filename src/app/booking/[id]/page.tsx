@@ -5,12 +5,12 @@ import { notFound } from "next/navigation";
 import { addDays, parseISO } from "date-fns";
 import { BadgeCheck, ChevronLeft } from "lucide-react";
 
-import { BookingConfirm } from "@/components/booking/booking-confirm";
-import { CheckoutDates } from "@/components/booking/checkout-dates";
-import { getListingById, isFullyVerified } from "@/data/listings";
+import { BookingConfirm } from "@/features/booking/components/booking-confirm";
+import { CheckoutDates } from "@/features/booking/components/checkout-dates";
+import { getListingById, isFullyVerified } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD, quoteStay, stayToNights } from "@/lib/pricing";
-import { firstParam, parseStay } from "@/lib/search-params";
+import { formatUSD, quoteStay, stayToNights } from "@/features/stays/lib/pricing";
+import { firstParam, parseISODate, parseStay } from "@/features/stays/lib/search-params";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();
@@ -26,7 +26,7 @@ export default async function BookingPage(props: PageProps<"/booking/[id]">) {
   const { d, t, date, lt } = await getI18n();
   const c = d.checkout;
 
-  const moveIn = firstParam(searchParams.moveIn) ?? listing.availableFrom;
+  const moveIn = parseISODate(firstParam(searchParams.moveIn)) ?? listing.availableFrom;
   const stay = parseStay(firstParam(searchParams.stay)) ?? { amount: 1, unit: "months" as const };
   const guests = Math.max(1, Number(firstParam(searchParams.guests)) || 1);
 

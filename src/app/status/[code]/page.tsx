@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { forbidden, notFound, unauthorized } from "next/navigation";
 
-import { MaintenanceScreen, OfflineScreen } from "@/components/errors/status-screens";
+import { MaintenanceScreen, OfflineScreen } from "@/shared/errors/status-screens";
 import { getI18n } from "@/i18n/server";
 
 export const metadata: Metadata = { robots: { index: false } };

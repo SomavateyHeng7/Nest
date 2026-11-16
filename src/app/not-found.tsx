@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { ErrorScreen } from "@/components/errors/error-screen";
-import { Button } from "@/components/ui/button";
+import { ErrorScreen } from "@/shared/errors/error-screen";
+import { Button } from "@/shared/ui/button";
 import { getI18n } from "@/i18n/server";
 
 export default async function NotFound() {

@@ -3,8 +3,8 @@ import { cookies } from "next/headers";
 import { defaultLocale, isLocale, LOCALE_COOKIE, type Locale } from "@/i18n/config";
 import { dictionaries, term, type Dictionary } from "@/i18n";
 import { formatDate, formatDateRange, formatRelative } from "@/i18n/format";
-import { listingTitle } from "@/lib/listing-text";
-import type { Listing } from "@/types/listing";
+import { listingTitle } from "@/features/listings/lib/listing-text";
+import type { Listing } from "@/features/listings/types";
 
 export async function getLocale(): Promise<Locale> {
   const value = (await cookies()).get(LOCALE_COOKIE)?.value;

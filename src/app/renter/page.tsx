@@ -4,15 +4,16 @@ import Link from "next/link";
 import { differenceInCalendarDays, parseISO } from "date-fns";
 import { KeyRound, MessageCircle, Receipt } from "lucide-react";
 
-import { ExtendStay } from "@/components/activity/extend-stay";
-import { RenterViewings, SavedHomes } from "@/components/activity/renter-sections";
-import { StatusBadge } from "@/components/dashboard/status-badge";
-import { Button } from "@/components/ui/button";
-import { currentUser, stays } from "@/data/dashboard";
-import { getListingById } from "@/data/listings";
+import { ExtendStay } from "@/features/renter/components/extend-stay";
+import { RenterViewings, SavedHomes } from "@/features/renter/components/renter-sections";
+import { StatusBadge } from "@/features/booking/components/status-badge";
+import { Button } from "@/shared/ui/button";
+import { currentUser } from "@/features/account/current-user";
+import { stays } from "@/features/booking/data";
+import { getListingById } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD } from "@/lib/pricing";
-import type { Stay } from "@/types/dashboard";
+import { formatUSD } from "@/features/stays/lib/pricing";
+import type { Stay } from "@/features/booking/types";
 
 type I18n = Awaited<ReturnType<typeof getI18n>>;
 

@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-import { ErrorScreen } from "@/components/errors/error-screen";
-import { ListingCard } from "@/components/listing/listing-card";
-import { Button } from "@/components/ui/button";
-import { listings } from "@/data/listings";
+import { ErrorScreen } from "@/shared/errors/error-screen";
+import { ListingCard } from "@/features/listings/components/listing-card";
+import { Button } from "@/shared/ui/button";
+import { listings } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
 
 /** A listing id that doesn't exist — usually a home that was paused or rented long-term. */

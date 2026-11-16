@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { LOCALE_COOKIE, type Locale } from "@/i18n/config";
 import { dictionaries, term } from "@/i18n";
 import { formatDate, formatDateRange, formatRelative } from "@/i18n/format";
-import { listingTitle } from "@/lib/listing-text";
-import type { Listing } from "@/types/listing";
+import { listingTitle } from "@/features/listings/lib/listing-text";
+import type { Listing } from "@/features/listings/types";
 
 interface LocaleContextValue {
   locale: Locale;

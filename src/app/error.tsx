@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import Link from "next/link";
 
-import { ErrorScreen } from "@/components/errors/error-screen";
-import { Button } from "@/components/ui/button";
+import { ErrorScreen } from "@/shared/errors/error-screen";
+import { Button } from "@/shared/ui/button";
 import { useI18n } from "@/i18n/client";
 
 // Error boundaries must be Client Components. Next 16 passes `retry` (re-fetch and re-render).

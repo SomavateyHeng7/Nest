@@ -3,15 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { BedDouble, CalendarCheck, Inbox, Percent, Plus, Wallet } from "lucide-react";
 
-import { BookingRequests } from "@/components/dashboard/booking-requests";
-import { OwnerShell } from "@/components/dashboard/owner-nav";
-import { OwnerViewings } from "@/components/dashboard/owner-viewings";
-import { StatusBadge } from "@/components/dashboard/status-badge";
-import { StatTile } from "@/components/ui/stat-tile";
-import { monthlyIncome, ownerBookings, ownerListingIds, ownerListingStatus, ownerViewings } from "@/data/dashboard";
-import { getListingById } from "@/data/listings";
+import { BookingRequests } from "@/features/owner/components/booking-requests";
+import { OwnerShell } from "@/features/owner/components/owner-nav";
+import { OwnerViewings } from "@/features/viewings/components/owner-viewings";
+import { StatusBadge } from "@/features/booking/components/status-badge";
+import { StatTile } from "@/shared/ui/stat-tile";
+import { monthlyIncome, ownerListingIds, ownerListingStatus } from "@/features/owner/data";
+import { ownerBookings } from "@/features/booking/data";
+import { ownerViewings } from "@/features/viewings/data";
+import { getListingById } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD } from "@/lib/pricing";
+import { formatUSD } from "@/features/stays/lib/pricing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();

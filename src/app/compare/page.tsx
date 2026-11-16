@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CompareTable } from "@/components/compare/compare-table";
+import { CompareTable } from "@/features/compare/components/compare-table";
 import { getI18n } from "@/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {

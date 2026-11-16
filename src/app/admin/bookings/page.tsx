@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { AdminHeader } from "@/components/admin/admin-header";
-import { BookingsTable } from "@/components/admin/bookings-table";
+import { AdminHeader } from "@/features/admin/components/admin-header";
+import { BookingsTable } from "@/features/admin/components/bookings-table";
 import { getI18n } from "@/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {

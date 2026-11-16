@@ -17,24 +17,79 @@ import {
   Zap,
 } from "lucide-react";
 
-import { SaveButton } from "@/components/activity/save-button";
-import { AmenityIcon } from "@/components/listing/amenity-icon";
-import { BookingSidebar } from "@/components/listing/booking-sidebar";
-import { OwnerDescription } from "@/components/listing/owner-text";
-import { StayCalendar } from "@/components/listing/stay-calendar";
-import { StayDraftProvider } from "@/components/listing/stay-draft";
-import { VerificationPanel } from "@/components/listing/verification-panel";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getListingById } from "@/data/listings";
+import { SaveButton } from "@/features/renter/components/save-button";
+import { AmenityIcon } from "@/features/listings/components/amenity-icon";
+import { BookingSidebar } from "@/features/booking/components/booking-sidebar";
+import { OwnerDescription } from "@/features/listings/components/owner-text";
+import { StayCalendar } from "@/features/stays/components/stay-calendar";
+import { StayDraftProvider } from "@/features/stays/components/stay-draft";
+import { VerificationPanel } from "@/features/listings/components/verification-panel";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
+import { getListingById } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { listingTitle } from "@/lib/listing-text";
-import { formatUSD } from "@/lib/pricing";
+import { listingDescription, listingTitle } from "@/features/listings/lib/listing-text";
+import { formatUSD } from "@/features/stays/lib/pricing";
+import { SITE_URL } from "@/shared/lib/site";
+import type { Listing } from "@/features/listings/types";
+
+function metaDescription(text: string) {
+  const flat = text.replace(/\s+/g, " ").trim();
+  return flat.length > 160 ? `${flat.slice(0, 157).trimEnd()}…` : flat;
+}
 
 export async function generateMetadata(props: PageProps<"/listing/[id]">): Promise<Metadata> {
   const { id } = await props.params;
   const listing = getListingById(id);
   const { locale } = await getI18n();
-  return { title: listing ? listingTitle(listing, locale).text : "Listing" };
+  if (!listing) return { title: "Listing" };
+
+  const title = listingTitle(listing, locale).text;
+  const description = metaDescription(listingDescription(listing, locale).text);
+  const image = listing.images[0];
+  return {
+    title,
+    description,
+    alternates: { canonical: `/listing/${listing.id}` },
+    openGraph: { type: "website", title, description, url: `/listing/${listing.id}`, images: image ? [{ url: image, alt: title }] : undefined },
+    twitter: { card: "summary_large_image", title, description, images: image ? [image] : undefined },
+  };
+}
+
+const SCHEMA_TYPE: Record<Listing["type"], string> = {
+  condo: "Apartment",
+  apartment: "Apartment",
+  "service-apartment": "Apartment",
+  room: "Room",
+  house: "House",
+};
+
+/** schema.org structured data so search engines can show price, rating and location. */
+function listingJsonLd(listing: Listing, name: string, description: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": SCHEMA_TYPE[listing.type],
+    name,
+    description,
+    url: `${SITE_URL}/listing/${listing.id}`,
+    image: listing.images,
+    numberOfBedrooms: listing.bedrooms,
+    numberOfBathroomsTotal: listing.baths,
+    floorSize: { "@type": "QuantitativeValue", value: listing.sizeSqm, unitCode: "MTK" },
+    occupancy: { "@type": "QuantitativeValue", maxValue: listing.maxGuests },
+    amenityFeature: listing.amenities.map((a) => ({ "@type": "LocationFeatureSpecification", name: a, value: true })),
+    address: { "@type": "PostalAddress", addressLocality: listing.city, addressRegion: listing.district, addressCountry: "KH" },
+    ...(listing.reviewCount > 0 && {
+      aggregateRating: { "@type": "AggregateRating", ratingValue: listing.rating, reviewCount: listing.reviewCount },
+    }),
+    offers: {
+      "@type": "Offer",
+      price: listing.pricing.monthly,
+      priceCurrency: "USD",
+      url: `${SITE_URL}/listing/${listing.id}`,
+      availability: "https://schema.org/InStock",
+      priceSpecification: { "@type": "UnitPriceSpecification", price: listing.pricing.monthly, priceCurrency: "USD", unitCode: "MON" },
+    },
+  };
 }
 
 function Section({ title, id, children }: { title: string; id?: string; children: React.ReactNode }) {
@@ -72,6 +127,12 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
 
   return (
     <StayDraftProvider listing={listing}>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(listingJsonLd(listing, title.text, listingDescription(listing, locale).text)).replace(/</g, "\\u003c"),
+      }}
+    />
     <div className="mx-auto max-w-7xl px-4 pt-6 pb-28 sm:px-6 lg:pb-24">
       <div className="flex items-center justify-between gap-4">
         <Link href="/listing" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">

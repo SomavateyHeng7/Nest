@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { getI18n } from "@/i18n/server";
 
 export default async function BookingIndexPage() {

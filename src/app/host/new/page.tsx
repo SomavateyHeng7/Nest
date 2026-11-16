@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ListingWizard } from "@/components/dashboard/listing-wizard";
+import { ListingWizard } from "@/features/owner/components/listing-wizard";
 import { getI18n } from "@/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {

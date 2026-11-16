@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { Inbox } from "@/components/messages/inbox";
-import { threads } from "@/data/dashboard";
+import { Inbox } from "@/features/messaging/components/inbox";
+import { threads } from "@/features/messaging/data";
 import { getI18n } from "@/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
