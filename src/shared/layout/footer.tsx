@@ -32,12 +32,25 @@ export async function Footer() {
         label: t(c),
       })),
     },
+    {
+      title: d.footer.company,
+      links: [
+        { href: "/about", label: d.footer.about },
+        { href: "/help", label: d.footer.help },
+        { href: "/contact", label: d.footer.contact },
+      ],
+    },
+  ];
+
+  const legalLinks = [
+    { href: "/terms", label: d.footer.terms },
+    { href: "/privacy", label: d.footer.privacy },
   ];
 
   return (
     <footer className="mt-auto border-t border-border bg-card/60">
-      <div className="mx-auto grid grid-cols-1 max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)]">
-        <div className="flex max-w-xs flex-col gap-3">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-10 px-4 py-12 sm:px-6 md:grid-cols-4 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
+        <div className="col-span-2 flex max-w-xs flex-col gap-3 md:col-span-4 lg:col-span-1">
           <Logo />
           <p className="text-sm text-muted-foreground">{d.footer.tagline}</p>
         </div>
@@ -57,7 +70,20 @@ export async function Footer() {
         ))}
       </div>
       <div className="border-t border-border">
-        <p className="mx-auto max-w-7xl px-4 py-5 text-xs text-muted-foreground sm:px-6">{d.footer.legal(new Date().getFullYear())}</p>
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 sm:px-6 md:flex-row md:items-center md:justify-between md:gap-8">
+          <p className="text-xs text-muted-foreground">{d.footer.legal(new Date().getFullYear())}</p>
+          <nav aria-label={`${d.footer.terms} · ${d.footer.privacy}`} className="flex shrink-0 gap-5">
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </div>
     </footer>
   );

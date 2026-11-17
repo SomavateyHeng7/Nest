@@ -1,38 +1,18 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 
-import { ListingBrowser, type BrowserFilters } from "@/features/listings/components/listing-browser";
+import { ListingBrowser } from "@/features/listings/components/listing-browser";
 import { listings } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { ANYWHERE, cities, propertyTypes } from "@/features/listings/lib/destinations";
-import { firstParam, parseISODate, parseStay } from "@/features/stays/lib/search-params";
-import type { PropertyType } from "@/features/listings/types";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();
   return { title: d.nav.findStay };
 }
 
-export default async function ListingsPage(props: PageProps<"/listing">) {
-  const params = await props.searchParams;
-
-  const city = firstParam(params.city);
-  const type = firstParam(params.type) as PropertyType | undefined;
-
-  const initial: BrowserFilters = {
-    city: city && cities.includes(city) ? city : ANYWHERE,
-    district: "",
-    moveIn: parseISODate(firstParam(params.moveIn)) ?? "",
-    stay: parseStay(firstParam(params.stay)) ?? { amount: 1, unit: "months" },
-    types: type && propertyTypes.includes(type) ? [type] : [],
-    maxMonthly: 1500,
-    minBedrooms: 0,
-    billsIncluded: false,
-    fullyVerifiedOnly: false,
-    furnishedOnly: false,
-  };
-
-  // Keyed on the query so a new search from the navbar/hero resets filter state.
-  const key = JSON.stringify(params);
-
-  return <ListingBrowser key={key} listings={listings} initial={initial} />;
+export default async function ListingsPage() {
+  // Render per request so the results in the first HTML match the search in the
+  // URL, which the browser reads (and keeps in sync) itself.
+  await connection();
+  return <ListingBrowser listings={listings} />;
 }

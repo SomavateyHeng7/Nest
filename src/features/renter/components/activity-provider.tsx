@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import type { Stay } from "@/features/booking/types";
 import type { Viewing } from "@/features/viewings/types";
 
 const STORAGE_KEY = "nest.activity";
@@ -11,6 +12,8 @@ interface ActivityState {
   viewings: Viewing[];
   /** Stay id → requested new move-out date (ISO). */
   extensions: Record<string, string>;
+  /** Booking requests sent from checkout, newest first. */
+  requests: Stay[];
 }
 
 interface ActivityContextValue extends ActivityState {
@@ -22,15 +25,17 @@ interface ActivityContextValue extends ActivityState {
   cancelViewing: (id: string) => void;
   requestExtension: (stayId: string, moveOut: string) => void;
   cancelExtension: (stayId: string) => void;
+  addRequest: (request: Omit<Stay, "id" | "status">) => Stay;
+  cancelRequest: (id: string) => void;
 }
 
-const empty: ActivityState = { saved: [], viewings: [], extensions: {} };
+const empty: ActivityState = { saved: [], viewings: [], extensions: {}, requests: [] };
 
 const ActivityContext = createContext<ActivityContextValue | null>(null);
 
 /**
- * The renter's own activity — saved homes, viewing requests, extension
- * requests. Prototype only: kept in localStorage until there's a backend.
+ * The renter's own activity — saved homes, viewing requests, booking and
+ * extension requests. Prototype only: kept in localStorage until there's a backend.
  */
 export function ActivityProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<ActivityState>(empty);
@@ -82,6 +87,16 @@ export function ActivityProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const addRequest = useCallback((r: Omit<Stay, "id" | "status">) => {
+    const request: Stay = { ...r, id: `req-${Date.now()}`, status: "requested" };
+    setState((s) => ({ ...s, requests: [request, ...s.requests] }));
+    return request;
+  }, []);
+
+  const cancelRequest = useCallback((id: string) => {
+    setState((s) => ({ ...s, requests: s.requests.filter((r) => r.id !== id) }));
+  }, []);
+
   const value = useMemo<ActivityContextValue>(
     () => ({
       ...state,
@@ -92,8 +107,10 @@ export function ActivityProvider({ children }: { children: React.ReactNode }) {
       cancelViewing,
       requestExtension,
       cancelExtension,
+      addRequest,
+      cancelRequest,
     }),
-    [state, ready, toggleSaved, addViewing, cancelViewing, requestExtension, cancelExtension]
+    [state, ready, toggleSaved, addViewing, cancelViewing, requestExtension, cancelExtension, addRequest, cancelRequest]
   );
 
   return <ActivityContext.Provider value={value}>{children}</ActivityContext.Provider>;

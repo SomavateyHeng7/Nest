@@ -1,3 +1,5 @@
+import { differenceInCalendarMonths, parseISO } from "date-fns";
+
 import type { Pricing } from "@/features/listings/types";
 
 export type DurationUnit = "days" | "weeks" | "months";
@@ -54,56 +56,72 @@ export interface StayQuote {
   laterPayments: number;
 }
 
+/** Shortest stay each tier's rate applies to. */
+const TIER_MIN_NIGHTS: Record<RateTier, number> = { nightly: 1, weekly: 7, monthly: 28 };
+
+/** Rent for `nights` under one tier, prorated by day. */
+function tierRent(pricing: Pricing, tier: RateTier, nights: number) {
+  if (tier === "monthly") return Math.round((pricing.monthly / DAYS_PER_MONTH) * nights);
+  if (tier === "weekly") return Math.round((pricing.weekly / 7) * nights);
+  return pricing.nightly * nights;
+}
+
 /**
- * Picks the cheapest applicable rate tier for the length of stay.
- * Short stays use the nightly rate, 1–3 weeks the weekly rate, and a month or
- * longer the monthly rate (prorated by day after the first month).
+ * Refundable deposit by length of stay: none under a week, half for 1–3 weeks,
+ * the full deposit from four weeks. It follows the stay length, not the
+ * rate charged, so a cheaper rate never adds a deposit.
+ */
+function depositFor(pricing: Pricing, nights: number) {
+  if (nights >= TIER_MIN_NIGHTS.monthly) return pricing.deposit;
+  if (nights >= TIER_MIN_NIGHTS.weekly) return Math.round(pricing.deposit / 2);
+  return 0;
+}
+
+/**
+ * Quotes the cheapest rent for a stay, so a shorter stay never costs more
+ * than a longer one. Each tier is tried, and a tier the stay is too short
+ * for is charged as its minimum length (e.g. 6 nights can cost the same as
+ * the 1-week price, 27 nights the same as 4 weeks at the monthly rate).
  */
 export function quoteStay(pricing: Pricing, nights: number): StayQuote {
   const safeNights = Math.max(1, Math.round(nights));
 
-  if (safeNights >= 28) {
-    const months = safeNights / DAYS_PER_MONTH;
-    const rentTotal = Math.round(pricing.monthly * months);
-    const firstPayment = Math.min(rentTotal, pricing.monthly);
-    return {
-      nights: safeNights,
-      tier: "monthly",
-      rate: pricing.monthly,
-      rentTotal,
-      dueAtBooking: firstPayment + pricing.deposit,
-      deposit: pricing.deposit,
-      renterFee: 0,
-      laterPayments: Math.max(0, Math.ceil(months) - 1),
-    };
-  }
+  const tiers: RateTier[] = ["nightly", "weekly", "monthly"];
+  const best = tiers
+    .map((tier) => ({ tier, rent: tierRent(pricing, tier, Math.max(safeNights, TIER_MIN_NIGHTS[tier])) }))
+    // On a tie prefer the longer tier, whose rate is what the renter will recognise.
+    .reduce((a, b) => (b.rent <= a.rent ? b : a));
 
-  if (safeNights >= 7) {
-    const rentTotal = Math.round((pricing.weekly / 7) * safeNights);
-    const deposit = Math.round(pricing.deposit / 2);
-    return {
-      nights: safeNights,
-      tier: "weekly",
-      rate: pricing.weekly,
-      rentTotal,
-      dueAtBooking: rentTotal + deposit,
-      deposit,
-      renterFee: 0,
-      laterPayments: 0,
-    };
-  }
+  const rentTotal = best.rent;
+  const deposit = depositFor(pricing, safeNights);
+  // Stays of four weeks or more are paid month by month whichever rate wins, so
+  // a cheap weekly rate on a long stay never puts the whole rent up front.
+  const isLong = safeNights >= TIER_MIN_NIGHTS.monthly;
+  const instalments = isLong ? Math.max(1, Math.ceil(safeNights / DAYS_PER_MONTH)) : 1;
+  const perMonth = Math.round((rentTotal / safeNights) * DAYS_PER_MONTH);
+  const firstPayment = isLong ? Math.min(rentTotal, perMonth) : rentTotal;
 
-  const rentTotal = pricing.nightly * safeNights;
   return {
     nights: safeNights,
-    tier: "nightly",
-    rate: pricing.nightly,
+    tier: best.tier,
+    rate: pricing[best.tier],
     rentTotal,
-    dueAtBooking: rentTotal,
-    deposit: 0,
+    dueAtBooking: firstPayment + deposit,
+    deposit,
     renterFee: 0,
-    laterPayments: 0,
+    laterPayments: instalments - 1,
   };
+}
+
+/**
+ * The rent instalment due on `dueDate` for a monthly stay: one month's rent,
+ * or whatever is left of the total for the final, shorter month. The first
+ * month is paid at booking, then one instalment per calendar month after move-in.
+ */
+export function nextRentAmount(stay: { moveIn: string; monthlyRent: number; rentTotal: number }, dueDate: string) {
+  const paidMonths = Math.max(1, differenceInCalendarMonths(parseISO(dueDate), parseISO(stay.moveIn)));
+  const remaining = stay.rentTotal - stay.monthlyRent * paidMonths;
+  return Math.max(0, Math.min(stay.monthlyRent, remaining));
 }
 
 export interface PlacementFeeTier {

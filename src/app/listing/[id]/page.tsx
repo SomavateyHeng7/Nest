@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { SaveButton } from "@/features/renter/components/save-button";
+import { AreaMap } from "@/features/listings/components/listing-map";
 import { AmenityIcon } from "@/features/listings/components/amenity-icon";
 import { BookingSidebar } from "@/features/booking/components/booking-sidebar";
 import { MobileBookingBar } from "@/features/booking/components/mobile-booking-bar";
@@ -242,6 +243,7 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
           </Section>
 
           <Section title={d.listing.neighbourhood}>
+            <AreaMap location={listing.location} className="aspect-video max-h-80 w-full" />
             <p className="text-sm text-muted-foreground">{d.listing.addressHidden}</p>
             <ul className="flex flex-col gap-2">
               {listing.nearby.map((n) => {

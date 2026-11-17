@@ -15,6 +15,11 @@ export const PRIVATE_PATHS = [
   "/messages",
   "/profile",
   "/earning",
-  "/status",
   "/maintenance",
 ];
+
+/**
+ * Public support inbox shown on /contact and in the legal pages.
+ * Placeholder (`.example` is a reserved domain) — replace with the real address before launch.
+ */
+export const SUPPORT_EMAIL = "hello@nest.example";

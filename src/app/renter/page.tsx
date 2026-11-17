@@ -5,57 +5,24 @@ import { differenceInCalendarDays, parseISO } from "date-fns";
 import { KeyRound, MessageCircle, Receipt } from "lucide-react";
 
 import { ExtendStay } from "@/features/renter/components/extend-stay";
+import { ComingSoonButton } from "@/features/renter/components/coming-soon-button";
 import { RenterViewings, SavedHomes } from "@/features/renter/components/renter-sections";
+import { StayRow, UpcomingStays } from "@/features/renter/components/stay-list";
 import { StatusBadge } from "@/features/booking/components/status-badge";
 import { Button } from "@/shared/ui/button";
 import { currentUser } from "@/features/account/current-user";
 import { stays } from "@/features/booking/data";
 import { getListingById } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD } from "@/features/stays/lib/pricing";
-import type { Stay } from "@/features/booking/types";
-
-type I18n = Awaited<ReturnType<typeof getI18n>>;
+import { formatUSD, nextRentAmount } from "@/features/stays/lib/pricing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();
   return { title: d.renter.title };
 }
 
-function StayRow({ stay, i18n }: { stay: Stay; i18n: I18n }) {
-  const { d, t, range, lt } = i18n;
-  const listing = getListingById(stay.listingId);
-  if (!listing) return null;
-  const nights = differenceInCalendarDays(parseISO(stay.moveOut), parseISO(stay.moveIn));
-
-  return (
-    <Link
-      href={`/listing/${listing.id}`}
-      className="flex gap-4 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-foreground/25"
-    >
-      <div className="relative aspect-4/3 w-28 shrink-0 overflow-hidden rounded-xl sm:w-36">
-        <Image src={listing.images[0]} alt={lt(listing).text} fill sizes="144px" className="object-cover" />
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-1 py-1">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <p className="truncate font-semibold" lang={lt(listing).lang}>{lt(listing).text}</p>
-          <StatusBadge status={stay.status} />
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {t(listing.district)}, {t(listing.city)} · {d.renter.hostedBy(listing.owner.name.split(" ")[0])}
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {range(stay.moveIn, stay.moveOut)} · {d.common.nights(nights)} · {d.common.guests(stay.guests)}
-        </p>
-        <p className="mt-auto text-sm font-medium tabular">{d.renter.totalRent(formatUSD(stay.rentTotal))}</p>
-      </div>
-    </Link>
-  );
-}
-
 export default async function RenterPage() {
-  const i18n = await getI18n();
-  const { d, t, date, lt } = i18n;
+  const { d, t, date, lt } = await getI18n();
   const r = d.renter;
   const today = new Date();
   const active = stays.find((s) => s.status === "active");
@@ -110,10 +77,16 @@ export default async function RenterPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-accent-terracotta/10 px-4 py-3">
                   <p className="flex items-center gap-2 text-sm">
                     <Receipt className="size-4 text-accent-terracotta" />
-                    {r.nextRent} <span className="font-semibold tabular">{formatUSD(286)}</span>{" "}
+                    {r.nextRent} <span className="font-semibold tabular">{formatUSD(nextRentAmount(active, active.nextPaymentDue))}</span>{" "}
                     {r.due(date(active.nextPaymentDue, "EEE, MMM d"))}
                   </p>
-                  <Button className="h-8 bg-accent-terracotta px-3 text-white hover:bg-terracotta-strong">{r.payKhqr}</Button>
+                  <ComingSoonButton
+                    className="h-8 bg-accent-terracotta px-3 text-white hover:bg-terracotta-strong"
+                    title={r.paySoon.title}
+                    description={r.paySoon.body}
+                  >
+                    {r.payKhqr}
+                  </ComingSoonButton>
                 </div>
               )}
               <div className="flex flex-wrap gap-2">
@@ -122,10 +95,15 @@ export default async function RenterPage() {
                   {r.messageOwner}
                 </Button>
                 <ExtendStay stay={active} listing={activeListing} />
-                <Button variant="outline" className="h-9 gap-1.5 px-3">
+                <ComingSoonButton
+                  variant="outline"
+                  className="h-9 gap-1.5 px-3"
+                  title={r.checkInSoon.title}
+                  description={r.checkInSoon.body}
+                >
                   <KeyRound className="size-4" />
                   {r.checkIn}
-                </Button>
+                </ComingSoonButton>
               </div>
             </div>
           </div>
@@ -137,13 +115,7 @@ export default async function RenterPage() {
       <section className="mt-10">
         <h2 className="font-semibold">{r.upcoming}</h2>
         <div className="mt-3 flex flex-col gap-3">
-          {upcoming.length ? (
-            upcoming.map((s) => <StayRow key={s.id} stay={s} i18n={i18n} />)
-          ) : (
-            <p className="rounded-2xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
-              {r.nothing}
-            </p>
-          )}
+          <UpcomingStays stays={upcoming} />
         </div>
       </section>
 
@@ -151,7 +123,7 @@ export default async function RenterPage() {
         <h2 className="font-semibold">{r.past}</h2>
         <div className="mt-3 flex flex-col gap-3">
           {past.map((s) => (
-            <StayRow key={s.id} stay={s} i18n={i18n} />
+            <StayRow key={s.id} stay={s} />
           ))}
         </div>
       </section>

@@ -1,17 +1,13 @@
 "use client";
 
 import { createContext, useContext, useMemo, useState } from "react";
-import { addDays, areIntervalsOverlapping, format, isAfter, parseISO, subDays } from "date-fns";
+import { addDays, format, parseISO, subDays } from "date-fns";
 
+import { stayProblem, type StayProblem } from "@/features/stays/lib/availability";
 import { stayToNights, type StayLength } from "@/features/stays/lib/pricing";
 import type { Listing } from "@/features/listings/types";
 
-export type StayProblem =
-  | { kind: "min"; nights: number }
-  | { kind: "max"; months: number }
-  | { kind: "noDate" }
-  | { kind: "early"; from: string }
-  | { kind: "clash"; start: string; end: string };
+export type { StayProblem };
 
 interface StayDraft {
   listing: Listing;
@@ -31,15 +27,6 @@ interface StayDraft {
 
 const StayDraftContext = createContext<StayDraft | null>(null);
 
-function overlaps(listing: Listing, start: Date, nights: number) {
-  return listing.bookedRanges.find((r) =>
-    areIntervalsOverlapping(
-      { start, end: addDays(start, nights) },
-      { start: parseISO(r.start), end: parseISO(r.end) }
-    )
-  );
-}
-
 /** Longest common stay that fits the calendar from the first available day. */
 function defaultStay(listing: Listing): StayLength {
   const candidates: StayLength[] = [
@@ -48,14 +35,7 @@ function defaultStay(listing: Listing): StayLength {
     { amount: 2, unit: "weeks" },
     { amount: Math.max(listing.minStayNights, 3), unit: "days" },
   ];
-  const start = parseISO(listing.availableFrom);
-  return (
-    candidates.find((c) => {
-      const n = stayToNights(c);
-      if (n < listing.minStayNights || n > listing.maxStayMonths * 31) return false;
-      return !overlaps(listing, start, n);
-    }) ?? candidates[0]
-  );
+  return candidates.find((c) => stayProblem(listing, listing.availableFrom, stayToNights(c)) === null) ?? candidates[0];
 }
 
 /**
@@ -82,15 +62,7 @@ export function StayDraftProvider({
     const moveOut = start ? addDays(start, nights) : null;
     const lastNight = moveOut ? subDays(moveOut, 1) : null;
 
-    let problem: StayProblem | null = null;
-    if (nights < listing.minStayNights) problem = { kind: "min", nights: listing.minStayNights };
-    else if (nights > listing.maxStayMonths * 31) problem = { kind: "max", months: listing.maxStayMonths };
-    else if (!start) problem = { kind: "noDate" };
-    else if (isAfter(parseISO(listing.availableFrom), start)) problem = { kind: "early", from: listing.availableFrom };
-    else {
-      const clash = overlaps(listing, start, nights);
-      if (clash) problem = { kind: "clash", start: clash.start, end: clash.end };
-    }
+    const problem = stayProblem(listing, moveIn, nights);
 
     return { listing, moveIn, setMoveIn, stay, setStay, guests, setGuests, nights, moveOut, lastNight, problem };
   }, [listing, moveIn, stay, guests]);

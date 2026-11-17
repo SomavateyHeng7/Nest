@@ -82,6 +82,315 @@ export const en = {
     income: "Income",
     legal: (year: number) =>
       `© ${year} Nest Cambodia · Powered by Somatech · Prototype — listings, bookings and payments are sample data.`,
+    company: "Nest",
+    about: "About",
+    help: "Help centre",
+    contact: "Contact",
+    terms: "Terms",
+    privacy: "Privacy",
+  },
+
+  /** Shared by the Terms and Privacy pages. */
+  legal: {
+    updated: (date: string) => `Last updated ${date}`,
+    onThisPage: "On this page",
+    draftTitle: "Prototype draft",
+    draftBody:
+      "This page was written for the Nest prototype. It hasn’t been reviewed by a lawyer and isn’t a binding agreement yet.",
+    questions: "Questions about this page?",
+    contactUs: "Contact us",
+    seeAlso: "See also",
+    terms: {
+      title: "Terms of use",
+      lede: "The rules for renting and listing on Nest, in plain language.",
+      sections: [
+        {
+          id: "about",
+          title: "About these terms",
+          body: [
+            "Nest is a marketplace run by Nest Cambodia that connects renters with owners of homes, rooms and condos in Cambodia. These terms apply whenever you browse, book or list on Nest.",
+            "By creating an account or making a booking, you agree to these terms and to our Privacy policy.",
+          ],
+        },
+        {
+          id: "accounts",
+          title: "Your account",
+          body: ["To book or list on Nest you need an account. You agree to:"],
+          list: [
+            "be at least 18 years old;",
+            "give accurate details and keep them up to date;",
+            "confirm your phone number and ID when asked;",
+            "keep your login private — you’re responsible for activity on your account.",
+          ],
+        },
+        {
+          id: "bookings",
+          title: "Bookings",
+          body: [
+            "Sending a request doesn’t charge you. The owner has 24 hours to accept. Once they accept, you have 24 hours to pay to confirm the dates; otherwise the request expires at no cost.",
+            "The stay itself is an agreement between the renter and the owner. Both agree to follow the house rules shown on the listing.",
+          ],
+        },
+        {
+          id: "payments",
+          title: "Payments, fees and deposits",
+          body: [],
+          list: [
+            "Renters pay the rent the owner sets. Nest charges renters no booking or service fees.",
+            "Payments are made through Nest with KHQR, ABA or card. Nest holds the payment and releases it to the owner 24 hours after move-in.",
+            "Stays of a week or longer include a refundable deposit (half the usual amount for stays under 4 weeks), returned within 7 days of move-out, less any damage agreed between renter and owner.",
+            "Listing is free. Owners pay a one-time placement fee when a booking completes — 50% of one month’s rent for 1–3 month stays, 75% for 4–6 months and 100% for 7–12 months — deducted from the first payout.",
+          ],
+        },
+        {
+          id: "cancellations",
+          title: "Cancellations",
+          body: [
+            "Renters can cancel for free up to 7 days before move-in. If the owner cancels a confirmed booking, the renter gets a full refund.",
+          ],
+        },
+        {
+          id: "owners",
+          title: "For owners",
+          body: ["If you list a property on Nest, you agree to:"],
+          list: [
+            "have the right to rent it, and show us documents that prove it;",
+            "describe it accurately, with current photos and prices;",
+            "allow a verification visit before the listing goes live;",
+            "honour confirmed bookings and reply to requests within 24 hours.",
+          ],
+        },
+        {
+          id: "conduct",
+          title: "Using Nest responsibly",
+          body: [
+            "Don’t ask for or make payments outside Nest — they aren’t protected. Fraud, discrimination and harassment aren’t allowed. We may pause or close accounts that break these terms.",
+          ],
+        },
+        {
+          id: "liability",
+          title: "Our responsibility",
+          body: [
+            "We verify owners and visit listings, but we can’t guarantee every detail of every stay. To the extent the law allows, Nest’s liability is limited to the fees Nest received for the booking in question.",
+          ],
+        },
+        {
+          id: "changes",
+          title: "Changes and governing law",
+          body: [
+            "We may update these terms. If a change is significant we’ll let you know before it applies. These terms are governed by the laws of the Kingdom of Cambodia.",
+          ],
+        },
+      ],
+    },
+    privacy: {
+      title: "Privacy policy",
+      lede: "What we collect when you use Nest, why we need it, and the choices you have.",
+      sections: [
+        {
+          id: "collect",
+          title: "What we collect",
+          body: [],
+          list: [
+            "Account details: your name, phone number and email.",
+            "Verification: your ID document and selfie and, for owners, documents showing you can rent the property.",
+            "Bookings and payments: dates, amounts and payment status. Card details are handled by our payment providers; Nest doesn’t store full card numbers.",
+            "Messages you send to owners, renters and our team.",
+            "Basic usage data, such as pages visited and device type.",
+          ],
+        },
+        {
+          id: "use",
+          title: "How we use it",
+          body: [],
+          list: [
+            "to run bookings, payments, deposits and payouts;",
+            "to verify identities and listings and prevent fraud;",
+            "to help you when you contact us;",
+            "to send messages about your bookings and account;",
+            "to improve Nest.",
+          ],
+        },
+        {
+          id: "share",
+          title: "Who we share it with",
+          body: ["We don’t sell your personal information. We share only what’s needed:"],
+          list: [
+            "with the other person in a booking — for example your name, verified status and booking details;",
+            "with payment providers, to process KHQR, ABA and card payments;",
+            "with service providers that host and run Nest for us;",
+            "with authorities, when the law requires it.",
+          ],
+        },
+        {
+          id: "documents",
+          title: "Identity and ownership documents",
+          body: [
+            "Verification documents are only seen by the Nest verification team. We use them only to verify you or your listing, and keep them only as long as we need to.",
+          ],
+        },
+        {
+          id: "cookies",
+          title: "Cookies",
+          body: [
+            "We use essential cookies to keep you signed in and to remember your preferences, such as language and theme.",
+          ],
+        },
+        {
+          id: "retention",
+          title: "How long we keep it",
+          body: [
+            "We keep your information while your account is open, and afterwards only as long as needed for bookings, disputes or legal requirements.",
+          ],
+        },
+        {
+          id: "rights",
+          title: "Your choices",
+          body: [
+            "You can ask to see, correct or delete your information at any time. Contact us and we’ll reply to your request.",
+          ],
+        },
+      ],
+    },
+  },
+
+  about: {
+    eyebrow: "About Nest",
+    title: "Renting in Cambodia, without the guesswork.",
+    lede: "Nest is for flexible stays — a few days, a few months or a full year — in homes our team has visited in person.",
+    imageAlt: "A bright living room in a Nest-verified home",
+    storyTitle: "Why we started Nest",
+    story: [
+      "Finding a place to live in Cambodia usually means scrolling Facebook groups, chasing agents and hoping the photos are real. Hotel sites cover short trips, but not the months in between.",
+      "Nest brings both together: verified homes you can compare on total cost, then book for exactly as long as you need. Owners list for free and only pay when a booking completes.",
+    ],
+    valuesTitle: "What we stand for",
+    values: [
+      { title: "Verified in person", body: "We check every owner’s ID and right to rent, then visit the home before it gets the Nest badge." },
+      { title: "No renter fees", body: "Renters pay exactly the rent the owner sets. Owners pay once, only when a booking completes." },
+      { title: "Stays that fit your life", body: "Book by the day, week or month, with better rates the longer you stay." },
+      { title: "Protected payments", body: "We hold your payment until 24 hours after move-in, so you’re covered if the home isn’t as described." },
+    ],
+    whereTitle: "Where we are",
+    whereBody: "Nest is built by Somatech. We’re starting in Phnom Penh, Siem Reap and Kampot, and verifying new homes every week.",
+    ctaTitle: "Ready to find your next place?",
+    ctaRenter: "Find a stay",
+    ctaOwner: "List your property",
+  },
+
+  help: {
+    eyebrow: "Help centre",
+    title: "How can we help?",
+    lede: "Answers to common questions about booking, paying and listing on Nest.",
+    jumpTo: "Jump to a topic",
+    groups: [
+      {
+        id: "booking",
+        title: "Booking a stay",
+        faqs: [
+          {
+            q: "How does booking work?",
+            a: "Pick your dates and send a request with a short note. The owner has 24 hours to reply. If they accept, you have 24 hours to pay and lock in the dates. Nothing is charged before then.",
+          },
+          {
+            q: "Can I see the home before I book?",
+            a: "Yes. Request a viewing from any listing — in person at the property, or a live video walk-through on Telegram or WhatsApp.",
+          },
+          {
+            q: "How long can I stay?",
+            a: "From a few days up to 12 months. Book by the day, week or month; longer stays get better rates.",
+          },
+          {
+            q: "Can I extend my stay?",
+            a: "Yes. Request an extension from My stays. Once the owner confirms, the new dates are added to your booking.",
+          },
+        ],
+      },
+      {
+        id: "payments",
+        title: "Payments and deposits",
+        faqs: [
+          { q: "Does Nest charge renters a fee?", a: "No. You pay exactly the rent the owner sets — no booking or service fees." },
+          { q: "How can I pay?", a: "With KHQR, ABA or card, always through Nest." },
+          {
+            q: "When does the owner get paid?",
+            a: "Nest holds your payment and releases it to the owner 24 hours after you move in, so you’re covered if the home isn’t as described.",
+          },
+          { q: "How do deposits work?", a: "Stays of a week or longer include a refundable deposit: half for 1–3 weeks, the full amount from 4 weeks. It’s returned within 7 days of move-out." },
+          { q: "What’s the cancellation policy?", a: "Cancellation is free up to 7 days before move-in." },
+        ],
+      },
+      {
+        id: "safety",
+        title: "Verification and safety",
+        faqs: [
+          {
+            q: "What does “Nest verified” mean?",
+            a: "We’ve checked the owner’s ID and a document showing they can rent the property, and our team has visited the home to confirm the photos and details.",
+          },
+          { q: "Are renters verified too?", a: "Yes. Every renter confirms their phone number and ID before they can request to book." },
+          {
+            q: "Someone asked me to pay outside Nest. What should I do?",
+            a: "Don’t pay. Payments outside Nest aren’t protected. Please report it to us from the Contact page.",
+          },
+          {
+            q: "How do I report a problem with a listing or a stay?",
+            a: "Contact us with the listing or booking reference. Our trust & safety team reviews every report.",
+          },
+        ],
+      },
+      {
+        id: "owners",
+        title: "Listing your property",
+        faqs: [
+          {
+            q: "How much does it cost to list?",
+            a: "Listing is free. You pay a one-time placement fee only when a booking completes: 50% of one month’s rent for 1–3 month stays, 75% for 4–6 months and 100% for 7–12 months.",
+          },
+          {
+            q: "When do I get paid?",
+            a: "Payouts go to your account 24 hours after each move-in. The placement fee is deducted from the first month’s rent, so you never pay out of pocket.",
+          },
+          {
+            q: "How long does verification take?",
+            a: "Upload your ID and proof you can rent the property, then book a 20-minute visit. Most listings go live within 3 days.",
+          },
+        ],
+      },
+    ],
+    stillTitle: "Still need help?",
+    stillBody: "Send us a message and our team will get back to you.",
+    stillCta: "Contact us",
+  },
+
+  contact: {
+    eyebrow: "Contact",
+    title: "Talk to the Nest team",
+    lede: "Questions about a booking, a listing, or something that doesn’t look right? Send us a message.",
+    email: "Email",
+    hours: "Support hours",
+    hoursValue: "Monday to Saturday, 8:00–18:00 (Phnom Penh time)",
+    booked: "Already booked?",
+    bookedBody: "Message your owner or renter directly from Messages.",
+    openMessages: "Open Messages",
+    helpTitle: "Quick answers",
+    helpBody: "Most questions about booking, payments and listing are answered in the Help centre.",
+    openHelp: "Visit the Help centre",
+    formTitle: "Send a message",
+    name: "Your name",
+    emailField: "Email",
+    topic: "Topic",
+    topics: ["A booking", "A payment or deposit", "Listing my property", "Report a problem", "Something else"],
+    reference: "Booking or listing reference",
+    optional: "optional",
+    referencePlaceholder: "e.g. bk-1042",
+    message: "Message",
+    messagePlaceholder: "How can we help?",
+    send: "Send message",
+    sending: "Sending…",
+    sentTitle: "Message received",
+    sentBody: "This is a prototype, so nothing was actually sent. In the live product our team would reply by email.",
+    sendAnother: "Send another message",
   },
 
   /** Translations for data values (places, amenities, phrases). English shows data as-is. */
@@ -193,6 +502,14 @@ export const en = {
     ownerCta2: "See how fees work",
   },
 
+  map: {
+    resultsLabel: "Map of matching homes",
+    areaLabel: "Map of the neighbourhood",
+    list: "List",
+    map: "Map",
+    viewToggle: "Show results as",
+  },
+
   browse: {
     city: "City",
     stayLength: "Stay length",
@@ -249,7 +566,7 @@ export const en = {
     included: "Included in rent",
     electricity: "Electricity",
     deposit: "Deposit",
-    depositBody: (v: string) => `${v} for monthly stays, refunded within 7 days of move-out`,
+    depositBody: (v: string) => `${v} for stays of 4 weeks or more (half for 1–3 weeks), refunded within 7 days of move-out`,
     renterFee: "Nest fee for renters",
     renterFeeBody: "None. The price you see is the rent you pay.",
     availability: "Availability",
@@ -344,6 +661,7 @@ export const en = {
       bank: { label: "Bank transfer", hint: "ACLEDA, Wing, Canadia and more" },
       card: { label: "Visa / Mastercard", hint: "Debit or credit card" },
     },
+    fixDatesFirst: "These dates don’t work for this home. Change them in the summary to send your request.",
     nothingCharged: (name: string, amount: string) =>
       `Nothing is charged now. If ${name} accepts, you’ll have 24 hours to pay ${amount} to lock in the dates.`,
     send: (name: string) => `Send request to ${name}`,
@@ -437,9 +755,18 @@ export const en = {
     nextRent: "Next rent",
     due: (d: string) => `due ${d}`,
     payKhqr: "Pay with KHQR",
+    paySoon: {
+      title: "KHQR payments are coming soon",
+      body: "For now, pay your owner the way you agreed in Messages.",
+    },
     messageOwner: "Message owner",
     extend: "Extend stay",
     checkIn: "Check-in details",
+    checkInSoon: {
+      title: "Check-in details are coming soon",
+      body: "Your owner will share the address and key handover in Messages.",
+    },
+    cancelRequest: "Cancel request",
     upcoming: "Upcoming & requested",
     extendDisabled: "Extension already requested",
     nothing: "Nothing booked yet.",

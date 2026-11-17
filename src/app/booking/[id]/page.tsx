@@ -9,6 +9,7 @@ import { BookingConfirm } from "@/features/booking/components/booking-confirm";
 import { CheckoutDates } from "@/features/booking/components/checkout-dates";
 import { getListingById, isFullyVerified } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
+import { stayProblem } from "@/features/stays/lib/availability";
 import { formatUSD, quoteStay, stayToNights } from "@/features/stays/lib/pricing";
 import { firstParam, parseISODate, parseStay } from "@/features/stays/lib/search-params";
 
@@ -28,9 +29,11 @@ export default async function BookingPage(props: PageProps<"/booking/[id]">) {
 
   const moveIn = parseISODate(firstParam(searchParams.moveIn)) ?? listing.availableFrom;
   const stay = parseStay(firstParam(searchParams.stay)) ?? { amount: 1, unit: "months" as const };
-  const guests = Math.max(1, Number(firstParam(searchParams.guests)) || 1);
+  // The query string is user-editable, so re-apply the listing's own limits here.
+  const guests = Math.min(listing.maxGuests, Math.max(1, Math.floor(Number(firstParam(searchParams.guests))) || 1));
 
   const nights = stayToNights(stay);
+  const problem = stayProblem(listing, moveIn, nights);
   const quote = quoteStay(listing.pricing, nights);
   const moveOut = addDays(parseISO(moveIn), nights);
   const ownerFirstName = listing.owner.name.split(" ")[0];
@@ -49,7 +52,18 @@ export default async function BookingPage(props: PageProps<"/booking/[id]">) {
       <h1 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-dark-forest">{c.title}</h1>
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px]">
-        <BookingConfirm ownerFirstName={ownerFirstName} listingTitle={lt(listing).text} dueAtBooking={quote.dueAtBooking} />
+        <BookingConfirm
+          listingId={listing.id}
+          ownerFirstName={ownerFirstName}
+          listingTitle={lt(listing).text}
+          moveIn={moveIn}
+          nights={nights}
+          guests={guests}
+          monthlyRent={listing.pricing.monthly}
+          rentTotal={quote.rentTotal}
+          dueAtBooking={quote.dueAtBooking}
+          blocked={problem !== null}
+        />
 
         <aside className="h-fit rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-24">
           <div className="flex gap-4">
@@ -90,7 +104,7 @@ export default async function BookingPage(props: PageProps<"/booking/[id]">) {
               <dd className="font-medium">{guests}</dd>
             </div>
           </dl>
-          <CheckoutDates listing={listing} moveIn={moveIn} stay={stay} guests={guests} />
+          <CheckoutDates listing={listing} moveIn={moveIn} stay={stay} guests={guests} problem={problem} />
 
           <dl className="mt-5 flex flex-col gap-2 border-t border-border pt-5 text-sm">
             <div className="flex justify-between gap-3">

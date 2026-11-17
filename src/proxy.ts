@@ -29,6 +29,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Skip framework assets, files in /public, robots/sitemap, the favicon and the
-  // /status error-state gallery (so the 503 design stays reviewable while live).
-  matcher: ["/((?!_next/|status|robots\\.txt|sitemap\\.xml|favicon\\.ico|.*\\.[a-zA-Z0-9]+$).*)"],
+  // /maintenance/status error-state gallery (so the 503 design stays reviewable while live).
+  matcher: ["/((?!_next/|maintenance/status|robots\\.txt|sitemap\\.xml|favicon\\.ico|.*\\.[a-zA-Z0-9]+$).*)"],
 };

@@ -208,3 +208,53 @@
     display: none;
   }
 }
+
+/* ---- Maps (Leaflet) ---- */
+.leaflet-container {
+  font: inherit;
+  background: var(--muted);
+}
+/* Keep Leaflet's own z-indexes (400+) inside the map, under the navbar and dialogs. */
+.nest-map {
+  isolation: isolate;
+}
+.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
+.nest-price-pin {
+  display: inline-block;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
+  transition: background-color 150ms, color 150ms;
+}
+.leaflet-marker-icon:hover .nest-price-pin,
+.leaflet-marker-icon:focus-visible .nest-price-pin {
+  background: var(--brand-forest);
+  color: var(--background);
+  border-color: var(--brand-forest);
+}
+.leaflet-marker-icon:focus-visible {
+  outline: none;
+}
+.nest-area-circle {
+  stroke: var(--brand-forest);
+  fill: var(--brand-forest);
+  fill-opacity: 0.15;
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--card);
+  color: var(--foreground);
+}
+.leaflet-popup-content {
+  margin: 10px;
+}

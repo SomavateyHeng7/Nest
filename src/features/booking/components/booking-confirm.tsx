@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, CreditCard, Landmark, QrCode, Smartphone } from "lucide-react";
+import { addDays, format, parseISO } from "date-fns";
+import { AlertCircle, Check, CreditCard, Landmark, QrCode, Smartphone } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { currentUser } from "@/features/account/current-user";
+import { useActivity } from "@/features/renter/components/activity-provider";
 import { useI18n } from "@/i18n/client";
 import { formatUSD } from "@/features/stays/lib/pricing";
 import { cn } from "@/shared/lib/utils";
@@ -35,15 +37,31 @@ function StepHeader({ n, title, done, active }: { n: number; title: string; done
 }
 
 export function BookingConfirm({
+  listingId,
   ownerFirstName,
   listingTitle,
+  moveIn,
+  nights,
+  guests,
+  monthlyRent,
+  rentTotal,
   dueAtBooking,
+  blocked,
 }: {
+  listingId: string;
   ownerFirstName: string;
   listingTitle: string;
+  moveIn: string;
+  nights: number;
+  guests: number;
+  monthlyRent: number;
+  rentTotal: number;
   dueAtBooking: number;
+  /** The dates can't be booked (checked on the server); sending is disabled until they're changed. */
+  blocked: boolean;
 }) {
   const { d } = useI18n();
+  const { addRequest } = useActivity();
   const c = d.checkout;
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [name, setName] = useState(currentUser.name);
@@ -188,9 +206,27 @@ export function BookingConfirm({
             <p className="rounded-xl bg-muted/70 px-4 py-3 text-sm text-muted-foreground">
               {c.nothingCharged(ownerFirstName, formatUSD(dueAtBooking))}
             </p>
+            {blocked && (
+              <p className="flex items-start gap-2 rounded-xl bg-warning/10 px-4 py-3 text-sm">
+                <AlertCircle className="mt-0.5 size-4 shrink-0 text-warning" />
+                {c.fixDatesFirst}
+              </p>
+            )}
             <Button
               className="h-12 bg-accent-terracotta text-base text-white hover:bg-terracotta-strong sm:w-fit sm:px-8"
-              onClick={() => setStep(3)}
+              disabled={blocked}
+              onClick={() => {
+                // Prototype: kept in this browser until booking requests go to the backend.
+                addRequest({
+                  listingId,
+                  moveIn,
+                  moveOut: format(addDays(parseISO(moveIn), nights), "yyyy-MM-dd"),
+                  guests,
+                  monthlyRent,
+                  rentTotal,
+                });
+                setStep(3);
+              }}
             >
               {c.send(ownerFirstName)}
             </Button>

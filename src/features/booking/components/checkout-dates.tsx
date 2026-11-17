@@ -12,6 +12,7 @@ import { Button } from "@/shared/ui/button";
 import { useI18n } from "@/i18n/client";
 import type { StayLength } from "@/features/stays/lib/pricing";
 import { serializeStay } from "@/features/stays/lib/search-params";
+import type { StayProblem } from "@/features/stays/lib/availability";
 import type { Listing } from "@/features/listings/types";
 
 function Editor({ onClose }: { onClose: () => void }) {
@@ -63,14 +64,17 @@ export function CheckoutDates({
   moveIn,
   stay,
   guests,
+  problem,
 }: {
   listing: Listing;
   moveIn: string;
   stay: StayLength;
   guests: number;
+  /** Why the dates in the URL can't be booked (checked on the server). Opens the editor so it can be fixed. */
+  problem: StayProblem | null;
 }) {
   const { d } = useI18n();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(problem !== null);
 
   if (!open) {
     return (

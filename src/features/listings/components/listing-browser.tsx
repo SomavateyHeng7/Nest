@@ -1,46 +1,35 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { addDays, areIntervalsOverlapping, isAfter, parseISO } from "date-fns";
-import { CalendarDays, SlidersHorizontal, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { CalendarDays, List, Map as MapIcon, SlidersHorizontal, X } from "lucide-react";
 
 import { ListingCard } from "@/features/listings/components/listing-card";
+import { ResultsMap } from "@/features/listings/components/listing-map";
 import { StayLengthPicker } from "@/features/stays/components/stay-length-picker";
 import { Button } from "@/shared/ui/button";
 import { Dialog } from "@/shared/ui/dialog";
 import { isFullyVerified } from "@/features/listings/data";
 import { useI18n } from "@/i18n/client";
 import { ANYWHERE, areas, cities, propertyTypes } from "@/features/listings/lib/destinations";
-import { formatUSD, quoteStay, stayToNights, type StayLength } from "@/features/stays/lib/pricing";
+import {
+  BUDGET_MAX,
+  BUDGET_MIN,
+  parseBrowseParams,
+  serializeBrowseParams,
+  type BrowserFilters,
+  type BrowseView,
+  type Sort,
+} from "@/features/listings/lib/browse-params";
+import { stayProblem } from "@/features/stays/lib/availability";
+import { formatUSD, quoteStay, stayToNights } from "@/features/stays/lib/pricing";
 import { cn } from "@/shared/lib/utils";
-import type { Listing, PropertyType } from "@/features/listings/types";
+import type { Listing } from "@/features/listings/types";
 
-export interface BrowserFilters {
-  city: string;
-  district: string;
-  moveIn: string;
-  stay: StayLength;
-  types: PropertyType[];
-  maxMonthly: number;
-  minBedrooms: number;
-  billsIncluded: boolean;
-  fullyVerifiedOnly: boolean;
-  furnishedOnly: boolean;
-}
-
-type Sort = "recommended" | "price-asc" | "price-desc" | "available";
-
-const BUDGET_MAX = 1500;
-
+/** Same rules as checkout; with no move-in date picked, any start date is fine. */
 function fitsDates(listing: Listing, moveIn: string, nights: number) {
-  if (nights < listing.minStayNights || nights > listing.maxStayMonths * 31) return false;
-  if (!moveIn) return true;
-  const start = parseISO(moveIn);
-  if (isAfter(parseISO(listing.availableFrom), start)) return false;
-  const end = addDays(start, nights);
-  return !listing.bookedRanges.some((r) =>
-    areIntervalsOverlapping({ start, end }, { start: parseISO(r.start), end: parseISO(r.end) })
-  );
+  const problem = stayProblem(listing, moveIn, nights);
+  return !problem || problem.kind === "noDate";
 }
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -82,17 +71,55 @@ function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange
   );
 }
 
-export function ListingBrowser({ listings, initial }: { listings: Listing[]; initial: BrowserFilters }) {
+/** How long the URL waits for filters to settle (e.g. while dragging the budget slider). */
+const URL_WRITE_DELAY_MS = 300;
+
+export function ListingBrowser({ listings }: { listings: Listing[] }) {
   const { d, t, date } = useI18n();
-  const [filters, setFilters] = useState<BrowserFilters>(initial);
-  const [sort, setSort] = useState<Sort>("recommended");
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.toString();
+  const [initial] = useState(() => parseBrowseParams(Object.fromEntries(searchParams)));
+  const [filters, setFilters] = useState<BrowserFilters>(initial.filters);
+  const [sort, setSort] = useState<Sort>(initial.sort);
+  const [view, setView] = useState<BrowseView>(initial.view);
   const [showFilters, setShowFilters] = useState(false);
+
+  const stateQuery = serializeBrowseParams(filters, sort, view);
+  const stateQueryRef = useRef(stateQuery);
+  useEffect(() => {
+    stateQueryRef.current = stateQuery;
+  });
+
+  // The URL is the source of truth when it changes from outside this component
+  // (a navbar or footer search link, Back/Forward): load the search it describes.
+  // Our own writes below already match the state, so they're skipped.
+  useEffect(() => {
+    if (urlQuery === stateQueryRef.current) return;
+    const next = parseBrowseParams(Object.fromEntries(new URLSearchParams(urlQuery)));
+    setFilters(next.filters);
+    setSort(next.sort);
+    setView(next.view);
+  }, [urlQuery]);
+
+  // Mirror the search into the URL so it can be shared, bookmarked and survives
+  // a reload. replaceState updates the address without a server round trip, and
+  // is debounced because Safari throws after ~100 history calls in 10 seconds.
+  useEffect(() => {
+    if (stateQuery === urlQuery) return;
+    const timer = window.setTimeout(() => {
+      const url = stateQuery ? `${window.location.pathname}?${stateQuery}` : window.location.pathname;
+      window.history.replaceState(null, "", url);
+    }, URL_WRITE_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [stateQuery, urlQuery]);
 
   const set = <K extends keyof BrowserFilters>(key: K, value: BrowserFilters[K]) =>
     setFilters((f) => ({ ...f, [key]: value }));
 
   const nights = stayToNights(filters.stay);
   const districts = areas.find((a) => a.city === filters.city)?.districts ?? [];
+
+  const total = useCallback((l: Listing) => quoteStay(l.pricing, nights).rentTotal, [nights]);
 
   const results = useMemo(() => {
     const filtered = listings.filter((l) => {
@@ -107,14 +134,13 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
       return fitsDates(l, filters.moveIn, nights);
     });
 
-    const total = (l: Listing) => quoteStay(l.pricing, nights).rentTotal;
     return [...filtered].sort((a, b) => {
       if (sort === "price-asc") return total(a) - total(b);
       if (sort === "price-desc") return total(b) - total(a);
       if (sort === "available") return a.availableFrom.localeCompare(b.availableFrom);
       return Number(isFullyVerified(b)) - Number(isFullyVerified(a)) || b.rating - a.rating;
     });
-  }, [listings, filters, nights, sort]);
+  }, [listings, filters, nights, sort, total]);
 
   const activeCount =
     filters.types.length +
@@ -166,7 +192,7 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
         </div>
         <input
           type="range"
-          min={150}
+          min={BUDGET_MIN}
           max={BUDGET_MAX}
           step={50}
           value={filters.maxMonthly}
@@ -315,6 +341,29 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
                 {d.browse.pricesFor(d.stay.format(filters.stay), filters.moveIn ? date(filters.moveIn, "MMM d, yyyy") : null)}
               </p>
             </div>
+            <div className="flex flex-wrap items-center gap-3">
+            <div role="group" aria-label={d.map.viewToggle} className="flex rounded-lg border border-input bg-card p-0.5">
+              {(
+                [
+                  ["list", List, d.map.list],
+                  ["map", MapIcon, d.map.map],
+                ] as const
+              ).map(([v, Icon, label]) => (
+                <button
+                  key={v}
+                  type="button"
+                  aria-pressed={view === v}
+                  onClick={() => setView(v)}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm font-medium transition-colors",
+                    view === v ? "bg-dark-forest text-background" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon className="size-4" />
+                  {label}
+                </button>
+              ))}
+            </div>
             <label className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">{d.browse.sort}</span>
               <select
@@ -329,6 +378,7 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
                 ))}
               </select>
             </label>
+            </div>
           </div>
 
           {results.length === 0 ? (
@@ -342,6 +392,8 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
                 {d.browse.clearFilters}
               </Button>
             </div>
+          ) : view === "map" ? (
+            <ResultsMap listings={results} priceOf={total} className="h-[65dvh] min-h-[420px]" />
           ) : (
             <div className="grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
               {results.map((l, i) => (

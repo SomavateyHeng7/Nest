@@ -30,6 +30,11 @@ export interface Pricing {
   deposit: number;
 }
 
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
 export interface DateRange {
   start: string;
   end: string;
@@ -45,6 +50,12 @@ export interface Listing {
   city: string;
   district: string;
   nearby: string[];
+  /**
+   * Approximate map point for the area (WGS84). Never the exact address: the
+   * backend should return a point offset by a few hundred metres, and the exact
+   * address is shared only after a booking is confirmed.
+   */
+  location: LatLng;
   pricing: Pricing;
   minStayNights: number;
   maxStayMonths: number;
