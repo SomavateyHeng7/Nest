@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -20,6 +19,8 @@ import {
 import { SaveButton } from "@/features/renter/components/save-button";
 import { AmenityIcon } from "@/features/listings/components/amenity-icon";
 import { BookingSidebar } from "@/features/booking/components/booking-sidebar";
+import { MobileBookingBar } from "@/features/booking/components/mobile-booking-bar";
+import { ListingGallery } from "@/features/listings/components/listing-gallery";
 import { OwnerDescription } from "@/features/listings/components/owner-text";
 import { StayCalendar } from "@/features/stays/components/stay-calendar";
 import { StayDraftProvider } from "@/features/stays/components/stay-draft";
@@ -160,19 +161,9 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
         </div>
       </div>
 
-      {/* Gallery */}
-      <div className="mt-6 grid h-[280px] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-3xl sm:h-[440px]">
-        <div className="relative col-span-4 row-span-2 sm:col-span-2">
-          <Image src={listing.images[0]} alt={title.text} fill priority sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
-        </div>
-        {listing.images.slice(1, 5).map((src, i) => (
-          <div key={src + i} className="relative hidden sm:block">
-            <Image src={src} alt={`${title.text} — ${d.listing.photo(i + 2)}`} fill sizes="25vw" className="object-cover" />
-          </div>
-        ))}
-      </div>
+      <ListingGallery images={listing.images} title={title.text} />
 
-      <div className="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-[1fr_380px]">
+      <div className="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex min-w-0 flex-col gap-8">
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {facts.map(({ icon: Icon, label }) => (
@@ -188,7 +179,7 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
           <OwnerDescription listing={listing} />
 
           <Section title={d.listing.pricing}>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {rates.map((r) => (
                 <div
                   key={r.label}
@@ -212,7 +203,7 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
                 </div>
               ))}
             </div>
-            <div className="grid gap-x-8 gap-y-3 rounded-2xl bg-muted/60 p-4 text-sm sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-3 rounded-2xl bg-muted/60 p-4 text-sm sm:grid-cols-2">
               <div>
                 <p className="font-medium">{d.listing.included}</p>
                 <p className="text-muted-foreground">{listing.utilitiesIncluded.map(t).join(", ")}</p>
@@ -312,20 +303,7 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
         </aside>
       </div>
 
-      {/* Mobile: keep price and the main action in reach while scrolling */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-4 border-t border-border bg-background/95 px-4 py-3 backdrop-blur lg:hidden">
-        <p>
-          <span className="text-lg font-semibold tabular">{formatUSD(pricing.monthly)}</span>
-          <span className="text-sm text-muted-foreground"> {d.common.perMonth}</span>
-          <span className="block text-xs text-muted-foreground">{d.book.mobilePrice(formatUSD(pricing.nightly))}</span>
-        </p>
-        <a
-          href="#book"
-          className="inline-flex h-11 shrink-0 items-center rounded-lg bg-accent-terracotta px-5 text-sm font-medium text-white hover:bg-terracotta-strong"
-        >
-          {d.book.request}
-        </a>
-      </div>
+      <MobileBookingBar />
     </div>
     </StayDraftProvider>
   );

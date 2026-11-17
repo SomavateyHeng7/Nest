@@ -48,7 +48,7 @@ export default async function HostPage() {
         <StatTile label={o.stats.moveIns} value={String(upcoming.length)} hint={o.stats.moveInsHint} icon={<CalendarCheck className="size-4.5" />} />
       </div>
 
-      <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_360px]">
+      <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
         <section>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">

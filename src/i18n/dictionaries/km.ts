@@ -285,6 +285,8 @@ export const km: Dictionary = {
     emptyTitle: "មិនទាន់មានផ្ទះត្រូវនឹងលក្ខខណ្ឌទាំងនេះទេ",
     emptyBody: "សាកល្បងថ្ងៃចូលនៅផ្សេង ការស្នាក់នៅខ្លីជាងនេះ ឬបន្ធូរតម្រង។ ផ្ទះថ្មីត្រូវបានផ្ទៀងផ្ទាត់រៀងរាល់សប្តាហ៍។",
     clearFilters: "សម្អាតតម្រង",
+    closeFilters: "បិទតម្រង",
+    showResults: (n) => (n === 0 ? "គ្មានផ្ទះត្រូវនឹងតម្រង" : `បង្ហាញផ្ទះ ${n}`),
   },
 
   listing: {
@@ -324,6 +326,8 @@ export const km: Dictionary = {
     since: (y) => `នៅលើ Nest តាំងពីឆ្នាំ ${y}`,
     replies: (time, rate) => `ឆ្លើយតប${time} · ${rate}%`,
     photo: (n) => `រូបភាពទី ${n}`,
+    photoCount: (i, n) => `${i} / ${n}`,
+    photos: "រូបភាព",
     ownerText: {
       khmerByOwner: "កំណែភាសាខ្មែរ សរសេរដោយម្ចាស់ផ្ទះ",
       englishOnly: "ម្ចាស់ផ្ទះបានសរសេរជាភាសាអង់គ្លេស",

@@ -31,7 +31,7 @@ export function SaveButton({
       className={cn(
         "relative z-10 inline-flex shrink-0 items-center justify-center gap-1.5 transition-colors",
         variant === "overlay"
-          ? "size-8 rounded-full bg-background/95 shadow-sm hover:bg-background"
+          ? "size-10 rounded-full bg-background/95 shadow-sm hover:bg-background sm:size-8"
           : "h-9 rounded-full border border-border bg-card px-3.5 text-sm font-medium hover:border-foreground/30",
         className
       )}

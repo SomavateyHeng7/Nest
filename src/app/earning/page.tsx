@@ -41,7 +41,7 @@ export default async function EarningPage() {
         <StatTile label={i.nextPayout} value={formatUSD(upcomingPayout)} hint={i.nextPayoutHint} />
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_340px]">
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
         <EarningsChart data={monthlyIncome} />
 
         <div className="rounded-2xl border border-border bg-card p-5">

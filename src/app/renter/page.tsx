@@ -79,7 +79,7 @@ export default async function RenterPage() {
 
       {active && activeListing && (
         <section className="mt-6 overflow-hidden rounded-3xl border border-border bg-card">
-          <div className="grid md:grid-cols-[280px_1fr]">
+          <div className="grid grid-cols-1 md:grid-cols-[280px_minmax(0,1fr)]">
             <div className="relative aspect-video md:aspect-auto">
               <Image src={activeListing.images[0]} alt={lt(activeListing).text} fill sizes="280px" className="object-cover" />
             </div>

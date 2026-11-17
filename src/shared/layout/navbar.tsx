@@ -28,8 +28,8 @@ export function Navbar() {
   if (pathname.startsWith("/admin")) {
     return (
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
-        <div className="flex h-14 items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/admin" aria-label={d.admin.eyebrow} className="flex items-center gap-2.5">
+        <div className="flex h-14 items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
+          <Link href="/admin" aria-label={d.admin.eyebrow} className="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
             <Logo />
             <span className="rounded-md bg-dark-forest px-1.5 py-0.5 text-[11px] font-semibold tracking-wide text-background uppercase">
               {d.admin.staff}
@@ -78,12 +78,12 @@ export function Navbar() {
             variant="ghost"
             size="icon"
             aria-label={d.nav.messages}
-            className="relative"
+            className="relative size-10 sm:size-8"
             nativeButton={false}
             render={<Link href="/messages" />}
           >
             <MessageCircle className="size-4.5" />
-            <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-accent-terracotta ring-2 ring-background" />
+            <span className="absolute top-2 right-2 size-2 rounded-full sm:top-1.5 sm:right-1.5 bg-accent-terracotta ring-2 ring-background" />
           </Button>
           <span className="hidden sm:block">
             <ThemeMenu />
@@ -102,7 +102,7 @@ export function Navbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="size-10 lg:hidden"
             aria-label={open ? d.nav.closeMenu : d.nav.openMenu}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}

@@ -82,19 +82,22 @@ export function EarningsChart({ data }: { data: MonthlyIncome[] }) {
                   <div key={t} className="h-px w-full bg-border" />
                 ))}
               </div>
-              {data.map((m) => {
+              {data.map((m, i) => {
                 const net = m.rent - m.fees;
                 const active = hover === m.month;
+                // Keep the tooltip inside the chart at the edges instead of spilling off small screens.
+                const align = i === 0 ? "left-0" : i === data.length - 1 ? "right-0" : "left-1/2 -translate-x-1/2";
                 return (
                   <div
                     key={m.month}
                     className="relative flex h-full flex-1 flex-col items-center justify-end"
-                    onMouseEnter={() => setHover(m.month)}
-                    onMouseLeave={() => setHover(null)}
+                    onPointerEnter={(e) => e.pointerType === "mouse" && setHover(m.month)}
+                    onPointerLeave={(e) => e.pointerType === "mouse" && setHover(null)}
+                    onClick={() => setHover(active ? null : m.month)}
                   >
                     {active && (
                       <div
-                        className="absolute z-10 mb-2 w-max -translate-y-full rounded-lg bg-foreground px-2.5 py-1.5 text-xs text-background shadow-md"
+                        className={`absolute z-10 mb-2 w-max -translate-y-full rounded-lg bg-foreground px-2.5 py-1.5 text-xs text-background shadow-md ${align}`}
                         style={{ bottom: `${(m.rent / max) * 100}%` }}
                       >
                         <p className="font-semibold tabular">{c.tipPayout(formatUSD(net))}</p>

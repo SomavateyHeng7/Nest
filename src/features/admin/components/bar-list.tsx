@@ -91,8 +91,9 @@ export function BarList({
               <li
                 key={row.key}
                 className="relative"
-                onMouseEnter={() => setHover(row.key)}
-                onMouseLeave={() => setHover(null)}
+                onPointerEnter={(e) => e.pointerType === "mouse" && setHover(row.key)}
+                onPointerLeave={(e) => e.pointerType === "mouse" && setHover(null)}
+                onClick={() => setHover(active ? null : row.key)}
               >
                 <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
                   <span className={cn("truncate", active ? "text-foreground" : "text-muted-foreground")}>{row.label}</span>

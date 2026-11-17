@@ -48,7 +48,7 @@ export default async function BookingPage(props: PageProps<"/booking/[id]">) {
       </Link>
       <h1 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-dark-forest">{c.title}</h1>
 
-      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px]">
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px]">
         <BookingConfirm ownerFirstName={ownerFirstName} listingTitle={lt(listing).text} dueAtBooking={quote.dueAtBooking} />
 
         <aside className="h-fit rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-24">

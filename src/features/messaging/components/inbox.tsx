@@ -48,7 +48,13 @@ export function Inbox({ initialThreads }: { initialThreads: Thread[] }) {
   }
 
   return (
-    <div className="grid h-[calc(100dvh-4rem-3rem)] min-h-[520px] overflow-hidden rounded-3xl border border-border bg-card md:grid-cols-[320px_1fr]">
+    <div
+      className={cn(
+        "grid grid-cols-1 overflow-hidden rounded-3xl border border-border bg-card md:h-[calc(100dvh-4rem-3rem)] md:min-h-[520px] md:grid-cols-[320px_minmax(0,1fr)]",
+        // Phones: the thread list sizes to its content; an open conversation fills the screen.
+        mobileOpen && "h-[calc(100dvh-4rem-3rem)] min-h-[420px]"
+      )}
+    >
       <aside className={cn("flex flex-col border-r border-border", mobileOpen && "hidden md:flex")}>
         <div className="border-b border-border p-4">
           <h1 className="font-heading text-xl font-semibold text-dark-forest">{m.title}</h1>

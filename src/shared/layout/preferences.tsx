@@ -34,7 +34,7 @@ export function LanguageSwitch({ className }: { className?: string }) {
           lang={l}
           onClick={() => locale !== l && setLocale(l)}
           className={cn(
-            "rounded-full px-2.5 py-1 text-xs font-semibold transition-colors",
+            "rounded-full px-2.5 py-2 text-xs font-semibold transition-colors sm:py-1",
             locale === l ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
           )}
         >
@@ -68,7 +68,7 @@ export function ThemeSwitch({ className }: { className?: string }) {
           aria-checked={current === value}
           onClick={() => setTheme(value)}
           className={cn(
-            "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+            "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium transition-colors sm:px-3 sm:py-1.5",
             current === value ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
           )}
         >

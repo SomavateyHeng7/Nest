@@ -23,7 +23,7 @@ export default async function ListingNotFound() {
         </Button>
       }
     >
-      <div className="grid gap-x-5 gap-y-8 text-left sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-8 text-left sm:grid-cols-3">
         {suggestions.map((l) => (
           <ListingCard key={l.id} listing={l} />
         ))}

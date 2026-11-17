@@ -24,12 +24,12 @@ export function StayLengthPicker({
   const max = maxFor[value.unit];
 
   return (
-    <div className={cn("flex items-center gap-2", compact ? "flex-row" : "flex-col items-stretch sm:flex-row sm:items-center")}>
+    <div className={cn("flex items-center gap-2", compact ? "flex-row flex-wrap" : "flex-col items-stretch sm:flex-row sm:items-center")}>
       <div className="flex items-center rounded-lg border border-input bg-background">
         <button
           type="button"
           aria-label={d.stay.shorter}
-          className="grid size-8 place-items-center rounded-l-lg text-muted-foreground hover:bg-muted disabled:opacity-40"
+          className="grid size-10 place-items-center rounded-l-lg sm:size-8 text-muted-foreground hover:bg-muted disabled:opacity-40"
           disabled={value.amount <= 1}
           onClick={() => onChange({ ...value, amount: Math.max(1, value.amount - 1) })}
         >
@@ -41,7 +41,7 @@ export function StayLengthPicker({
         <button
           type="button"
           aria-label={d.stay.longer}
-          className="grid size-8 place-items-center rounded-r-lg text-muted-foreground hover:bg-muted disabled:opacity-40"
+          className="grid size-10 place-items-center rounded-r-lg sm:size-8 text-muted-foreground hover:bg-muted disabled:opacity-40"
           disabled={value.amount >= max}
           onClick={() => onChange({ ...value, amount: Math.min(max, value.amount + 1) })}
         >
@@ -57,7 +57,7 @@ export function StayLengthPicker({
             aria-checked={value.unit === u}
             onClick={() => onChange({ unit: u, amount: Math.min(value.amount, maxFor[u]) })}
             className={cn(
-              "flex-1 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors",
+              "flex-1 rounded-md px-3 py-2.5 text-xs sm:px-2.5 sm:py-1 font-medium whitespace-nowrap transition-colors",
               value.unit === u ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
           >

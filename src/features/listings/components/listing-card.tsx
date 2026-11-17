@@ -18,11 +18,14 @@ export function ListingCard({
   listing,
   showCompare = true,
   stay,
+  eager = false,
 }: {
   listing: Listing;
   showCompare?: boolean;
   /** When set, the card shows the total rent for this stay instead of list prices. */
   stay?: StayLength;
+  /** Load the photo right away; set for cards in the first row, which can be the page's LCP. */
+  eager?: boolean;
 }) {
   const { d, t, date, lt } = useI18n();
   const { has, toggle, isFull } = useCompare();
@@ -41,6 +44,7 @@ export function ListingCard({
           src={listing.images[0]}
           alt={lt(listing).text}
           fill
+          loading={eager ? "eager" : undefined}
           sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
@@ -54,7 +58,7 @@ export function ListingCard({
                 disabled={!selected && isFull}
                 aria-pressed={selected}
                 className={cn(
-                  "relative z-10 inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm transition-colors disabled:opacity-60",
+                  "relative z-10 inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-2.5 text-xs font-semibold shadow-sm sm:px-2.5 sm:py-1 transition-colors disabled:opacity-60",
                   selected ? "bg-dark-forest text-background" : "bg-background/95 text-foreground hover:bg-background"
                 )}
               >

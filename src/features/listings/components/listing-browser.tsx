@@ -7,6 +7,7 @@ import { CalendarDays, SlidersHorizontal, X } from "lucide-react";
 import { ListingCard } from "@/features/listings/components/listing-card";
 import { StayLengthPicker } from "@/features/stays/components/stay-length-picker";
 import { Button } from "@/shared/ui/button";
+import { Dialog } from "@/shared/ui/dialog";
 import { isFullyVerified } from "@/features/listings/data";
 import { useI18n } from "@/i18n/client";
 import { ANYWHERE, areas, cities, propertyTypes } from "@/features/listings/lib/destinations";
@@ -49,7 +50,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+        "rounded-full border px-3.5 py-2.5 text-sm font-medium transition-colors sm:px-3 sm:py-1.5",
         active
           ? "border-dark-forest bg-dark-forest text-background"
           : "border-border bg-card text-foreground hover:border-foreground/30"
@@ -212,8 +213,8 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
     <div className="mx-auto max-w-7xl px-4 pt-6 pb-24 sm:px-6">
       {/* Search summary bar */}
       <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 lg:flex-row lg:items-center">
-        <div className="grid flex-1 gap-3 sm:grid-cols-3 lg:flex lg:items-center lg:gap-0">
-          <label className="flex flex-col gap-0.5 px-3 lg:min-w-44">
+        <div className="grid flex-1 grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:flex lg:items-center lg:gap-0">
+          <label className="flex min-w-0 flex-col gap-0.5 px-3 lg:min-w-44">
             <span className="text-xs font-semibold">{d.browse.city}</span>
             <select
               value={filters.city}
@@ -227,7 +228,7 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-0.5 px-3 lg:min-w-40 lg:border-l lg:border-border">
+          <label className="flex min-w-0 flex-col gap-0.5 px-3 sm:border-l sm:border-border lg:min-w-40">
             <span className="flex items-center gap-1 text-xs font-semibold">
               <CalendarDays className="size-3" /> {d.search.moveIn}
             </span>
@@ -238,16 +239,16 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
               className="bg-transparent text-sm outline-none"
             />
           </label>
-          <div className="flex flex-col gap-1 px-3 lg:border-l lg:border-border">
+          <div className="flex flex-col gap-1 px-3 sm:border-l sm:border-border">
             <span className="text-xs font-semibold">{d.browse.stayLength}</span>
             <StayLengthPicker value={filters.stay} onChange={(v) => set("stay", v)} compact />
           </div>
         </div>
         <Button
           variant="outline"
-          className="h-10 gap-2 px-4 lg:hidden"
-          onClick={() => setShowFilters((v) => !v)}
-          aria-expanded={showFilters}
+          className="h-11 gap-2 px-4 lg:hidden"
+          onClick={() => setShowFilters(true)}
+          aria-haspopup="dialog"
         >
           <SlidersHorizontal className="size-4" />
           {d.browse.filters}{activeCount > 0 && ` (${activeCount})`}
@@ -267,8 +268,30 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
         </div>
       )}
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[280px_1fr]">
-        <aside className={cn("lg:block", showFilters ? "block" : "hidden")}>
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+        {/* Phones and tablets: filters live in a bottom sheet so results stay in view. */}
+        <Dialog
+          open={showFilters}
+          onOpenChange={setShowFilters}
+          title={d.browse.filters}
+          closeLabel={d.browse.closeFilters}
+          className="lg:hidden"
+        >
+          {panel}
+          <div className="sticky -bottom-5 -mx-5 mt-6 -mb-5 flex items-center gap-3 border-t border-border bg-popover px-5 py-4">
+            <Button variant="ghost" className="h-12 px-4" onClick={reset} disabled={activeCount === 0}>
+              {d.common.reset}
+            </Button>
+            <Button
+              className="h-12 flex-1 bg-dark-forest text-base text-background hover:bg-dark-forest/90"
+              onClick={() => setShowFilters(false)}
+            >
+              {d.browse.showResults(results.length)}
+            </Button>
+          </div>
+        </Dialog>
+
+        <aside className="hidden lg:block">
           <div className="rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-24">
             <div className="mb-5 flex items-center justify-between">
               <h2 className="font-semibold">{d.browse.filters}</h2>
@@ -321,8 +344,9 @@ export function ListingBrowser({ listings, initial }: { listings: Listing[]; ini
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
-              {results.map((l) => (
-                <ListingCard key={l.id} listing={l} stay={filters.stay} />
+              {results.map((l, i) => (
+                // Up to three cards share the first row (xl), so those load eagerly.
+                <ListingCard key={l.id} listing={l} stay={filters.stay} eager={i < 3} />
               ))}
             </div>
           )}

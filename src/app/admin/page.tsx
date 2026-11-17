@@ -58,7 +58,7 @@ export default async function AdminOverview() {
 
       <section className="mt-8">
         <h2 className="mb-3 font-semibold">{o.attention}</h2>
-        <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           {attention.map(({ href, icon: Icon, text, urgent }) => (
             <li key={href}>
               <Link
@@ -82,7 +82,7 @@ export default async function AdminOverview() {
         </ul>
       </section>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <BarList
           title={o.funnel}
           sub={o.funnelSub}

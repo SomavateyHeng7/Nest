@@ -29,7 +29,7 @@ export function HeroSearch() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid w-full gap-1 rounded-2xl bg-card p-2 text-left shadow-2xl shadow-black/20 ring-1 ring-black/5 md:grid-cols-[1fr_1fr_auto_auto] md:items-center"
+      className="grid grid-cols-1 w-full gap-1 rounded-2xl bg-card p-2 text-left shadow-2xl shadow-black/20 ring-1 ring-black/5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] md:items-center"
     >
       <label className="flex flex-col gap-1 rounded-xl px-4 py-2.5 hover:bg-muted/60">
         <span className="flex items-center gap-1.5 text-xs font-semibold text-foreground">

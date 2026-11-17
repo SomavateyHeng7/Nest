@@ -220,7 +220,7 @@ export function ListingWizard() {
   }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[220px_1fr]">
+    <div className="grid grid-cols-1 gap-10 lg:grid-cols-[220px_minmax(0,1fr)]">
       <ol className="flex gap-2 overflow-x-auto scrollbar-none lg:flex-col">
         {steps.map((s, i) => (
           <li key={s}>
@@ -262,7 +262,7 @@ export function ListingWizard() {
                 </Pill>
               ))}
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label={w.city}>
                 <select
                   value={city}
@@ -310,11 +310,11 @@ export function ListingWizard() {
         {step === 1 && (
           <div className="flex flex-col gap-6">
             <h2 className="font-heading text-2xl font-semibold text-dark-forest">{w.basics}</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Counter label={w.bedrooms} value={bedrooms} onChange={setBedrooms} />
               <Counter label={w.bathrooms} value={baths} onChange={setBaths} min={1} />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label={w.size}>
                 <Input type="number" min={1} value={size} onChange={(e) => setSize(Number(e.target.value))} className="h-11 bg-card" />
               </Field>
@@ -374,12 +374,12 @@ export function ListingWizard() {
               <h2 className="font-heading text-2xl font-semibold text-dark-forest">{w.pricingTitle}</h2>
               <p className="text-sm text-muted-foreground">{w.pricingSub}</p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <Field label={w.perNight} hint={w.under1w}><MoneyInput value={nightly} onChange={setNightly} /></Field>
               <Field label={w.perWeek} hint={w.w13}><MoneyInput value={weekly} onChange={setWeekly} /></Field>
               <Field label={w.perMonth} hint={w.m1plus}><MoneyInput value={monthly} onChange={setMonthly} /></Field>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <Field label={w.deposit}><MoneyInput value={deposit} onChange={setDeposit} /></Field>
               <Field label={w.minNights}>
                 <Input type="number" min={1} value={minNights} onChange={(e) => setMinNights(Number(e.target.value))} className="h-11 bg-card" />
@@ -401,7 +401,7 @@ export function ListingWizard() {
             <div className="rounded-2xl bg-accent/50 p-5">
               <p className="text-sm font-semibold">{w.feeTitle}</p>
               <p className="text-xs text-muted-foreground">{w.feeSub}</p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {placementFeeTiers.map((tier) => (
                   <div key={tier.minMonths} className="rounded-xl bg-card px-3.5 py-3">
                     <p className="text-xs text-muted-foreground">{d.income.tierStay(d.fees.tierLabel(tier.minMonths, tier.maxMonths))}</p>

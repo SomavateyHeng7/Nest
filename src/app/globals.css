@@ -161,6 +161,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Leave room below the footer for the listing page's pinned booking bar (shown below lg). */
+  @media (width < 64rem) {
+    body:has([data-mobile-booking-bar]) {
+      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    }
+  }
   html {
     @apply font-sans;
   }

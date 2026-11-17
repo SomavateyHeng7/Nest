@@ -23,7 +23,7 @@ export default async function ProfilePage() {
     <div className="mx-auto max-w-4xl px-4 pt-8 pb-24 sm:px-6">
       <h1 className="font-heading text-3xl font-semibold tracking-tight text-dark-forest">{p.title}</h1>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-[260px_1fr]">
+      <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="flex h-fit flex-col items-center gap-3 rounded-2xl border border-border bg-card p-6 text-center">
           <Avatar className="size-24">
             <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
@@ -46,7 +46,7 @@ export default async function ProfilePage() {
         <div className="flex flex-col gap-6">
           <section className="rounded-2xl border border-border bg-card p-6">
             <h2 className="font-semibold">{p.personal}</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <label className="flex flex-col gap-1.5">
                 <span className="text-sm font-medium">{p.fullName}</span>
                 <Input defaultValue={currentUser.name} className="h-10" />

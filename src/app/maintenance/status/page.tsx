@@ -29,7 +29,7 @@ export default async function StatusIndex() {
         {codes.map((c) => (
           <li key={c}>
             <Link
-              href={`/status/${c}`}
+              href={`/maintenance/status/${c}`}
               className="flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 transition-colors hover:border-foreground/30"
             >
               <span className="w-16 shrink-0 font-mono text-sm font-semibold text-muted-foreground">{c}</span>

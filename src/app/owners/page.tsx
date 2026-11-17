@@ -22,7 +22,7 @@ export default async function OwnersPage() {
   const o = d.owners;
   return (
     <div>
-      <section className="mx-auto grid max-w-7xl gap-12 px-4 pt-12 pb-20 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+      <section className="mx-auto grid grid-cols-1 max-w-7xl gap-12 px-4 pt-12 pb-20 sm:px-6 lg:grid-cols-[1.1fr_minmax(0,1fr)] lg:items-center">
         <div className="flex flex-col gap-6">
           <p className="text-sm font-semibold tracking-widest text-accent-terracotta uppercase">{o.eyebrow}</p>
           <h1 className="font-heading text-5xl leading-[1.05] font-semibold tracking-tight text-dark-forest sm:text-6xl">
@@ -55,7 +55,7 @@ export default async function OwnersPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <h2 className="font-heading text-3xl font-semibold tracking-tight text-dark-forest">{o.pricingTitle}</h2>
           <p className="mt-1 text-muted-foreground">{o.pricingSub}</p>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
             {placementFeeTiers.map((t, i) => (
               <div key={t.minMonths} className="flex flex-col rounded-3xl border border-border bg-background p-6">
                 <p className="text-sm font-medium text-muted-foreground">{o.tierStays(d.fees.tierLabel(t.minMonths, t.maxMonths))}</p>
@@ -70,13 +70,13 @@ export default async function OwnersPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center">
+      <section className="mx-auto grid grid-cols-1 max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center">
         <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
           <Image src={listings[3].images[0]} alt={o.imageAlt} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
         </div>
         <div>
           <h2 className="font-heading text-3xl font-semibold tracking-tight text-dark-forest">{o.toolsTitle}</h2>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
             {o.benefits.map(({ title, body }, i) => {
               const Icon = benefitIcons[i];
               return (

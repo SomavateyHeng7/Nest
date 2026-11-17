@@ -36,7 +36,7 @@ export async function Footer() {
 
   return (
     <footer className="mt-auto border-t border-border bg-card/60">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+      <div className="mx-auto grid grid-cols-1 max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div className="flex max-w-xs flex-col gap-3">
           <Logo />
           <p className="text-sm text-muted-foreground">{d.footer.tagline}</p>

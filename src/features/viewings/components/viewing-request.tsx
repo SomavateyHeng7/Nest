@@ -158,7 +158,7 @@ export function ViewingRequest({ listing }: { listing: Listing }) {
 
             <section>
               <h3 className="mb-2 text-sm font-semibold">{v.how}</h3>
-              <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label={v.how}>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2" role="radiogroup" aria-label={v.how}>
                 {(["in-person", "video"] as const).map((key) => {
                   const Icon = key === "video" ? Video : MapPin;
                   return (
@@ -197,7 +197,7 @@ export function ViewingRequest({ listing }: { listing: Listing }) {
               />
             </label>
 
-            <div className="sticky bottom-0 -mx-5 -mb-5 border-t border-border bg-popover px-5 py-4">
+            <div className="sticky -bottom-5 -mx-5 -mb-5 border-t border-border bg-popover px-5 py-4">
               <Button
                 className="h-12 w-full bg-accent-terracotta text-base text-white hover:bg-terracotta-strong"
                 disabled={!time}

@@ -145,7 +145,7 @@ export function ExtendStay({ stay, listing }: { stay: Stay; listing: Listing }) 
               </dl>
             )}
 
-            <div className="sticky bottom-0 -mx-5 -mb-5 border-t border-border bg-popover px-5 py-4">
+            <div className="sticky -bottom-5 -mx-5 -mb-5 border-t border-border bg-popover px-5 py-4">
             <Button
               className="h-12 w-full bg-accent-terracotta text-base text-white hover:bg-terracotta-strong"
               disabled={!picked}

@@ -242,7 +242,7 @@ export function AvailabilityManager({ listings, bookings }: { listings: Listing[
   const months = [start, addMonths(start, 1)];
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[300px_minmax(0,1fr)]">
       <aside className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           {listings.map((l) => (
@@ -333,7 +333,7 @@ export function AvailabilityManager({ listings, bookings }: { listings: Listing[
         </div>
         <p className="mb-4 text-xs text-muted-foreground">{c.dragHint}</p>
         {/* touch-none: dragging across days must not scroll the page */}
-        <div className="grid touch-none gap-8 md:grid-cols-2">
+        <div className="grid grid-cols-1 touch-none gap-8 md:grid-cols-2">
           {months.map((m) => (
             <MonthGrid
               key={m.toISOString()}

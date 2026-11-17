@@ -22,7 +22,7 @@ export async function VerificationPanel({ verification }: { verification: Verifi
           </p>
         </div>
       </div>
-      <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+      <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {keys.map((key) => {
           const ok = verification[key];
           const item = d.verification.items[key];

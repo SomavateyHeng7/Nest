@@ -97,7 +97,7 @@ export function BookingSidebar() {
                 aria-label={d.book.fewerGuests}
                 disabled={guests <= 1}
                 onClick={() => setGuests(guests - 1)}
-                className="grid size-7 place-items-center rounded-full border border-input disabled:opacity-40"
+                className="grid size-10 place-items-center rounded-full border border-input disabled:opacity-40 sm:size-8"
               >
                 <Minus className="size-3.5" />
               </button>
@@ -107,7 +107,7 @@ export function BookingSidebar() {
                 aria-label={d.book.moreGuests}
                 disabled={guests >= listing.maxGuests}
                 onClick={() => setGuests(guests + 1)}
-                className="grid size-7 place-items-center rounded-full border border-input disabled:opacity-40"
+                className="grid size-10 place-items-center rounded-full border border-input disabled:opacity-40 sm:size-8"
               >
                 <Plus className="size-3.5" />
               </button>

@@ -105,7 +105,7 @@ export function BookingConfirm({
         <StepHeader n={1} title={c.step1} done={step > 1} active={step === 1} />
         {step === 1 ? (
           <form
-            className="mt-5 grid gap-4 sm:grid-cols-2"
+            className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2"
             onSubmit={(e) => {
               e.preventDefault();
               setStep(2);
@@ -164,7 +164,7 @@ export function BookingConfirm({
         <StepHeader n={2} title={c.step2} done={false} active={step === 2} />
         {step === 2 && (
           <div className="mt-5 flex flex-col gap-4">
-            <div role="radiogroup" aria-label={c.paymentMethod} className="grid gap-2 sm:grid-cols-2">
+            <div role="radiogroup" aria-label={c.paymentMethod} className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {methods.map(({ id, icon: Icon }) => (
                 <button
                   key={id}

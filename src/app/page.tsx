@@ -62,7 +62,7 @@ export default async function Home() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 pt-10 pb-16 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:pt-16 lg:pb-24">
+        <div className="mx-auto grid grid-cols-1 max-w-7xl gap-10 px-4 pt-10 pb-16 sm:px-6 lg:grid-cols-[1.05fr_minmax(0,1fr)] lg:items-center lg:pt-16 lg:pb-24">
           <div className="relative z-10 flex flex-col gap-6">
             <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
               <span className="size-1.5 rounded-full bg-primary-sage" />
@@ -93,7 +93,7 @@ export default async function Home() {
                 src={listings[0].images[0]}
                 alt={h.heroAltA}
                 fill
-                priority
+                preload
                 sizes="40vw"
                 className="object-cover"
               />
@@ -177,7 +177,7 @@ export default async function Home() {
 
       {/* Verification */}
       <section className="bg-dark-forest text-background dark:bg-card dark:text-foreground">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="mx-auto grid grid-cols-1 max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="flex flex-col gap-4">
             <p className="text-sm font-semibold tracking-widest text-accent-terracotta uppercase">{h.verifyEyebrow}</p>
             <h2 className="font-heading text-4xl leading-tight font-semibold tracking-tight">
@@ -187,7 +187,7 @@ export default async function Home() {
               {h.verifyBody}
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {h.checks.map(({ title, body }, i) => {
               const Icon = checkIcons[i];
               return (
@@ -207,7 +207,7 @@ export default async function Home() {
         <h2 className="text-center font-heading text-3xl font-semibold tracking-tight text-dark-forest">
           {h.stepsTitle}
         </h2>
-        <ol className="mt-12 grid gap-8 md:grid-cols-3">
+        <ol className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
           {h.steps.map(({ title, body }, i) => {
             const Icon = stepIcons[i];
             return (

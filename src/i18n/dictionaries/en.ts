@@ -224,6 +224,8 @@ export const en = {
     emptyTitle: "No homes match all of that yet",
     emptyBody: "Try a different move-in date, a shorter stay, or loosen a filter. New homes are verified every week.",
     clearFilters: "Clear filters",
+    closeFilters: "Close filters",
+    showResults: (n: number) => (n === 0 ? "No homes match" : `Show ${plural(n, "home", "homes")}`),
   },
 
   listing: {
@@ -263,6 +265,8 @@ export const en = {
     since: (y: number) => `On Nest since ${y}`,
     replies: (time: string, rate: number) => `Replies ${time} · ${rate}%`,
     photo: (n: number) => `photo ${n}`,
+    photoCount: (i: number, n: number) => `${i} / ${n}`,
+    photos: "Photos",
     ownerText: {
       khmerByOwner: "Khmer version written by the owner",
       englishOnly: "The owner wrote this in English",

@@ -32,7 +32,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   }
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-2 lg:py-16">
+    <div className="mx-auto grid grid-cols-1 max-w-6xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-2 lg:py-16">
       <div className="mx-auto flex w-full max-w-md flex-col">
         <h1 className="font-heading text-3xl font-semibold tracking-tight text-dark-forest">
           {isLogin ? a.loginTitle : a.signupTitle}

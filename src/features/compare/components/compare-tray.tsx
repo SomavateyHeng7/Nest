@@ -45,8 +45,9 @@ export function CompareTray() {
   return (
     <div
       className={cn(
-        "pointer-events-none fixed inset-x-0 z-50 flex px-4 sm:bottom-4 sm:justify-center",
-        onListingPage ? "bottom-[5.5rem] justify-end lg:bottom-4" : "bottom-4 justify-end"
+        "pointer-events-none fixed inset-x-0 z-50 flex justify-end px-4 sm:justify-center",
+        // The listing page's booking bar stays pinned below lg, so the tray sits above it until then.
+        onListingPage ? "bottom-[calc(5.5rem+env(safe-area-inset-bottom))] lg:bottom-4" : "bottom-4"
       )}
     >
       {/* Phone: collapsed pill */}

@@ -208,7 +208,7 @@ export function CompareTable() {
       {!isFull && (
         <div className="mt-10">
           <h2 className="font-semibold">{c.addAnother}</h2>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {suggestions.map((l) => (
               <button
                 key={l.id}

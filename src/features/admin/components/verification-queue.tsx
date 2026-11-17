@@ -205,7 +205,7 @@ export function VerificationQueue() {
                 )}
               </div>
               {!open.visit && (
-                <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
+                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
                   <label className="flex flex-col gap-1 text-xs font-medium">
                     {v.inspector}
                     <select
