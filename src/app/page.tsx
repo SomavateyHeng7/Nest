@@ -54,7 +54,7 @@ function MarkIcon({ mark, labels }: { mark: Mark; labels: { yes: string; no: str
 }
 
 export default async function Home() {
-  const { d } = await getI18n();
+  const { d, money } = await getI18n();
   const h = d.home;
   const featured = listings.filter((l) => l.city === "Phnom Penh").slice(0, 4);
 
@@ -115,7 +115,7 @@ export default async function Home() {
               <p className="mt-2 text-sm font-medium">{h.heroCardTitle}</p>
               <div className="mt-3 flex items-end justify-between">
                 <p className="text-sm">
-                  <span className="text-lg font-semibold tabular">$650</span>
+                  <span className="text-lg font-semibold tabular">{money(650)}</span>
                   <span className="text-muted-foreground"> {d.common.perMonth}</span>
                 </p>
                 <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">

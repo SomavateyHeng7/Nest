@@ -10,7 +10,7 @@ import { CheckoutDates } from "@/features/booking/components/checkout-dates";
 import { getListingById, isFullyVerified } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
 import { stayProblem } from "@/features/stays/lib/availability";
-import { formatUSD, quoteStay, stayToNights } from "@/features/stays/lib/pricing";
+import { quoteStay, stayToNights } from "@/features/stays/lib/pricing";
 import { firstParam, parseISODate, parseStay } from "@/features/stays/lib/search-params";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,7 +24,7 @@ export default async function BookingPage(props: PageProps<"/booking/[id]">) {
   const listing = getListingById(id);
   if (!listing) notFound();
 
-  const { d, t, date, lt } = await getI18n();
+  const {  d, t, date, lt, money, currency, rate } = await getI18n();
   const c = d.checkout;
 
   const moveIn = parseISODate(firstParam(searchParams.moveIn)) ?? listing.availableFrom;
@@ -37,7 +37,7 @@ export default async function BookingPage(props: PageProps<"/booking/[id]">) {
   const quote = quoteStay(listing.pricing, nights);
   const moveOut = addDays(parseISO(moveIn), nights);
   const ownerFirstName = listing.owner.name.split(" ")[0];
-  const rateLabel = d.rate[quote.tier](formatUSD(quote.rate));
+  const rateLabel = d.rate[quote.tier](money(quote.rate));
   const firstRent = quote.dueAtBooking - quote.deposit;
 
   return (
@@ -109,26 +109,29 @@ export default async function BookingPage(props: PageProps<"/booking/[id]">) {
           <dl className="mt-5 flex flex-col gap-2 border-t border-border pt-5 text-sm">
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">{c.rentWith(rateLabel)}</dt>
-              <dd className="tabular">{formatUSD(quote.rentTotal)}</dd>
+              <dd className="tabular">{money(quote.rentTotal)}</dd>
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">{d.book.serviceFee}</dt>
-              <dd className="font-medium text-success">$0</dd>
+              <dd className="font-medium text-success">{money(0)}</dd>
             </div>
             {quote.deposit > 0 && (
               <div className="flex justify-between gap-3">
                 <dt className="text-muted-foreground">{d.book.deposit}</dt>
-                <dd className="tabular">{formatUSD(quote.deposit)}</dd>
+                <dd className="tabular">{money(quote.deposit)}</dd>
               </div>
             )}
             <div className="mt-2 flex justify-between gap-3 border-t border-border pt-3 text-base font-semibold">
               <dt>{d.book.dueWhenAccepted}</dt>
-              <dd className="tabular">{formatUSD(quote.dueAtBooking)}</dd>
+              <dd className="tabular">{money(quote.dueAtBooking)}</dd>
             </div>
             {quote.laterPayments > 0 && firstRent < quote.rentTotal && (
               <p className="text-xs text-muted-foreground">
-                {c.remaining(formatUSD(quote.rentTotal - firstRent), quote.laterPayments)}
+                {c.remaining(money(quote.rentTotal - firstRent), quote.laterPayments)}
               </p>
+            )}
+            {currency === "KHR" && (
+              <p className="text-xs text-muted-foreground">{d.prefs.currencyNote(Math.round(rate).toLocaleString("en-US"))}</p>
             )}
           </dl>
         </aside>

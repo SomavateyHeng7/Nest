@@ -9,8 +9,9 @@ import { SaveButton } from "@/features/renter/components/save-button";
 import { useCompare } from "@/features/compare/components/compare-provider";
 import { VerifiedBadge } from "@/features/listings/components/verified-badge";
 import { isFullyVerified } from "@/features/listings/data";
+import { useReviews } from "@/features/reviews/store";
 import { useI18n } from "@/i18n/client";
-import { formatUSD, quoteStay, stayToNights, type StayLength } from "@/features/stays/lib/pricing";
+import { quoteStay, stayToNights, type StayLength } from "@/features/stays/lib/pricing";
 import { cn } from "@/shared/lib/utils";
 import type { Listing } from "@/features/listings/types";
 
@@ -27,7 +28,8 @@ export function ListingCard({
   /** Load the photo right away; set for cards in the first row, which can be the page's LCP. */
   eager?: boolean;
 }) {
-  const { d, t, date, lt } = useI18n();
+  const { d, t, date, lt, money } = useI18n();
+  const rating = useReviews().summary(listing.id);
   const { has, toggle, isFull } = useCompare();
   const selected = has(listing.id);
   const quote = stay ? quoteStay(listing.pricing, stayToNights(stay)) : null;
@@ -82,10 +84,15 @@ export function ListingCard({
           <span className="font-medium tracking-wide uppercase">
             {d.propertyType[listing.type]} · {t(listing.district)}, {t(listing.city)}
           </span>
-          <span className="flex shrink-0 items-center gap-1 text-foreground">
-            <Star className="size-3.5 fill-current text-accent-terracotta" />
-            <span className="tabular">{listing.rating.toFixed(2)}</span>
-          </span>
+          {rating.count > 0 ? (
+            <span className="flex shrink-0 items-center gap-1 text-foreground" aria-label={`${d.reviews.ratingLabel(rating.average.toFixed(1))}, ${d.common.reviews(rating.count)}`}>
+              <Star className="size-3.5 fill-current text-accent-terracotta" aria-hidden />
+              <span className="tabular">{rating.average.toFixed(1)}</span>
+              <span className="text-muted-foreground tabular">({rating.count})</span>
+            </span>
+          ) : (
+            <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-[11px] font-semibold text-accent-foreground">{d.reviews.new}</span>
+          )}
         </div>
         <h3 className="line-clamp-1 font-medium text-foreground" lang={lt(listing).lang}>
           <Link
@@ -111,17 +118,17 @@ export function ListingCard({
         </div>
         {quote && stay ? (
           <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 text-sm">
-            <span className="text-base font-semibold text-foreground tabular">{formatUSD(quote.rentTotal)}</span>
+            <span className="text-base font-semibold text-foreground tabular">{money(quote.rentTotal)}</span>
             <span className="text-muted-foreground">{d.card.totalFor(d.stay.format(stay))}</span>
-            <span className="text-muted-foreground">· {d.rate[quote.tier](formatUSD(quote.rate))}</span>
+            <span className="text-muted-foreground">· {d.rate[quote.tier](money(quote.rate))}</span>
           </p>
         ) : (
           <p className="mt-1 flex items-baseline gap-1.5 text-sm">
-            <span className="text-base font-semibold text-foreground tabular">{formatUSD(listing.pricing.monthly)}</span>
+            <span className="text-base font-semibold text-foreground tabular">{money(listing.pricing.monthly)}</span>
             <span className="text-muted-foreground">{d.common.perMonth}</span>
             <span className="text-muted-foreground">·</span>
             <span className="text-muted-foreground tabular">
-              {formatUSD(listing.pricing.nightly)} {d.common.perNight}
+              {money(listing.pricing.nightly)} {d.common.perNight}
             </span>
           </p>
         )}

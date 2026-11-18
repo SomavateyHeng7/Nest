@@ -11,7 +11,7 @@ import { monthlyIncome } from "@/features/owner/data";
 import { ownerBookings } from "@/features/booking/data";
 import { getListingById } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD, placementFee, placementFeeTiers } from "@/features/stays/lib/pricing";
+import { placementFee, placementFeeTiers } from "@/features/stays/lib/pricing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();
@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function EarningPage() {
-  const { d, range, lt } = await getI18n();
+  const { d, range, lt, money } = await getI18n();
   const i = d.income;
 
   const rent = monthlyIncome.reduce((s, m) => s + m.rent, 0);
@@ -35,10 +35,10 @@ export default async function EarningPage() {
   return (
     <OwnerShell title={i.title} description={i.sub(currentUser.payoutMethod)}>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatTile label={i.rentReceived} value={formatUSD(rent)} hint={i.last6} />
-        <StatTile label={i.fees} value={formatUSD(fees)} hint={i.feesHint(((fees / rent) * 100).toFixed(0))} />
-        <StatTile label={i.payout} value={formatUSD(rent - fees)} hint={i.payoutHint} />
-        <StatTile label={i.nextPayout} value={formatUSD(upcomingPayout)} hint={i.nextPayoutHint} />
+        <StatTile label={i.rentReceived} value={money(rent)} hint={i.last6} />
+        <StatTile label={i.fees} value={money(fees)} hint={i.feesHint(((fees / rent) * 100).toFixed(0))} />
+        <StatTile label={i.payout} value={money(rent - fees)} hint={i.payoutHint} />
+        <StatTile label={i.nextPayout} value={money(upcomingPayout)} hint={i.nextPayoutHint} />
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -89,11 +89,11 @@ export default async function EarningPage() {
                       {listing ? lt(listing).text : null}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{range(b.moveIn, b.moveOut)}</td>
-                    <td className="px-4 py-3 text-right tabular">{formatUSD(b.rentTotal)}</td>
+                    <td className="px-4 py-3 text-right tabular">{money(b.rentTotal)}</td>
                     <td className="px-4 py-3 text-right whitespace-nowrap text-muted-foreground tabular">
-                      −{formatUSD(fee)} <span className="text-xs">({tier.rate * 100}%)</span>
+                      −{money(fee)} <span className="text-xs">({tier.rate * 100}%)</span>
                     </td>
-                    <td className="px-4 py-3 text-right font-semibold tabular">{formatUSD(b.rentTotal - fee)}</td>
+                    <td className="px-4 py-3 text-right font-semibold tabular">{money(b.rentTotal - fee)}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={b.status} />
                     </td>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { useI18n } from "@/i18n/client";
-import { formatUSD } from "@/features/stays/lib/pricing";
+
 import type { MonthlyIncome } from "@/features/owner/types";
 
 const CHART_HEIGHT = 200;
@@ -14,7 +14,7 @@ function niceMax(max: number) {
 }
 
 export function EarningsChart({ data }: { data: MonthlyIncome[] }) {
-  const { d, date } = useI18n();
+  const { d, date, money } = useI18n();
   const c = d.income.chart;
   const monthLabel = (iso: string) => date(`${iso}-01`, "MMM");
   const [showTable, setShowTable] = useState(false);
@@ -59,9 +59,9 @@ export function EarningsChart({ data }: { data: MonthlyIncome[] }) {
             {data.map((m) => (
               <tr key={m.month} className="border-b border-border/60 last:border-0">
                 <td className="py-2">{monthLabel(m.month)}</td>
-                <td className="py-2 text-right tabular">{formatUSD(m.rent)}</td>
-                <td className="py-2 text-right tabular">{m.fees ? `−${formatUSD(m.fees)}` : "—"}</td>
-                <td className="py-2 text-right font-medium tabular">{formatUSD(m.rent - m.fees)}</td>
+                <td className="py-2 text-right tabular">{money(m.rent)}</td>
+                <td className="py-2 text-right tabular">{m.fees ? `−${money(m.fees)}` : "—"}</td>
+                <td className="py-2 text-right font-medium tabular">{money(m.rent - m.fees)}</td>
               </tr>
             ))}
           </tbody>
@@ -72,7 +72,7 @@ export function EarningsChart({ data }: { data: MonthlyIncome[] }) {
             <div className="flex w-12 shrink-0 flex-col justify-between text-right text-xs text-muted-foreground tabular" style={{ height: CHART_HEIGHT }}>
               {ticks.map((t) => (
                 <span key={t} className="-translate-y-1/2 first:translate-y-0 last:translate-y-0">
-                  {formatUSD(t)}
+                  {money(t)}
                 </span>
               ))}
             </div>
@@ -100,8 +100,8 @@ export function EarningsChart({ data }: { data: MonthlyIncome[] }) {
                         className={`absolute z-10 mb-2 w-max -translate-y-full rounded-lg bg-foreground px-2.5 py-1.5 text-xs text-background shadow-md ${align}`}
                         style={{ bottom: `${(m.rent / max) * 100}%` }}
                       >
-                        <p className="font-semibold tabular">{c.tipPayout(formatUSD(net))}</p>
-                        {m.fees > 0 && <p className="opacity-75 tabular">{c.tipFee(formatUSD(m.fees))}</p>}
+                        <p className="font-semibold tabular">{c.tipPayout(money(net))}</p>
+                        {m.fees > 0 && <p className="opacity-75 tabular">{c.tipFee(money(m.fees))}</p>}
                       </div>
                     )}
                     <div className="flex w-full max-w-10 flex-col overflow-hidden rounded-t-md" style={{ height: `${(m.rent / max) * 100}%` }}>

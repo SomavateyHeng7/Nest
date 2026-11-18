@@ -8,6 +8,7 @@ import { Button } from "@/shared/ui/button";
 import { Dialog } from "@/shared/ui/dialog";
 import { toast } from "@/shared/ui/toast";
 import { canApproveHost, hostApplications, type ApplicationStatus, type DocState, type HostApplication } from "@/features/admin/data";
+import { useAudit } from "@/features/admin/audit";
 import { useI18n } from "@/i18n/client";
 import { cn } from "@/shared/lib/utils";
 
@@ -38,6 +39,7 @@ export function HostApplications() {
   const docState = d.admin.verify.docState;
   const tt = d.admin.toast;
 
+  const { log } = useAudit();
   const [apps, setApps] = useState(hostApplications);
   const [tab, setTab] = useState<ApplicationStatus>("pending");
   const [q, setQ] = useState("");
@@ -61,6 +63,7 @@ export function HostApplications() {
 
   function setCheck(app: HostApplication, key: "identity" | "selfie" | "payout", state: DocState) {
     patch(app.id, { checks: { ...app.checks, [key]: state } });
+    log({ action: state === "approved" ? "host.checkApproved" : "host.checkRequested", target: app.name, ref: app.id, detail: a.checks[key] });
     if (state === "approved") toast.success(tt.docApproved, { description: `${app.name} · ${a.checks[key]}` });
     else toast.info(tt.docRequested(app.name.split(" ")[0]));
   }
@@ -69,17 +72,30 @@ export function HostApplications() {
     const prev = { status: app.status, decisionReason: app.decisionReason, decidedAt: app.decidedAt };
     patch(app.id, { status, decisionReason: message, decidedAt: new Date().toISOString() });
     setOpenId(null);
+    log({
+      action: status === "approved" ? "host.approved" : status === "rejected" ? "host.rejected" : "host.infoRequested",
+      target: app.name,
+      ref: app.id,
+      detail: message,
+    });
     const first = app.name.split(" ")[0];
     const text = status === "approved" ? tt.hostApproved(app.name) : status === "rejected" ? tt.hostRejected(app.name) : tt.hostInfo(first);
     const show = status === "rejected" ? toast.warning : toast.success;
     show(text, {
       description: message,
-      action: { label: d.toast.undo, onClick: () => patch(app.id, prev) },
+      action: {
+        label: d.toast.undo,
+        onClick: () => {
+          patch(app.id, prev);
+          log({ action: "host.reopened", target: app.name, ref: app.id });
+        },
+      },
     });
   }
 
   function reopen(app: HostApplication) {
     patch(app.id, { status: "pending", decisionReason: undefined, decidedAt: undefined });
+    log({ action: "host.reopened", target: app.name, ref: app.id });
     toast.info(tt.hostReopened(app.name));
   }
 

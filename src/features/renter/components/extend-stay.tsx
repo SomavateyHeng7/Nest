@@ -11,7 +11,7 @@ import { Button } from "@/shared/ui/button";
 import { Calendar } from "@/shared/ui/calendar";
 import { Dialog } from "@/shared/ui/dialog";
 import { useI18n } from "@/i18n/client";
-import { formatUSD, quoteStay } from "@/features/stays/lib/pricing";
+import { quoteStay } from "@/features/stays/lib/pricing";
 import type { Stay } from "@/features/booking/types";
 import type { Listing } from "@/features/listings/types";
 
@@ -22,7 +22,7 @@ const pickerLocales = { en: enUS, km };
  * booking or the listing's maximum stay), see the extra rent, send the request.
  */
 export function ExtendStay({ stay, listing }: { stay: Stay; listing: Listing }) {
-  const { d, date, locale } = useI18n();
+  const { d, date, locale, money } = useI18n();
   const x = d.extend;
   const { extensions, requestExtension, cancelExtension, ready } = useActivity();
   const ownerFirst = listing.owner.name.split(" ")[0];
@@ -136,11 +136,11 @@ export function ExtendStay({ stay, listing }: { stay: Stay; listing: Listing }) 
                 </div>
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground">{x.extraRent}</dt>
-                  <dd className="font-semibold tabular">{formatUSD(extraRent)}</dd>
+                  <dd className="font-semibold tabular">{money(extraRent)}</dd>
                 </div>
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground">{x.fee}</dt>
-                  <dd className="font-medium text-success">$0</dd>
+                  <dd className="font-medium text-success">{money(0)}</dd>
                 </div>
               </dl>
             )}

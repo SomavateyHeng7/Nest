@@ -20,7 +20,14 @@ Our advantage is that we are building for the Cambodian rental market from the g
 Technical Background: Technical team
 
 Progress so far:
-We are currently at the early validation stage. We have defined the core problem, target users, MVP scope, business model, and initial competitive landscape. Our next step is to build the MVP and validate it with renters and property owners in Phnom Penh.
+We are at the early validation stage. We have defined the core problem, target users, MVP scope, business model, and initial competitive landscape, and we have built a working, bilingual (English and Khmer) prototype of the whole marketplace using sample listings.
+
+What the prototype already covers:
+- Renters: search and filter by city, dates, stay length, budget, and verification, with list and map views; compare homes; save homes; request viewings; book with a transparent quote; review a finished stay; and open a dispute if something goes wrong. Prices can be shown in US dollars or Cambodian riel.
+- Owners: a dashboard with booking requests, viewings and earnings; a listing wizard (prices can be entered in riel); an availability calendar; public replies to reviews; document re-upload; and the placement-fee calculator that reflects our pricing model.
+- Nest staff: host applications, a verification queue (ID, right-to-rent documents, and an in-person visit), private document handling where every access is recorded, dispute handling with evidence and refund outcomes, review moderation, and a permanent audit log.
+
+What is not built yet: user accounts, a real database, and payments (KHQR and ABA). Today the prototype runs on sample data, so it demonstrates the flows but does not process real bookings or money. Our next step is to build those three pieces, onboard our first verified properties in Phnom Penh, and validate the product with real renters and owners.
 
 Competitors/alternatives - what do you understand that they don’t?
 Our alternatives include Khmer24, Realestate.com.kh, Airbnb, Facebook rental groups, and traditional real-estate agents. We believe the gap is between property discovery and actual rental booking. Classifieds and social media provide listings but often require manual communication and negotiation, while hotel platforms focus mainly on short stays. Nest focuses specifically on flexible residential rentals, combining verified properties, availability, transparent pricing, booking, payment, and renter-owner communication in one experience.

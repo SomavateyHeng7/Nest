@@ -7,7 +7,7 @@ import { BarList } from "@/features/admin/components/bar-list";
 import { StatTile } from "@/shared/ui/stat-tile";
 import { adminBookings, funnel, hostApplications, platformKpis, reports, stayMix, verificationQueue } from "@/features/admin/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD } from "@/features/stays/lib/pricing";
+
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();
@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AdminOverview() {
-  const { d, date } = await getI18n();
+  const { d, date, money } = await getI18n();
   const o = d.admin.overview;
   const k = platformKpis;
 
@@ -47,11 +47,11 @@ export default async function AdminOverview() {
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         <StatTile
           label={o.revenue}
-          value={formatUSD(k.feeRevenue)}
+          value={money(k.feeRevenue)}
           icon={<TrendingUp className="size-4.5" />}
           hint={o.revenueHint(`${change >= 0 ? "+" : ""}${Math.round(change * 100)}%`)}
         />
-        <StatTile label={o.booked} value={formatUSD(k.bookedRent)} hint={o.bookedHint} />
+        <StatTile label={o.booked} value={money(k.bookedRent)} hint={o.bookedHint} />
         <StatTile label={o.live} value={String(k.liveListings)} hint={o.liveHint(verificationQueue.length)} />
         <StatTile label={o.reply} value={o.hours(k.medianReplyHours)} hint={o.replyHint} />
       </div>

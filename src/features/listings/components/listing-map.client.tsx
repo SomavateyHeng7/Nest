@@ -9,7 +9,7 @@ import L from "leaflet";
 import { Circle, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 
 import { useI18n } from "@/i18n/client";
-import { formatUSD } from "@/features/stays/lib/pricing";
+
 import type { LatLng, Listing } from "@/features/listings/types";
 
 /**
@@ -68,17 +68,17 @@ export interface ResultsMapProps {
 
 /** Search results as price pins; each pin opens a small card linking to the listing. */
 export function ResultsMap({ listings, priceOf, className }: ResultsMapProps) {
-  const { d, t, lt } = useI18n();
+  const { d, t, lt, money } = useI18n();
   const points = useMemo(() => listings.map((l) => l.location), [listings]);
   // One icon per listing, rebuilt only when results or prices change, so
   // re-renders don't replace every pin's element (and drop keyboard focus).
   const pins = useMemo(
     () =>
       listings.map((l) => {
-        const price = formatUSD(priceOf(l));
+        const price = money(priceOf(l));
         return { listing: l, price, icon: priceIcon(price) };
       }),
-    [listings, priceOf]
+    [listings, priceOf, money]
   );
 
   return (

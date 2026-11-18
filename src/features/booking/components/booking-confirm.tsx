@@ -10,7 +10,7 @@ import { Input } from "@/shared/ui/input";
 import { currentUser } from "@/features/account/current-user";
 import { useActivity } from "@/features/renter/components/activity-provider";
 import { useI18n } from "@/i18n/client";
-import { formatUSD } from "@/features/stays/lib/pricing";
+
 import { cn } from "@/shared/lib/utils";
 
 const methods = [
@@ -60,7 +60,7 @@ export function BookingConfirm({
   /** The dates can't be booked (checked on the server); sending is disabled until they're changed. */
   blocked: boolean;
 }) {
-  const { d } = useI18n();
+  const { d, money } = useI18n();
   const { addRequest } = useActivity();
   const c = d.checkout;
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -74,7 +74,7 @@ export function BookingConfirm({
     const timeline = [
       { title: c.timeline.sent, body: c.timeline.sentBody(ownerFirstName), done: true },
       { title: c.timeline.responds(ownerFirstName), body: c.timeline.respondsBody, done: false },
-      { title: c.timeline.pay, body: c.timeline.payBody(formatUSD(dueAtBooking), c.methods[method].label), done: false },
+      { title: c.timeline.pay, body: c.timeline.payBody(money(dueAtBooking), c.methods[method].label), done: false },
       { title: c.timeline.moveIn, body: c.timeline.moveInBody, done: false },
     ];
     return (
@@ -204,7 +204,7 @@ export function BookingConfirm({
               ))}
             </div>
             <p className="rounded-xl bg-muted/70 px-4 py-3 text-sm text-muted-foreground">
-              {c.nothingCharged(ownerFirstName, formatUSD(dueAtBooking))}
+              {c.nothingCharged(ownerFirstName, money(dueAtBooking))}
             </p>
             {blocked && (
               <p className="flex items-start gap-2 rounded-xl bg-warning/10 px-4 py-3 text-sm">

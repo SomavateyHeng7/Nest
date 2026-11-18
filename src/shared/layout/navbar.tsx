@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { ArrowLeft, Menu, MessageCircle, X } from "lucide-react";
 
 import { Logo } from "@/shared/brand/logo";
-import { LanguageSwitch, PreferencesPanel, ThemeMenu } from "@/shared/layout/preferences";
+import { CurrencySwitch, LanguageSwitch, PreferencesPanel, ThemeMenu } from "@/shared/layout/preferences";
 import { Button } from "@/shared/ui/button";
 import { useI18n } from "@/i18n/client";
 import { cn } from "@/shared/lib/utils";
@@ -37,6 +37,7 @@ export function Navbar() {
           </Link>
           <div className="flex items-center gap-1">
             <LanguageSwitch className="mr-1" />
+            <CurrencySwitch className="mr-1 hidden sm:flex" />
             <ThemeMenu />
             <Button variant="ghost" className="h-9 gap-1.5 px-3" nativeButton={false} render={<Link href="/" />}>
               <ArrowLeft className="size-4" />
@@ -74,6 +75,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-1">
           <LanguageSwitch className="mr-1" />
+            <CurrencySwitch className="mr-1 hidden sm:flex" />
           <Button
             variant="ghost"
             size="icon"

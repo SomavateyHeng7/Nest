@@ -4,7 +4,10 @@ import Link from "next/link";
 import { BedDouble, CalendarCheck, Inbox, Percent, Plus, Wallet } from "lucide-react";
 
 import { BookingRequests } from "@/features/owner/components/booking-requests";
+import { OwnerVerification } from "@/features/owner/components/owner-verification";
 import { OwnerShell } from "@/features/owner/components/owner-nav";
+import { MyDisputes } from "@/features/disputes/components/my-disputes";
+import { OwnerReviews } from "@/features/reviews/components/owner-reviews";
 import { OwnerViewings } from "@/features/viewings/components/owner-viewings";
 import { StatusBadge } from "@/features/booking/components/status-badge";
 import { StatTile } from "@/shared/ui/stat-tile";
@@ -13,7 +16,7 @@ import { ownerBookings } from "@/features/booking/data";
 import { ownerViewings } from "@/features/viewings/data";
 import { getListingById } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD } from "@/features/stays/lib/pricing";
+
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();
@@ -27,7 +30,7 @@ const occupancy: Record<string, number> = {
 };
 
 export default async function HostPage() {
-  const { d, lt } = await getI18n();
+  const { d, lt, money } = await getI18n();
   const o = d.owner;
   const myListings = ownerListingIds.map(getListingById).filter((l) => l !== undefined);
   const pending = ownerBookings.filter((b) => b.status === "pending");
@@ -43,7 +46,7 @@ export default async function HostPage() {
     >
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatTile label={o.stats.requests} value={String(pending.length)} hint={o.stats.requestsHint} icon={<Inbox className="size-4.5" />} />
-        <StatTile label={o.stats.rent} value={formatUSD(thisMonth.rent)} hint={o.stats.rentHint} icon={<Wallet className="size-4.5" />} />
+        <StatTile label={o.stats.rent} value={money(thisMonth.rent)} hint={o.stats.rentHint} icon={<Wallet className="size-4.5" />} />
         <StatTile label={o.stats.occupancy} value={`${avgOccupancy}%`} hint={o.stats.occupancyHint} icon={<Percent className="size-4.5" />} />
         <StatTile label={o.stats.moveIns} value={String(upcoming.length)} hint={o.stats.moveInsHint} icon={<CalendarCheck className="size-4.5" />} />
       </div>
@@ -58,6 +61,11 @@ export default async function HostPage() {
           <BookingRequests bookings={[...pending, ...upcoming]} />
         </section>
         <OwnerViewings viewings={ownerViewings} />
+        <section className="mt-10">
+          <OwnerReviews listingIds={ownerListingIds} />
+        </section>
+        <OwnerVerification />
+        <MyDisputes party="owner" />
         </div>
 
         <section className="min-w-0">
@@ -83,7 +91,7 @@ export default async function HostPage() {
                   <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <BedDouble className="size-3.5" />
-                      {o.perMonthShort(formatUSD(l.pricing.monthly))}
+                      {o.perMonthShort(money(l.pricing.monthly))}
                     </span>
                     {ownerListingStatus[l.id] === "live" && <span className="tabular">{o.booked(occupancy[l.id])}</span>}
                   </div>

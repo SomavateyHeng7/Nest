@@ -10,6 +10,7 @@ import { StayLengthPicker } from "@/features/stays/components/stay-length-picker
 import { Button } from "@/shared/ui/button";
 import { Dialog } from "@/shared/ui/dialog";
 import { isFullyVerified } from "@/features/listings/data";
+import { useReviews } from "@/features/reviews/store";
 import { useI18n } from "@/i18n/client";
 import { ANYWHERE, areas, cities, propertyTypes } from "@/features/listings/lib/destinations";
 import {
@@ -17,12 +18,13 @@ import {
   BUDGET_MIN,
   parseBrowseParams,
   serializeBrowseParams,
+  RATING_STEPS,
   type BrowserFilters,
   type BrowseView,
   type Sort,
 } from "@/features/listings/lib/browse-params";
 import { stayProblem } from "@/features/stays/lib/availability";
-import { formatUSD, quoteStay, stayToNights } from "@/features/stays/lib/pricing";
+import { quoteStay, stayToNights } from "@/features/stays/lib/pricing";
 import { cn } from "@/shared/lib/utils";
 import type { Listing } from "@/features/listings/types";
 
@@ -75,7 +77,8 @@ function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange
 const URL_WRITE_DELAY_MS = 300;
 
 export function ListingBrowser({ listings }: { listings: Listing[] }) {
-  const { d, t, date } = useI18n();
+  const { d, t, date, money } = useI18n();
+  const reviews = useReviews();
   const searchParams = useSearchParams();
   const urlQuery = searchParams.toString();
   const [initial] = useState(() => parseBrowseParams(Object.fromEntries(searchParams)));
@@ -131,6 +134,7 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
       if (filters.billsIncluded && l.electricity !== "Included") return false;
       if (filters.fullyVerifiedOnly && !isFullyVerified(l)) return false;
       if (filters.furnishedOnly && !l.furnished) return false;
+      if (filters.minRating > 0 && reviews.summary(l.id).average < filters.minRating) return false;
       return fitsDates(l, filters.moveIn, nights);
     });
 
@@ -138,9 +142,13 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
       if (sort === "price-asc") return total(a) - total(b);
       if (sort === "price-desc") return total(b) - total(a);
       if (sort === "available") return a.availableFrom.localeCompare(b.availableFrom);
-      return Number(isFullyVerified(b)) - Number(isFullyVerified(a)) || b.rating - a.rating;
+      const ra = reviews.summary(a.id);
+      const rb = reviews.summary(b.id);
+      // Top rated: best average first, and among equals the one with more reviews.
+      if (sort === "rating") return rb.average - ra.average || rb.count - ra.count;
+      return Number(isFullyVerified(b)) - Number(isFullyVerified(a)) || rb.average - ra.average || rb.count - ra.count;
     });
-  }, [listings, filters, nights, sort, total]);
+  }, [listings, filters, nights, sort, total, reviews]);
 
   const activeCount =
     filters.types.length +
@@ -149,6 +157,7 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
     Number(filters.billsIncluded) +
     Number(filters.fullyVerifiedOnly) +
     Number(filters.furnishedOnly) +
+    Number(filters.minRating > 0) +
     Number(Boolean(filters.district));
 
   function reset() {
@@ -161,6 +170,7 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
       billsIncluded: false,
       fullyVerifiedOnly: false,
       furnishedOnly: false,
+      minRating: 0,
     }));
   }
 
@@ -187,7 +197,7 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
         <div className="flex items-baseline justify-between">
           <h3 className="text-sm font-semibold">{d.browse.budget}</h3>
           <span className="text-sm text-muted-foreground tabular">
-            {filters.maxMonthly >= BUDGET_MAX ? d.browse.budgetAny : d.browse.budgetUpTo(formatUSD(filters.maxMonthly))}
+            {filters.maxMonthly >= BUDGET_MAX ? d.browse.budgetAny : d.browse.budgetUpTo(money(filters.maxMonthly))}
           </span>
         </div>
         <input
@@ -201,8 +211,8 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
           aria-label={d.browse.budgetAria}
         />
         <div className="flex justify-between text-xs text-muted-foreground tabular">
-          <span>$150</span>
-          <span>$1,500+</span>
+          <span>{money(BUDGET_MIN)}</span>
+          <span>{money(BUDGET_MAX)}+</span>
         </div>
       </section>
 
@@ -212,6 +222,17 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
           {[0, 1, 2, 3].map((n) => (
             <Chip key={n} active={filters.minBedrooms === n} onClick={() => set("minBedrooms", n)}>
               {n === 0 ? d.browse.any : `${n}+`}
+            </Chip>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h3 className="text-sm font-semibold">{d.browse.rating}</h3>
+        <div className="flex gap-2">
+          {RATING_STEPS.map((n) => (
+            <Chip key={n} active={filters.minRating === n} onClick={() => set("minRating", n)}>
+              {n === 0 ? d.browse.any : d.browse.ratingPlus(String(n))}
             </Chip>
           ))}
         </div>

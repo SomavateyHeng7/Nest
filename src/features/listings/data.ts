@@ -90,8 +90,6 @@ export const listings: Listing[] = [
     images: [img("1502672260266-1c1ef2d93688"), img("1560448204-e02f11c3d0e2"), img("1522708323590-d24dbb6b0267"), img("1484154218962-a197022b5858"), img("1505691938895-1758d7feb511")],
     owner: owners.sokha,
     verification: fullyVerified("2026-10-02"),
-    rating: 4.92,
-    reviewCount: 38,
   },
   {
     id: "toul-kork-family-house",
@@ -123,8 +121,6 @@ export const listings: Listing[] = [
     images: [img("1568605114967-8130f3a36994"), img("1600596542815-ffad4c1539a9"), img("1600607687939-ce8a6c25118c"), img("1554995207-c18c203602cb")],
     owner: owners.dara,
     verification: fullyVerified("2026-09-18"),
-    rating: 4.88,
-    reviewCount: 12,
   },
   {
     id: "riverside-studio",
@@ -156,8 +152,6 @@ export const listings: Listing[] = [
     images: [img("1522708323590-d24dbb6b0267"), img("1493809842364-78817add7ffb"), img("1502672260266-1c1ef2d93688")],
     owner: owners.sreymom,
     verification: fullyVerified("2026-10-21"),
-    rating: 4.81,
-    reviewCount: 64,
   },
   {
     id: "bassac-service-apartment",
@@ -189,8 +183,6 @@ export const listings: Listing[] = [
     images: [img("1600585154340-be6161a56a0c"), img("1512918728675-ed5a9ecdebfd"), img("1560184897-ae75f418493e"), img("1484154218962-a197022b5858")],
     owner: owners.dara,
     verification: fullyVerified("2026-08-30"),
-    rating: 4.95,
-    reviewCount: 27,
   },
   {
     id: "toul-kork-student-room",
@@ -222,8 +214,6 @@ export const listings: Listing[] = [
     images: [img("1505691938895-1758d7feb511"), img("1493809842364-78817add7ffb"), img("1554995207-c18c203602cb")],
     owner: owners.vanna,
     verification: fullyVerified("2026-10-11"),
-    rating: 4.74,
-    reviewCount: 19,
   },
   {
     id: "chroy-changvar-view-condo",
@@ -252,8 +242,6 @@ export const listings: Listing[] = [
     images: [img("1512917774080-9991f1c4c750"), img("1560448204-e02f11c3d0e2"), img("1505691938895-1758d7feb511")],
     owner: owners.sokha,
     verification: { identity: true, ownership: true, inPersonVisit: false, photosMatch: true, verifiedOn: "2026-11-04" },
-    rating: 4.86,
-    reviewCount: 9,
   },
   {
     id: "sen-sok-apartment",
@@ -282,8 +270,6 @@ export const listings: Listing[] = [
     images: [img("1600607687939-ce8a6c25118c"), img("1484154218962-a197022b5858"), img("1554995207-c18c203602cb")],
     owner: owners.vanna,
     verification: fullyVerified("2026-09-29"),
-    rating: 4.7,
-    reviewCount: 6,
   },
   {
     id: "siem-reap-wooden-house",
@@ -315,8 +301,6 @@ export const listings: Listing[] = [
     images: [img("1600596542815-ffad4c1539a9"), img("1595526114035-0d45ed16cfbf"), img("1568605114967-8130f3a36994")],
     owner: owners.sreymom,
     verification: fullyVerified("2026-10-15"),
-    rating: 4.97,
-    reviewCount: 41,
   },
   {
     id: "kampot-river-room",
@@ -345,8 +329,6 @@ export const listings: Listing[] = [
     images: [img("1583608205776-bfd35f0d9f83"), img("1595526114035-0d45ed16cfbf"), img("1560184897-ae75f418493e")],
     owner: owners.vanna,
     verification: { identity: true, ownership: true, inPersonVisit: false, photosMatch: true, verifiedOn: "2026-11-01" },
-    rating: 4.79,
-    reviewCount: 23,
   },
 ];
 

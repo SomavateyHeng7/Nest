@@ -57,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const { locale } = await getI18n();
+  const { locale, currency, rate } = await getI18n();
 
   return (
     <html
@@ -67,7 +67,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <LocaleProvider initialLocale={locale}>
+          <LocaleProvider initialLocale={locale} initialCurrency={currency} khrRate={rate}>
             <ActivityProvider>
               <CompareProvider>
                 <Navbar />

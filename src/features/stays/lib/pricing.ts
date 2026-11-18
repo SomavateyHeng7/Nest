@@ -29,15 +29,6 @@ export function nightsToStay(nights: number): StayLength {
   return { amount: n, unit: "days" };
 }
 
-export function formatUSD(value: number, opts: { cents?: boolean } = {}) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: opts.cents ? 2 : 0,
-    minimumFractionDigits: opts.cents ? 2 : 0,
-  }).format(value);
-}
-
 export type RateTier = "nightly" | "weekly" | "monthly";
 
 export interface StayQuote {

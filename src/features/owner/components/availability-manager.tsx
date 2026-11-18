@@ -20,7 +20,7 @@ import { ChevronLeft, ChevronRight, Lock, Unlock } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
 import { useI18n } from "@/i18n/client";
-import { formatUSD } from "@/features/stays/lib/pricing";
+
 import { cn } from "@/shared/lib/utils";
 import type { OwnerBooking } from "@/features/booking/types";
 import type { Listing } from "@/features/listings/types";
@@ -150,7 +150,7 @@ function MonthGrid({
 }
 
 export function AvailabilityManager({ listings, bookings }: { listings: Listing[]; bookings: OwnerBooking[] }) {
-  const { d, t, date, lt } = useI18n();
+  const { d, t, date, lt, money } = useI18n();
   const c = d.calendar;
   const [listingId, setListingId] = useState(listings[0]?.id);
   const [start, setStart] = useState(() => startOfMonth(new Date()));
@@ -257,7 +257,7 @@ export function AvailabilityManager({ listings, bookings }: { listings: Listing[
             >
               <p className="truncate text-sm font-semibold" lang={lt(l).lang}>{lt(l).text}</p>
               <p className="text-xs text-muted-foreground">
-                {t(l.district)} · {d.owner.perMonthShort(formatUSD(l.pricing.monthly))}
+                {t(l.district)} · {d.owner.perMonthShort(money(l.pricing.monthly))}
               </p>
             </button>
           ))}
@@ -283,7 +283,7 @@ export function AvailabilityManager({ listings, bookings }: { listings: Listing[
           <div className="mt-3 flex items-center justify-between gap-3 text-sm">
             <span className="text-muted-foreground">{c.nightlyMonthly}</span>
             <span className="font-medium tabular">
-              {formatUSD(listing.pricing.nightly)} · {formatUSD(listing.pricing.monthly)}
+              {money(listing.pricing.nightly)} · {money(listing.pricing.monthly)}
             </span>
           </div>
         </div>

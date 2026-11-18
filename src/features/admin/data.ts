@@ -8,9 +8,26 @@ function img(id: string, w = 400) {
 
 /** Sample operator data for the admin console. Replace with real queries. */
 
+/** The signed-in staff member (prototype). Every audit entry is stamped with this name. */
+export const currentStaff = { name: "Mealea Sok", role: "Trust & safety" };
+
 // ---------- Verification queue ----------------------------------------------
 
-export type DocState = "missing" | "received" | "approved";
+export type DocState = "missing" | "received" | "approved" | "rejected";
+export type DocKind = "national-id" | "passport" | "title-deed" | "lease";
+
+/** Metadata for a file in private storage. The file itself is never sent to the browser until staff open it. */
+export interface StoredDoc {
+  name: string;
+  kind: DocKind;
+  sizeKb: number;
+  uploadedAt: string;
+  /** Why staff rejected it; shown to the owner. */
+  rejection?: string;
+}
+
+/** Days a document stays in storage before it is deleted automatically. */
+export const DOC_RETENTION_DAYS = 90;
 export type VerificationStage = "docs" | "visit" | "ready";
 
 export interface VerificationItem {
@@ -27,6 +44,8 @@ export interface VerificationItem {
   image: string;
   monthly: number;
   docs: { identity: DocState; ownership: DocState };
+  /** Uploaded files behind `docs`. Absent when nothing was uploaded or the file was deleted. */
+  files?: { identity?: StoredDoc; ownership?: StoredDoc };
   visit?: { date: string; time: string; inspector: string; done?: boolean };
   stage: VerificationStage;
 }
@@ -47,6 +66,10 @@ export const verificationQueue: VerificationItem[] = [
     image: img("1493809842364-78817add7ffb"),
     monthly: 390,
     docs: { identity: "received", ownership: "received" },
+    files: {
+      identity: { name: "kosal-national-id.jpg", kind: "national-id", sizeKb: 1840, uploadedAt: "2026-11-15T16:12:00" },
+      ownership: { name: "land-title-scan.pdf", kind: "title-deed", sizeKb: 2310, uploadedAt: "2026-11-15T16:18:00" },
+    },
     stage: "docs",
   },
   {
@@ -62,6 +85,28 @@ export const verificationQueue: VerificationItem[] = [
     image: img("1505691938895-1758d7feb511"),
     monthly: 240,
     docs: { identity: "approved", ownership: "missing" },
+    files: {
+      identity: { name: "passport-page.jpg", kind: "passport", sizeKb: 1210, uploadedAt: "2026-11-14T08:50:00" },
+    },
+    stage: "docs",
+  },
+  {
+    id: "vq-29",
+    title: "Garden studio, BKK1",
+    type: "apartment",
+    district: "BKK1",
+    city: "Phnom Penh",
+    ownerName: "Sokha Chan",
+    ownerPhone: "+855 12 ••• 678",
+    submittedAt: "2026-11-17T10:00:00",
+    photos: 6,
+    image: img("1493809842364-78817add7ffb"),
+    monthly: 520,
+    docs: { identity: "approved", ownership: "rejected" },
+    files: {
+      identity: { name: "national-id.jpg", kind: "national-id", sizeKb: 1520, uploadedAt: "2026-11-17T09:48:00" },
+      ownership: { name: "old-title-scan.pdf", kind: "title-deed", sizeKb: 2100, uploadedAt: "2026-11-17T09:55:00", rejection: "Document has expired" },
+    },
     stage: "docs",
   },
   {
@@ -78,6 +123,10 @@ export const verificationQueue: VerificationItem[] = [
     image: img("1512917774080-9991f1c4c750"),
     monthly: 720,
     docs: { identity: "approved", ownership: "approved" },
+    files: {
+      identity: { name: "national-id.jpg", kind: "national-id", sizeKb: 1520, uploadedAt: "2026-11-04T11:20:00" },
+      ownership: { name: "hard-title.pdf", kind: "title-deed", sizeKb: 3050, uploadedAt: "2026-11-04T11:31:00" },
+    },
     visit: { date: "2026-11-18", time: "10:00", inspector: "Bopha" },
     stage: "visit",
   },
@@ -94,6 +143,10 @@ export const verificationQueue: VerificationItem[] = [
     image: img("1600607687939-ce8a6c25118c"),
     monthly: 610,
     docs: { identity: "approved", ownership: "approved" },
+    files: {
+      identity: { name: "id-card.jpg", kind: "national-id", sizeKb: 980, uploadedAt: "2026-11-02T14:02:00" },
+      ownership: { name: "lease-agreement.pdf", kind: "lease", sizeKb: 1760, uploadedAt: "2026-11-02T14:09:00" },
+    },
     visit: { date: "2026-11-13", time: "15:30", inspector: "Rotha", done: true },
     stage: "ready",
   },
@@ -371,3 +424,157 @@ export const platformKpis = {
   liveListings: 9,
   medianReplyHours: 3.4,
 };
+
+// ---------- Disputes ---------------------------------------------------------
+
+export type DisputeKind = "deposit" | "mismatch" | "cancellation" | "payment";
+export type DisputeStatus = "open" | "investigating" | "resolved";
+export type DisputeParty = "renter" | "owner";
+export type DisputeOutcome = "refund-full" | "refund-partial" | "release-owner" | "dismissed";
+
+/** Nest commits to a first response within this many hours of a dispute being opened. */
+export const DISPUTE_SLA_HOURS = 72;
+
+export interface DisputeEvidence {
+  id: string;
+  from: DisputeParty;
+  name: string;
+  at: string;
+}
+
+export interface DisputeEvent {
+  id: string;
+  at: string;
+  /**
+   * "message" came from one of the two people; "request" is staff asking one of
+   * them for something; "note" is internal and never shown to either.
+   */
+  kind: "message" | "request" | "note";
+  /** Who wrote it: a renter or owner for messages, a staff member otherwise. */
+  by: string;
+  /** The person a message came from, or a request was sent to. */
+  party?: DisputeParty;
+  text: string;
+}
+
+export interface Dispute {
+  id: string;
+  listingId: string;
+  kind: DisputeKind;
+  status: DisputeStatus;
+  openedBy: DisputeParty;
+  renter: string;
+  owner: string;
+  /** Money Nest is holding for this stay, in USD. */
+  held: number;
+  stay: { moveIn: string; moveOut: string };
+  openedAt: string;
+  assignee?: string;
+  summary: string;
+  evidence: DisputeEvidence[];
+  timeline: DisputeEvent[];
+  resolution?: { outcome: DisputeOutcome; refund: number; note: string; resolvedAt: string; by: string };
+}
+
+/** Sample cases. The live list, including ones people open themselves, is in the disputes store. */
+export const disputes: Dispute[] = [
+  {
+    id: "dp-07",
+    listingId: "riverside-studio",
+    kind: "mismatch",
+    status: "investigating",
+    openedBy: "renter",
+    renter: "Emma Laurent",
+    owner: "Sreymom Ly",
+    held: 240,
+    stay: { moveIn: "2026-11-10", moveOut: "2026-12-10" },
+    openedAt: "2026-11-16T10:05:00",
+    assignee: "Rithy Ouk",
+    summary: "The balcony in photo 2 is shared with the next unit, not private as listed. Renter wants part of the rent back.",
+    evidence: [
+      { id: "ev-1", from: "renter", name: "balcony-shared.jpg", at: "2026-11-16T10:02:00" },
+      { id: "ev-2", from: "renter", name: "listing-screenshot.png", at: "2026-11-16T10:03:00" },
+    ],
+    timeline: [
+      { id: "ev-t1", at: "2026-11-16T10:05:00", kind: "message", by: "Emma Laurent", party: "renter", text: "The listing says private balcony. It is shared with the studio next door and they use it all day." },
+      { id: "ev-t2", at: "2026-11-17T09:20:00", kind: "message", by: "Sreymom Ly", party: "owner", text: "The balcony is shared but I wrote 'balcony' only. I am happy to give a small discount." },
+      { id: "ev-t3", at: "2026-11-17T09:40:00", kind: "note", by: "Rithy Ouk", text: "Listing photo 2 doesn't show the shared railing. Ask owner to fix the photos regardless of outcome." },
+    ],
+  },
+  {
+    id: "dp-06",
+    listingId: "toul-kork-family-house",
+    kind: "deposit",
+    status: "open",
+    openedBy: "renter",
+    renter: "Kenji Watanabe",
+    owner: "Dara Keo",
+    held: 1400,
+    stay: { moveIn: "2026-09-05", moveOut: "2026-11-05" },
+    openedAt: "2026-11-18T08:30:00",
+    summary: "Moved out on 5 Nov. Owner hasn’t returned the deposit and mentions damage, but sent no photos.",
+    evidence: [
+      { id: "ev-3", from: "renter", name: "move-out-video.mp4", at: "2026-11-18T08:25:00" },
+      { id: "ev-4", from: "renter", name: "move-in-checklist.pdf", at: "2026-11-18T08:27:00" },
+    ],
+    timeline: [
+      { id: "ev-t4", at: "2026-11-18T08:30:00", kind: "message", by: "Kenji Watanabe", party: "renter", text: "I left the house clean and handed back both keys. It has been two weeks without a reply about the deposit." },
+    ],
+  },
+  {
+    id: "dp-05",
+    listingId: "siem-reap-wooden-house",
+    kind: "cancellation",
+    status: "open",
+    openedBy: "owner",
+    renter: "Rithy Sam",
+    owner: "Sreymom Ly",
+    held: 780,
+    stay: { moveIn: "2026-11-20", moveOut: "2026-12-20" },
+    openedAt: "2026-11-15T14:20:00",
+    summary: "Renter cancelled the day before move-in and wants the first month back. Owner turned away other guests for those dates.",
+    evidence: [{ id: "ev-5", from: "owner", name: "declined-guest-messages.png", at: "2026-11-15T14:18:00" }],
+    timeline: [
+      { id: "ev-t5", at: "2026-11-15T14:20:00", kind: "message", by: "Sreymom Ly", party: "owner", text: "He cancelled with one day to go. I had two other guests asking for these dates and I said no to both." },
+    ],
+  },
+  {
+    id: "dp-04",
+    listingId: "bkk1-garden-condo",
+    kind: "deposit",
+    status: "investigating",
+    openedBy: "owner",
+    renter: "Marc Dubois",
+    owner: "Sokha Chan",
+    held: 450,
+    stay: { moveIn: "2026-08-15", moveOut: "2026-10-15" },
+    openedAt: "2026-11-14T09:40:00",
+    assignee: "Rithy Ouk",
+    summary: "A glass shelf in the bathroom was broken during the stay. Owner wants it replaced from the deposit.",
+    evidence: [{ id: "ev-7", from: "owner", name: "broken-shelf.jpg", at: "2026-11-14T09:35:00" }],
+    timeline: [
+      { id: "ev-t8", at: "2026-11-14T09:40:00", kind: "message", by: "Sokha Chan", party: "owner", text: "The glass shelf in the bathroom is cracked in two places. A replacement costs about $45." },
+      { id: "ev-t9", at: "2026-11-15T10:10:00", kind: "request", by: "Rithy Ouk", party: "renter", text: "Please tell us your side and share any move-out photos." },
+    ],
+  },
+  {
+    id: "dp-03",
+    listingId: "kampot-river-room",
+    kind: "payment",
+    status: "resolved",
+    openedBy: "owner",
+    renter: "Visal Chhun",
+    owner: "Vanna Heng",
+    held: 260,
+    stay: { moveIn: "2026-08-01", moveOut: "2026-08-31" },
+    openedAt: "2026-11-09T11:00:00",
+    assignee: "Mealea Sok",
+    summary: "Renter didn’t arrive and stopped replying after paying.",
+    evidence: [{ id: "ev-6", from: "owner", name: "no-show-messages.png", at: "2026-11-09T10:55:00" }],
+    timeline: [
+      { id: "ev-t6", at: "2026-11-09T11:00:00", kind: "message", by: "Vanna Heng", party: "owner", text: "He paid, then never came and has not answered in five days. The room stayed empty all month." },
+      { id: "ev-t7", at: "2026-11-12T15:50:00", kind: "note", by: "Mealea Sok", text: "Renter ignored three messages and one call. Account suspended." },
+    ],
+    resolution: { outcome: "release-owner", refund: 0, note: "Renter did not respond to three messages and a call.", resolvedAt: "2026-11-12T16:00:00", by: "Mealea Sok" },
+  },
+];

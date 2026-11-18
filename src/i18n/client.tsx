@@ -3,23 +3,38 @@
 import { createContext, useCallback, useContext, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import { LOCALE_COOKIE, type Locale } from "@/i18n/config";
+import { CURRENCY_COOKIE, LOCALE_COOKIE, type Currency, type Locale } from "@/i18n/config";
 import { dictionaries, term } from "@/i18n";
-import { formatDate, formatDateRange, formatRelative } from "@/i18n/format";
+import { formatDate, formatDateRange, formatMoney, formatRelative } from "@/i18n/format";
 import { listingTitle } from "@/features/listings/lib/listing-text";
 import type { Listing } from "@/features/listings/types";
 
 interface LocaleContextValue {
   locale: Locale;
   setLocale: (locale: Locale) => void;
+  currency: Currency;
+  /** Riel per US dollar, for showing prices in KHR. */
+  khrRate: number;
+  setCurrency: (currency: Currency) => void;
   pending: boolean;
 }
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
-export function LocaleProvider({ initialLocale, children }: { initialLocale: Locale; children: React.ReactNode }) {
+export function LocaleProvider({
+  initialLocale,
+  initialCurrency,
+  khrRate,
+  children,
+}: {
+  initialLocale: Locale;
+  initialCurrency: Currency;
+  khrRate: number;
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const [locale, setLocaleState] = useState(initialLocale);
+  const [currency, setCurrencyState] = useState(initialCurrency);
   const [pending, startTransition] = useTransition();
 
   const setLocale = useCallback(
@@ -33,7 +48,19 @@ export function LocaleProvider({ initialLocale, children }: { initialLocale: Loc
     [router]
   );
 
-  const value = useMemo(() => ({ locale, setLocale, pending }), [locale, setLocale, pending]);
+  const setCurrency = useCallback(
+    (next: Currency) => {
+      document.cookie = `${CURRENCY_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+      setCurrencyState(next);
+      startTransition(() => router.refresh());
+    },
+    [router]
+  );
+
+  const value = useMemo(
+    () => ({ locale, setLocale, currency, setCurrency, khrRate, pending }),
+    [locale, setLocale, currency, setCurrency, khrRate, pending]
+  );
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
 
@@ -45,18 +72,22 @@ export function useLocale() {
 
 /** Client-side translation helpers, mirroring getI18n() on the server. */
 export function useI18n() {
-  const { locale } = useLocale();
+  const { locale, currency, khrRate } = useLocale();
   return useMemo(() => {
     const d = dictionaries[locale];
     return {
       locale,
+      currency,
+      rate: khrRate,
       d,
       t: (value: string) => term(d, value),
       date: (value: Date | string, pattern: string) => formatDate(value, pattern, locale),
       range: (start: string, end: string) => formatDateRange(start, end, locale),
       relative: (value: Date | string) => formatRelative(value, locale),
+      /** A USD amount in the viewer's chosen currency (USD or KHR). */
+      money: (amountUSD: number, opts?: { cents?: boolean }) => formatMoney(amountUSD, currency, khrRate, opts),
       /** Owner-written listing title in the viewer's language when available. */
       lt: (listing: Pick<Listing, "title" | "titleKm">) => listingTitle(listing, locale),
     };
-  }, [locale]);
+  }, [locale, currency, khrRate]);
 }

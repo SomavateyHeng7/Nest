@@ -9,12 +9,14 @@ import { StatusBadge } from "@/features/booking/components/status-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { getListingById } from "@/features/listings/data";
+import { OpenDispute } from "@/features/disputes/components/open-dispute";
+import { currentUser } from "@/features/account/current-user";
 import { useI18n } from "@/i18n/client";
-import { formatUSD, placementFee } from "@/features/stays/lib/pricing";
+import { placementFee } from "@/features/stays/lib/pricing";
 import type { BookingStatus, OwnerBooking } from "@/features/booking/types";
 
 export function BookingRequests({ bookings }: { bookings: OwnerBooking[] }) {
-  const { d, range, relative, lt } = useI18n();
+  const { d, range, relative, lt, money } = useI18n();
   const [statuses, setStatuses] = useState<Record<string, BookingStatus>>(
     Object.fromEntries(bookings.map((b) => [b.id, b.status]))
   );
@@ -66,17 +68,29 @@ export function BookingRequests({ bookings }: { bookings: OwnerBooking[] }) {
               <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
                 <div>
                   <dt className="text-xs text-muted-foreground">{d.owner.totalRent}</dt>
-                  <dd className="font-semibold tabular">{formatUSD(b.rentTotal)}</dd>
+                  <dd className="font-semibold tabular">{money(b.rentTotal)}</dd>
                 </div>
                 <div>
                   <dt className="text-xs text-muted-foreground">{d.owner.placementFee(tier.rate * 100)}</dt>
-                  <dd className="tabular">−{formatUSD(fee)}</dd>
+                  <dd className="tabular">−{money(fee)}</dd>
                 </div>
                 <div>
                   <dt className="text-xs text-muted-foreground">{d.owner.youReceive}</dt>
-                  <dd className="font-semibold text-success tabular">{formatUSD(b.rentTotal - fee)}</dd>
+                  <dd className="font-semibold text-success tabular">{money(b.rentTotal - fee)}</dd>
                 </div>
               </dl>
+              {(status === "confirmed" || status === "active" || status === "completed") && (
+                <OpenDispute
+                  openedBy="owner"
+                  context={{
+                    listingId: b.listingId,
+                    renter: b.renterName,
+                    owner: currentUser.name,
+                    held: b.firstMonthRent,
+                    stay: { moveIn: b.moveIn, moveOut: b.moveOut },
+                  }}
+                />
+              )}
               {status === "pending" && (
                 <div className="flex gap-2">
                   <Button variant="ghost" size="icon-lg" aria-label={d.owner.messageRenter} nativeButton={false} render={<Link href="/messages" />}>

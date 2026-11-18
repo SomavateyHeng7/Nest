@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { toast } from "@/shared/ui/toast";
 import { adminUsers, type AdminUser, type UserRole } from "@/features/admin/data";
+import { useAudit } from "@/features/admin/audit";
 import { useI18n } from "@/i18n/client";
 import { cn } from "@/shared/lib/utils";
 
@@ -23,6 +24,7 @@ export function UsersTable() {
   const { d, date, relative } = useI18n();
   const u = d.admin.users;
   const tt = d.admin.toast;
+  const { log } = useAudit();
   const [users, setUsers] = useState(adminUsers);
   const [role, setRole] = useState<UserRole>("owner");
   const [q, setQ] = useState("");
@@ -36,8 +38,15 @@ export function UsersTable() {
 
   function suspend(user: AdminUser) {
     patch(user.id, { status: "suspended" });
+    log({ action: "user.suspended", target: user.name });
     toast.warning(tt.suspended(user.name), {
-      action: { label: d.toast.undo, onClick: () => patch(user.id, { status: "active" }) },
+      action: {
+        label: d.toast.undo,
+        onClick: () => {
+          patch(user.id, { status: "active" });
+          log({ action: "user.reactivated", target: user.name });
+        },
+      },
     });
   }
 
@@ -134,6 +143,7 @@ export function UsersTable() {
                         className="h-8 px-3"
                         onClick={() => {
                           patch(x.id, { idVerified: true });
+                          log({ action: "user.idVerified", target: x.name });
                           toast.success(tt.idVerified(x.name));
                         }}
                       >
@@ -150,6 +160,7 @@ export function UsersTable() {
                         className="h-8 px-3"
                         onClick={() => {
                           patch(x.id, { status: "active" });
+                          log({ action: "user.reactivated", target: x.name });
                           toast.success(tt.reactivated(x.name));
                         }}
                       >

@@ -76,6 +76,4 @@ export interface Listing {
   images: string[];
   owner: Owner;
   verification: Verification;
-  rating: number;
-  reviewCount: number;
 }

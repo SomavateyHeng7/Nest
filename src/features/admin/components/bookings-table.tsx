@@ -9,14 +9,14 @@ import { StatusBadge } from "@/features/booking/components/status-badge";
 import { adminBookings } from "@/features/admin/data";
 import { getListingById } from "@/features/listings/data";
 import { useI18n } from "@/i18n/client";
-import { formatUSD, placementFee } from "@/features/stays/lib/pricing";
+import { placementFee } from "@/features/stays/lib/pricing";
 import { cn } from "@/shared/lib/utils";
 import type { BookingStatus } from "@/features/booking/types";
 
 const statuses: (BookingStatus | "all")[] = ["all", "pending", "confirmed", "active", "completed", "declined"];
 
 export function BookingsTable() {
-  const { d, range, lt } = useI18n();
+  const { d, range, lt, money } = useI18n();
   const b = d.admin.bookings;
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<BookingStatus | "all">("all");
@@ -103,8 +103,8 @@ export function BookingsTable() {
                   {range(r.moveIn, r.moveOut)}
                   <span className="block text-xs">{d.common.nights(r.nights)}</span>
                 </td>
-                <td className="px-4 py-3 text-right tabular">{formatUSD(r.rentTotal)}</td>
-                <td className="px-4 py-3 text-right font-medium tabular">{r.fee ? formatUSD(r.fee) : "—"}</td>
+                <td className="px-4 py-3 text-right tabular">{money(r.rentTotal)}</td>
+                <td className="px-4 py-3 text-right font-medium tabular">{r.fee ? money(r.fee) : "—"}</td>
                 <td className="px-4 py-3">
                   <div className="flex flex-col items-start gap-1">
                     <StatusBadge status={r.status} />
@@ -122,7 +122,7 @@ export function BookingsTable() {
         </table>
         {shown.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">{b.empty}</p>}
       </div>
-      <p className="text-sm text-muted-foreground tabular">{b.totals(shown.length, formatUSD(feeTotal))}</p>
+      <p className="text-sm text-muted-foreground tabular">{b.totals(shown.length, money(feeTotal))}</p>
     </div>
   );
 }

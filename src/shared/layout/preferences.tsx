@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
-import { Check, Languages, Monitor, Moon, Sun } from "lucide-react";
+import { Check, Coins, Languages, Monitor, Moon, Sun } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
-import { localeNames, locales } from "@/i18n/config";
+import { currencies, localeNames, locales } from "@/i18n/config";
 import { useI18n, useLocale } from "@/i18n/client";
 import { cn } from "@/shared/lib/utils";
 
@@ -39,6 +39,39 @@ export function LanguageSwitch({ className }: { className?: string }) {
           )}
         >
           {localeNames[l].short}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+
+/** Segmented $ | ៛ switch. Prices are stored in USD; KHR only changes how they're shown. */
+export function CurrencySwitch({ className }: { className?: string }) {
+  const { currency, setCurrency, khrRate, pending } = useLocale();
+  const { d } = useI18n();
+
+  return (
+    <div
+      role="radiogroup"
+      aria-label={d.prefs.currency}
+      title={d.prefs.currencyNote(Math.round(khrRate).toLocaleString("en-US"))}
+      className={cn("flex items-center rounded-full bg-muted p-0.5", pending && "opacity-70", className)}
+    >
+      {currencies.map((c) => (
+        <button
+          key={c}
+          type="button"
+          role="radio"
+          aria-checked={currency === c}
+          aria-label={c}
+          onClick={() => currency !== c && setCurrency(c)}
+          className={cn(
+            "rounded-full px-2.5 py-2 text-xs font-semibold transition-colors sm:py-1",
+            currency === c ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          {c === "USD" ? "$" : "៛"}
         </button>
       ))}
     </div>
@@ -149,7 +182,7 @@ export function ThemeMenu() {
 
 /** Stacked language + theme controls for the mobile menu and the profile page. */
 export function PreferencesPanel({ className }: { className?: string }) {
-  const { d } = useI18n();
+  const { d, rate } = useI18n();
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       <div className="flex flex-col gap-2">
@@ -158,6 +191,19 @@ export function PreferencesPanel({ className }: { className?: string }) {
           {d.prefs.language}
         </span>
         <LanguageSwitch className="w-fit [&>button]:px-4 [&>button]:py-1.5 [&>button]:text-sm" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+          <Coins className="size-3.5" />
+          {d.prefs.currency}
+        </span>
+        <CurrencySwitch className="w-fit [&>button]:px-4 [&>button]:py-1.5 [&>button]:text-sm" />
+        <p className="max-w-xs text-xs text-muted-foreground">
+          {d.prefs.currencyNote(Math.round(rate).toLocaleString("en-US"))}{" "}
+          <a href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground">
+            {d.prefs.rateSource}
+          </a>
+        </p>
       </div>
       <div className="flex flex-col gap-2">
         <span className="text-xs font-semibold text-muted-foreground">{d.prefs.theme}</span>

@@ -7,12 +7,12 @@ import { differenceInCalendarDays, parseISO } from "date-fns";
 import { StatusBadge } from "@/features/booking/components/status-badge";
 import { useActivity } from "@/features/renter/components/activity-provider";
 import { getListingById } from "@/features/listings/data";
-import { formatUSD } from "@/features/stays/lib/pricing";
+
 import { useI18n } from "@/i18n/client";
 import type { Stay } from "@/features/booking/types";
 
 export function StayRow({ stay, action }: { stay: Stay; action?: React.ReactNode }) {
-  const { d, t, range, lt } = useI18n();
+  const { d, t, range, lt, money } = useI18n();
   const listing = getListingById(stay.listingId);
   if (!listing) return null;
   const nights = differenceInCalendarDays(parseISO(stay.moveOut), parseISO(stay.moveIn));
@@ -36,7 +36,7 @@ export function StayRow({ stay, action }: { stay: Stay; action?: React.ReactNode
           <p className="text-sm text-muted-foreground">
             {range(stay.moveIn, stay.moveOut)} · {d.common.nights(nights)} · {d.common.guests(stay.guests)}
           </p>
-          <p className="mt-auto text-sm font-medium tabular">{d.renter.totalRent(formatUSD(stay.rentTotal))}</p>
+          <p className="mt-auto text-sm font-medium tabular">{d.renter.totalRent(money(stay.rentTotal))}</p>
         </div>
       </Link>
       {action && <div className="flex justify-end">{action}</div>}

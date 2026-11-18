@@ -9,8 +9,9 @@ import { MAX_COMPARE, useCompare } from "@/features/compare/components/compare-p
 import { StayLengthPicker } from "@/features/stays/components/stay-length-picker";
 import { Button } from "@/shared/ui/button";
 import { getListingById, isFullyVerified, listings } from "@/features/listings/data";
+import { useReviews } from "@/features/reviews/store";
 import { useI18n } from "@/i18n/client";
-import { formatUSD, quoteStay, stayToNights, type StayLength } from "@/features/stays/lib/pricing";
+import { quoteStay, stayToNights, type StayLength } from "@/features/stays/lib/pricing";
 import { cn } from "@/shared/lib/utils";
 import type { Listing } from "@/features/listings/types";
 
@@ -30,7 +31,8 @@ function Yes({ ok, labels }: { ok: boolean; labels: { yes: string; no: string } 
 }
 
 export function CompareTable() {
-  const { d, t, date, lt } = useI18n();
+  const { d, t, date, lt, money } = useI18n();
+  const reviewStore = useReviews();
   const c = d.compare;
   const { ids, remove, toggle, isFull } = useCompare();
   const [stay, setStay] = useState<StayLength>({ amount: 3, unit: "months" });
@@ -63,7 +65,7 @@ export function CompareTable() {
           label: c.rows.total(d.stay.format(stay)),
           render: (_l, i) => (
             <span className="flex flex-wrap items-center gap-2">
-              <span className="text-lg font-semibold tabular">{formatUSD(totals[i])}</span>
+              <span className="text-lg font-semibold tabular">{money(totals[i])}</span>
               {totals[i] === cheapest && items.length > 1 && (
                 <span className="rounded-full bg-accent px-2 py-0.5 text-[11px] font-semibold text-accent-foreground">{c.lowest}</span>
               )}
@@ -74,14 +76,14 @@ export function CompareTable() {
           label: c.rows.rate,
           render: (l) => {
             const q = quoteStay(l.pricing, nights);
-            return d.rate[q.tier](formatUSD(q.rate));
+            return d.rate[q.tier](money(q.rate));
           },
         },
-        { label: c.rows.monthlyNightly, render: (l) => `${formatUSD(l.pricing.monthly)} · ${formatUSD(l.pricing.nightly)}` },
-        { label: c.rows.deposit, render: (l) => formatUSD(quoteStay(l.pricing, nights).deposit) },
+        { label: c.rows.monthlyNightly, render: (l) => `${money(l.pricing.monthly)} · ${money(l.pricing.nightly)}` },
+        { label: c.rows.deposit, render: (l) => money(quoteStay(l.pricing, nights).deposit) },
         { label: c.rows.included, render: (l) => l.utilitiesIncluded.map(t).join(", ") },
         { label: c.rows.electricity, render: (l) => t(l.electricity) },
-        { label: c.rows.renterFee, render: () => <span className="font-medium text-success">$0</span> },
+        { label: c.rows.renterFee, render: () => <span className="font-medium text-success">{money(0)}</span> },
       ],
     },
     {
@@ -113,13 +115,18 @@ export function CompareTable() {
         { label: c.rows.ownership, render: (l) => <Yes ok={l.verification.ownership} labels={d.common} /> },
         {
           label: c.rows.rating,
-          render: (l) => (
-            <span className="flex items-center gap-1">
-              <Star className="size-3.5 fill-current text-accent-terracotta" />
-              <span className="tabular">{l.rating.toFixed(2)}</span>
-              <span className="text-muted-foreground">({l.reviewCount})</span>
-            </span>
-          ),
+          render: (l) => {
+            const rating = reviewStore.summary(l.id);
+            return rating.count > 0 ? (
+              <span className="flex items-center gap-1">
+                <Star className="size-3.5 fill-current text-accent-terracotta" />
+                <span className="tabular">{rating.average.toFixed(1)}</span>
+                <span className="text-muted-foreground">({rating.count})</span>
+              </span>
+            ) : (
+              <span className="text-muted-foreground">{d.reviews.new}</span>
+            );
+          },
         },
         { label: c.rows.ownerReplies, render: (l) => `${t(l.owner.responseTime)} · ${l.owner.responseRate}%` },
       ],
@@ -221,7 +228,7 @@ export function CompareTable() {
                 </div>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium">{lt(l).text}</span>
-                  <span className="block text-xs text-muted-foreground">{formatUSD(l.pricing.monthly)} {d.common.perMonth}</span>
+                  <span className="block text-xs text-muted-foreground">{money(l.pricing.monthly)} {d.common.perMonth}</span>
                 </span>
                 <Plus className="size-4 shrink-0 text-muted-foreground" />
               </button>

@@ -8,8 +8,10 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { dictionaries } from "@/i18n";
 import { useI18n } from "@/i18n/client";
+import { currencies, type Currency } from "@/i18n/config";
+import { toRiel } from "@/i18n/format";
 import { areas, propertyTypes } from "@/features/listings/lib/destinations";
-import { formatUSD, placementFeeTiers } from "@/features/stays/lib/pricing";
+import { placementFeeTiers } from "@/features/stays/lib/pricing";
 import { cn } from "@/shared/lib/utils";
 import type { PropertyType } from "@/features/listings/types";
 
@@ -143,15 +145,42 @@ function BilingualField({
   );
 }
 
-function MoneyInput({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+/**
+ * Price field. The value is always US dollars; in riel mode it shows and accepts
+ * riel and converts at the current rate. While typing, the text is kept as the
+ * person wrote it so rounding never fights the cursor.
+ */
+function MoneyInput({
+  value,
+  onChange,
+  currency,
+  rate,
+}: {
+  value: number;
+  onChange: (usd: number) => void;
+  currency: Currency;
+  rate: number;
+}) {
+  const shown = currency === "KHR" ? toRiel(value, rate) : value;
+  const [draft, setDraft] = useState<string | null>(null);
+
   return (
     <div className="flex h-11 items-center rounded-lg border border-input bg-card px-3 focus-within:ring-3 focus-within:ring-ring/50">
-      <span className="text-muted-foreground">$</span>
+      <span className="text-muted-foreground">{currency === "KHR" ? "៛" : "$"}</span>
       <input
         type="number"
+        inputMode="decimal"
         min={0}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
+        step={currency === "KHR" ? 1000 : 1}
+        value={draft ?? String(shown)}
+        onFocus={() => setDraft(String(shown))}
+        onBlur={() => setDraft(null)}
+        onChange={(e) => {
+          setDraft(e.target.value);
+          const n = Number(e.target.value);
+          if (!Number.isFinite(n) || n < 0) return;
+          onChange(currency === "KHR" ? Math.round((n / rate) * 10000) / 10000 : n);
+        }}
         className="w-full bg-transparent px-1.5 text-base font-semibold outline-none tabular"
       />
     </div>
@@ -159,8 +188,10 @@ function MoneyInput({ value, onChange }: { value: number; onChange: (v: number) 
 }
 
 export function ListingWizard() {
-  const { d, t } = useI18n();
+  const { d, t, money, currency, rate } = useI18n();
   const w = d.wizard;
+  // Which currency the price boxes use; starts as the one the owner is browsing in.
+  const [priceCurrency, setPriceCurrency] = useState<Currency>(currency);
   const steps = w.steps;
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
@@ -374,13 +405,38 @@ export function ListingWizard() {
               <h2 className="font-heading text-2xl font-semibold text-dark-forest">{w.pricingTitle}</h2>
               <p className="text-sm text-muted-foreground">{w.pricingSub}</p>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <Field label={w.perNight} hint={w.under1w}><MoneyInput value={nightly} onChange={setNightly} /></Field>
-              <Field label={w.perWeek} hint={w.w13}><MoneyInput value={weekly} onChange={setWeekly} /></Field>
-              <Field label={w.perMonth} hint={w.m1plus}><MoneyInput value={monthly} onChange={setMonthly} /></Field>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span id="price-currency-label" className="text-sm font-medium">
+                {w.enterIn}
+              </span>
+              <div role="radiogroup" aria-labelledby="price-currency-label" className="flex rounded-full bg-muted p-0.5">
+                {currencies.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    role="radio"
+                    aria-checked={priceCurrency === c}
+                    onClick={() => setPriceCurrency(c)}
+                    className={cn(
+                      "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                      priceCurrency === c ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {c === "USD" ? "$ USD" : "៛ KHR"}
+                  </button>
+                ))}
+              </div>
+              {priceCurrency === "KHR" && (
+                <span className="text-xs text-muted-foreground">{w.enterInNote(Math.round(rate).toLocaleString("en-US"))}</span>
+              )}
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <Field label={w.deposit}><MoneyInput value={deposit} onChange={setDeposit} /></Field>
+              <Field label={w.perNight} hint={w.under1w}><MoneyInput value={nightly} onChange={setNightly} currency={priceCurrency} rate={rate} /></Field>
+              <Field label={w.perWeek} hint={w.w13}><MoneyInput value={weekly} onChange={setWeekly} currency={priceCurrency} rate={rate} /></Field>
+              <Field label={w.perMonth} hint={w.m1plus}><MoneyInput value={monthly} onChange={setMonthly} currency={priceCurrency} rate={rate} /></Field>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <Field label={w.deposit}><MoneyInput value={deposit} onChange={setDeposit} currency={priceCurrency} rate={rate} /></Field>
               <Field label={w.minNights}>
                 <Input type="number" min={1} value={minNights} onChange={(e) => setMinNights(Number(e.target.value))} className="h-11 bg-card" />
               </Field>
@@ -405,7 +461,7 @@ export function ListingWizard() {
                 {placementFeeTiers.map((tier) => (
                   <div key={tier.minMonths} className="rounded-xl bg-card px-3.5 py-3">
                     <p className="text-xs text-muted-foreground">{d.income.tierStay(d.fees.tierLabel(tier.minMonths, tier.maxMonths))}</p>
-                    <p className="font-semibold tabular">{formatUSD(monthly * tier.rate)}</p>
+                    <p className="font-semibold tabular">{money(monthly * tier.rate)}</p>
                   </div>
                 ))}
               </div>

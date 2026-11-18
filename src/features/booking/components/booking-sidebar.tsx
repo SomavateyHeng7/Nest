@@ -12,13 +12,13 @@ import { StayLengthPicker } from "@/features/stays/components/stay-length-picker
 import { useProblemText } from "@/features/stays/components/use-problem-text";
 import { Button } from "@/shared/ui/button";
 import { useI18n } from "@/i18n/client";
-import { formatUSD, quoteStay } from "@/features/stays/lib/pricing";
+import { quoteStay } from "@/features/stays/lib/pricing";
 import { serializeStay } from "@/features/stays/lib/search-params";
 import { cn } from "@/shared/lib/utils";
 
 export function BookingSidebar() {
   const router = useRouter();
-  const { d, date } = useI18n();
+  const {  d, date, money, currency, rate } = useI18n();
   const { listing, moveIn, stay, setStay, guests, setGuests, nights, moveOut, problem } = useStayDraft();
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -37,11 +37,11 @@ export function BookingSidebar() {
       <div className="rounded-2xl border border-border bg-card p-5 shadow-lg shadow-black/[0.04]">
         <div className="flex items-baseline justify-between">
           <p>
-            <span className="text-2xl font-semibold tabular">{formatUSD(listing.pricing.monthly)}</span>
+            <span className="text-2xl font-semibold tabular">{money(listing.pricing.monthly)}</span>
             <span className="text-sm text-muted-foreground"> {d.common.perMonth}</span>
           </p>
           <p className="text-sm text-muted-foreground tabular">
-            {formatUSD(listing.pricing.nightly)} {d.common.perNight}
+            {money(listing.pricing.nightly)} {d.common.perNight}
           </p>
         </div>
 
@@ -139,27 +139,30 @@ export function BookingSidebar() {
 
         <dl className="mt-5 flex flex-col gap-2 border-t border-border pt-4 text-sm">
           <div className="flex justify-between gap-3">
-            <dt className="text-muted-foreground">{d.book.rent(d.rate[quote.tier](formatUSD(quote.rate)))}</dt>
-            <dd className="tabular">{formatUSD(quote.rentTotal)}</dd>
+            <dt className="text-muted-foreground">{d.book.rent(d.rate[quote.tier](money(quote.rate)))}</dt>
+            <dd className="tabular">{money(quote.rentTotal)}</dd>
           </div>
           <div className="flex justify-between gap-3">
             <dt className="text-muted-foreground">{d.book.serviceFee}</dt>
-            <dd className="font-medium text-success">$0</dd>
+            <dd className="font-medium text-success">{money(0)}</dd>
           </div>
           {quote.deposit > 0 && (
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">{d.book.deposit}</dt>
-              <dd className="tabular">{formatUSD(quote.deposit)}</dd>
+              <dd className="tabular">{money(quote.deposit)}</dd>
             </div>
           )}
           <div className="mt-1 flex justify-between gap-3 border-t border-border pt-3 font-semibold">
             <dt>{d.book.dueWhenAccepted}</dt>
-            <dd className="tabular">{formatUSD(quote.dueAtBooking)}</dd>
+            <dd className="tabular">{money(quote.dueAtBooking)}</dd>
           </div>
           {quote.laterPayments > 0 && (
             <p className="text-xs text-muted-foreground">
-              {d.book.laterPayments(quote.laterPayments, formatUSD(listing.pricing.monthly))}
+              {d.book.laterPayments(quote.laterPayments, money(listing.pricing.monthly))}
             </p>
+          )}
+          {currency === "KHR" && (
+            <p className="text-xs text-muted-foreground">{d.prefs.currencyNote(Math.round(rate).toLocaleString("en-US"))}</p>
           )}
         </dl>
       </div>

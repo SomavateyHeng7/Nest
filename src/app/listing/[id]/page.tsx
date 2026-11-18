@@ -11,7 +11,6 @@ import {
   MapPin,
   Ruler,
   Sofa,
-  Star,
   Users,
   Zap,
 } from "lucide-react";
@@ -28,9 +27,12 @@ import { StayDraftProvider } from "@/features/stays/components/stay-draft";
 import { VerificationPanel } from "@/features/listings/components/verification-panel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { getListingById } from "@/features/listings/data";
+import { ListingRating } from "@/features/reviews/components/listing-rating";
+import { ListingReviews } from "@/features/reviews/components/listing-reviews";
+import { getReviewSummary } from "@/features/reviews/data";
 import { getI18n } from "@/i18n/server";
 import { listingDescription, listingTitle } from "@/features/listings/lib/listing-text";
-import { formatUSD } from "@/features/stays/lib/pricing";
+
 import { SITE_URL } from "@/shared/lib/site";
 import type { Listing } from "@/features/listings/types";
 
@@ -67,6 +69,7 @@ const SCHEMA_TYPE: Record<Listing["type"], string> = {
 
 /** schema.org structured data so search engines can show price, rating and location. */
 function listingJsonLd(listing: Listing, name: string, description: string) {
+  const reviewSummary = getReviewSummary(listing.id);
   return {
     "@context": "https://schema.org",
     "@type": SCHEMA_TYPE[listing.type],
@@ -80,8 +83,8 @@ function listingJsonLd(listing: Listing, name: string, description: string) {
     occupancy: { "@type": "QuantitativeValue", maxValue: listing.maxGuests },
     amenityFeature: listing.amenities.map((a) => ({ "@type": "LocationFeatureSpecification", name: a, value: true })),
     address: { "@type": "PostalAddress", addressLocality: listing.city, addressRegion: listing.district, addressCountry: "KH" },
-    ...(listing.reviewCount > 0 && {
-      aggregateRating: { "@type": "AggregateRating", ratingValue: listing.rating, reviewCount: listing.reviewCount },
+    ...(reviewSummary.count > 0 && {
+      aggregateRating: { "@type": "AggregateRating", ratingValue: reviewSummary.average, reviewCount: reviewSummary.count },
     }),
     offers: {
       "@type": "Offer",
@@ -108,7 +111,7 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
   const listing = getListingById(id);
   if (!listing) notFound();
 
-  const { d, t, locale } = await getI18n();
+  const { d, t, locale, money } = await getI18n();
   const { pricing, owner } = listing;
   const title = listingTitle(listing, locale);
 
@@ -150,11 +153,7 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
           {title.text}
         </h1>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1 text-foreground">
-            <Star className="size-4 fill-current text-accent-terracotta" />
-            <span className="font-medium tabular">{listing.rating.toFixed(2)}</span>
-            <span className="text-muted-foreground">· {d.common.reviews(listing.reviewCount)}</span>
-          </span>
+          <ListingRating listingId={listing.id} />
           <span className="flex items-center gap-1">
             <MapPin className="size-4" />
             {t(listing.district)}, {t(listing.city)}
@@ -198,7 +197,7 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
                   <p className="text-sm font-medium">{r.label}</p>
                   <p className="text-xs text-muted-foreground">{r.hint}</p>
                   <p className="mt-3">
-                    <span className="text-xl font-semibold tabular">{formatUSD(r.value)}</span>
+                    <span className="text-xl font-semibold tabular">{money(r.value)}</span>
                     <span className="text-sm text-muted-foreground"> / {r.unit}</span>
                   </p>
                 </div>
@@ -218,7 +217,7 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
               </div>
               <div>
                 <p className="font-medium">{d.listing.deposit}</p>
-                <p className="text-muted-foreground">{d.listing.depositBody(formatUSD(pricing.deposit))}</p>
+                <p className="text-muted-foreground">{d.listing.depositBody(money(pricing.deposit))}</p>
               </div>
               <div>
                 <p className="font-medium">{d.listing.renterFee}</p>
@@ -271,6 +270,10 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
                 </li>
               ))}
             </ul>
+          </Section>
+
+          <Section title={d.reviews.title} id="reviews">
+            <ListingReviews listingId={listing.id} ownerFirstName={owner.name.split(" ")[0]} />
           </Section>
 
           <Section title={d.listing.owner}>

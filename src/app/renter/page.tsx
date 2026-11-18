@@ -8,13 +8,17 @@ import { ExtendStay } from "@/features/renter/components/extend-stay";
 import { ComingSoonButton } from "@/features/renter/components/coming-soon-button";
 import { RenterViewings, SavedHomes } from "@/features/renter/components/renter-sections";
 import { StayRow, UpcomingStays } from "@/features/renter/components/stay-list";
+import { OpenDispute } from "@/features/disputes/components/open-dispute";
+import { MyDisputes } from "@/features/disputes/components/my-disputes";
+import { ReviewPrompts } from "@/features/reviews/components/review-prompts";
+import { WriteReview } from "@/features/reviews/components/write-review";
 import { StatusBadge } from "@/features/booking/components/status-badge";
 import { Button } from "@/shared/ui/button";
 import { currentUser } from "@/features/account/current-user";
 import { stays } from "@/features/booking/data";
 import { getListingById } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
-import { formatUSD, nextRentAmount } from "@/features/stays/lib/pricing";
+import { nextRentAmount } from "@/features/stays/lib/pricing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { d } = await getI18n();
@@ -22,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RenterPage() {
-  const { d, t, date, lt } = await getI18n();
+  const { d, t, date, lt, money } = await getI18n();
   const r = d.renter;
   const today = new Date();
   const active = stays.find((s) => s.status === "active");
@@ -43,6 +47,8 @@ export default async function RenterPage() {
     <div className="mx-auto max-w-5xl px-4 pt-8 pb-24 sm:px-6">
       <p className="text-sm text-muted-foreground">{r.greeting(currentUser.firstName)}</p>
       <h1 className="font-heading text-3xl font-semibold tracking-tight text-dark-forest">{r.title}</h1>
+
+      <ReviewPrompts stays={past} />
 
       {active && activeListing && (
         <section className="mt-6 overflow-hidden rounded-3xl border border-border bg-card">
@@ -77,7 +83,7 @@ export default async function RenterPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-accent-terracotta/10 px-4 py-3">
                   <p className="flex items-center gap-2 text-sm">
                     <Receipt className="size-4 text-accent-terracotta" />
-                    {r.nextRent} <span className="font-semibold tabular">{formatUSD(nextRentAmount(active, active.nextPaymentDue))}</span>{" "}
+                    {r.nextRent} <span className="font-semibold tabular">{money(nextRentAmount(active, active.nextPaymentDue))}</span>{" "}
                     {r.due(date(active.nextPaymentDue, "EEE, MMM d"))}
                   </p>
                   <ComingSoonButton
@@ -95,6 +101,16 @@ export default async function RenterPage() {
                   {r.messageOwner}
                 </Button>
                 <ExtendStay stay={active} listing={activeListing} />
+                <OpenDispute
+                  openedBy="renter"
+                  context={{
+                    listingId: active.listingId,
+                    renter: currentUser.name,
+                    owner: activeListing.owner.name,
+                    held: Math.min(active.monthlyRent, active.rentTotal),
+                    stay: { moveIn: active.moveIn, moveOut: active.moveOut },
+                  }}
+                />
                 <ComingSoonButton
                   variant="outline"
                   className="h-9 gap-1.5 px-3"
@@ -123,10 +139,33 @@ export default async function RenterPage() {
         <h2 className="font-semibold">{r.past}</h2>
         <div className="mt-3 flex flex-col gap-3">
           {past.map((s) => (
-            <StayRow key={s.id} stay={s} />
+            <StayRow
+              key={s.id}
+              stay={s}
+              action={
+                s.status === "completed" ? (
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <WriteReview stay={s} />
+                    <OpenDispute
+                      openedBy="renter"
+                      variant="ghost"
+                      context={{
+                        listingId: s.listingId,
+                        renter: currentUser.name,
+                        owner: getListingById(s.listingId)?.owner.name ?? "",
+                        held: Math.min(s.monthlyRent, s.rentTotal),
+                        stay: { moveIn: s.moveIn, moveOut: s.moveOut },
+                      }}
+                    />
+                  </div>
+                ) : undefined
+              }
+            />
           ))}
         </div>
       </section>
+
+      <MyDisputes party="renter" />
 
       <SavedHomes />
 

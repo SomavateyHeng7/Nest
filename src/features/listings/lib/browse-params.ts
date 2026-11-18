@@ -14,12 +14,16 @@ export interface BrowserFilters {
   billsIncluded: boolean;
   fullyVerifiedOnly: boolean;
   furnishedOnly: boolean;
+  /** Lowest guest rating to show; 0 means any. */
+  minRating: number;
 }
 
-export const SORTS = ["recommended", "price-asc", "price-desc", "available"] as const;
+export const SORTS = ["recommended", "price-asc", "price-desc", "available", "rating"] as const;
 export type Sort = (typeof SORTS)[number];
 
 export type BrowseView = "list" | "map";
+
+export const RATING_STEPS = [0, 4, 4.5] as const;
 
 export const BUDGET_MIN = 150;
 export const BUDGET_MAX = 1500;
@@ -40,6 +44,7 @@ export function parseBrowseParams(params: Params): { filters: BrowserFilters; so
     .filter((x): x is PropertyType => propertyTypes.includes(x as PropertyType));
   const max = Number(firstParam(params.max));
   const beds = Number(firstParam(params.beds));
+  const rating = Number(firstParam(params.rating));
   const sort = firstParam(params.sort) as Sort | undefined;
 
   return {
@@ -54,6 +59,7 @@ export function parseBrowseParams(params: Params): { filters: BrowserFilters; so
       billsIncluded: firstParam(params.bills) === "1",
       fullyVerifiedOnly: firstParam(params.visited) === "1",
       furnishedOnly: firstParam(params.furnished) === "1",
+      minRating: (RATING_STEPS as readonly number[]).includes(rating) ? rating : 0,
     },
     sort: sort && SORTS.includes(sort) ? sort : "recommended",
     view: firstParam(params.view) === "map" ? "map" : "list",
@@ -74,6 +80,7 @@ export function serializeBrowseParams(f: BrowserFilters, sort: Sort, view: Brows
   if (f.billsIncluded) q.set("bills", "1");
   if (f.fullyVerifiedOnly) q.set("visited", "1");
   if (f.furnishedOnly) q.set("furnished", "1");
+  if (f.minRating > 0) q.set("rating", String(f.minRating));
   if (sort !== "recommended") q.set("sort", sort);
   if (view === "map") q.set("view", "map");
   return q.toString();

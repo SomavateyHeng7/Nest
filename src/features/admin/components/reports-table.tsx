@@ -8,6 +8,7 @@ import { Button } from "@/shared/ui/button";
 import { toast } from "@/shared/ui/toast";
 import { reports as initialReports, type Report, type ReportSeverity } from "@/features/admin/data";
 import { getListingById } from "@/features/listings/data";
+import { useAudit, type AuditAction } from "@/features/admin/audit";
 import { useI18n } from "@/i18n/client";
 import { cn } from "@/shared/lib/utils";
 
@@ -23,6 +24,7 @@ export function ReportsTable() {
   const { d, relative, lt } = useI18n();
   const r = d.admin.reports;
   const tt = d.admin.toast;
+  const { log } = useAudit();
   const [resolved, setResolved] = useState<string[]>([]);
   const [paused, setPaused] = useState<string[]>([]);
   const [tab, setTab] = useState<Tab>("open");
@@ -31,24 +33,41 @@ export function ReportsTable() {
   const shown = initialReports.filter((rep) => (tab === "resolved") === isResolved(rep));
   const count = (t: Tab) => initialReports.filter((rep) => (t === "resolved") === isResolved(rep)).length;
 
+  const record = (action: AuditAction, rep: Report) => log({ action, target: rep.subject, ref: rep.id, detail: r.kind[rep.kind] });
+
   function resolve(rep: Report) {
     setResolved((list) => [...list, rep.id]);
+    record("report.resolved", rep);
     toast.success(tt.resolved, {
       description: rep.subject,
-      action: { label: d.toast.undo, onClick: () => setResolved((list) => list.filter((x) => x !== rep.id)) },
+      action: {
+        label: d.toast.undo,
+        onClick: () => {
+          setResolved((list) => list.filter((x) => x !== rep.id));
+          record("report.reopened", rep);
+        },
+      },
     });
   }
 
   function reopen(rep: Report) {
     setResolved((list) => list.filter((x) => x !== rep.id));
+    record("report.reopened", rep);
     toast.info(tt.reopened);
   }
 
   function pause(rep: Report) {
     setPaused((list) => [...list, rep.id]);
+    record("report.listingPaused", rep);
     toast.warning(tt.paused, {
       description: rep.subject,
-      action: { label: d.toast.undo, onClick: () => setPaused((list) => list.filter((x) => x !== rep.id)) },
+      action: {
+        label: d.toast.undo,
+        onClick: () => {
+          setPaused((list) => list.filter((x) => x !== rep.id));
+          record("report.listingResumed", rep);
+        },
+      },
     });
   }
 
@@ -108,11 +127,17 @@ export function ReportsTable() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   {!isResolved(rep) ? (
                     <>
-                      <Button variant="outline" className="h-9 gap-1.5 px-3" onClick={() => toast.success(tt.contacted)}>
+                      <Button variant="outline" className="h-9 gap-1.5 px-3" onClick={() => {
+                          record("report.contacted", rep);
+                          toast.success(tt.contacted);
+                        }}>
                         <MessageSquare className="size-4" />
                         {r.contact}
                       </Button>
-                      <Button variant="outline" className="h-9 gap-1.5 px-3" onClick={() => toast.info(tt.warned(rep.subject))}>
+                      <Button variant="outline" className="h-9 gap-1.5 px-3" onClick={() => {
+                          record("report.warned", rep);
+                          toast.info(tt.warned(rep.subject));
+                        }}>
                         <AlertTriangle className="size-4" />
                         {r.warn}
                       </Button>
