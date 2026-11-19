@@ -174,7 +174,7 @@ export function Inbox({ initialThreads }: { initialThreads: Thread[] }) {
                 aria-label={m.label}
                 className="max-h-32 min-h-11 flex-1 resize-none rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
               />
-              <Button type="submit" size="icon-lg" className="size-11 rounded-xl bg-accent-terracotta text-white hover:bg-terracotta-strong" aria-label={m.send} disabled={!draft.trim()}>
+              <Button type="submit" size="icon-lg" className="size-11 rounded-xl bg-cta text-white hover:bg-cta-strong" aria-label={m.send} disabled={!draft.trim()}>
                 <SendHorizontal className="size-4.5" />
               </Button>
             </form>

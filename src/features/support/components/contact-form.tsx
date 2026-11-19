@@ -93,7 +93,7 @@ export function ContactForm() {
       <Button
         type="submit"
         disabled={status === "sending"}
-        className="h-12 gap-2 self-stretch rounded-xl bg-accent-terracotta px-6 text-base text-white hover:bg-terracotta-strong sm:self-start"
+        className="h-12 gap-2 self-stretch rounded-xl bg-cta px-6 text-base text-white hover:bg-cta-strong sm:self-start"
       >
         <SendHorizontal className="size-4" />
         {status === "sending" ? c.sending : c.send}

@@ -114,7 +114,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             <Input type="password" required placeholder="••••••••" className="h-11 bg-card" />
           </label>
 
-          <Button type="submit" disabled={submitting} className="mt-2 h-12 bg-accent-terracotta text-base text-white hover:bg-terracotta-strong">
+          <Button type="submit" disabled={submitting} className="mt-2 h-12 bg-cta text-base text-white hover:bg-cta-strong">
             {isLogin ? a.login : a.signup}
           </Button>
           <p className="text-center text-xs text-muted-foreground">{a.prototype}</p>

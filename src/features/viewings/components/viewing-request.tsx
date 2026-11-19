@@ -199,7 +199,7 @@ export function ViewingRequest({ listing }: { listing: Listing }) {
 
             <div className="sticky -bottom-5 -mx-5 -mb-5 border-t border-border bg-popover px-5 py-4">
               <Button
-                className="h-12 w-full bg-accent-terracotta text-base text-white hover:bg-terracotta-strong"
+                className="h-12 w-full bg-cta text-base text-white hover:bg-cta-strong"
                 disabled={!time}
                 onClick={submit}
               >

@@ -223,7 +223,7 @@ export function VerificationQueue() {
                     {v.submitted(relative(item.submittedAt))}
                   </span>
                   <Button
-                    className={cn("h-9 px-4", stage === "ready" && "bg-accent-terracotta text-white hover:bg-terracotta-strong")}
+                    className={cn("h-9 px-4", stage === "ready" && "bg-cta text-white hover:bg-cta-strong")}
                     variant={stage === "ready" ? "default" : "outline"}
                     onClick={() => {
                       setReason(0);
@@ -482,7 +482,7 @@ export function VerificationQueue() {
                     {v.requestChanges}
                   </Button>
                   <Button
-                    className="h-10 bg-accent-terracotta px-4 text-white hover:bg-terracotta-strong"
+                    className="h-10 bg-cta px-4 text-white hover:bg-cta-strong"
                     disabled={stageOf(open) !== "ready"}
                     onClick={() => publish(open)}
                   >

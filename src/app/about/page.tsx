@@ -83,7 +83,7 @@ export default async function AboutPage() {
             <p className="font-heading text-2xl font-semibold lg:text-right">{a.ctaTitle}</p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button
-                className="h-12 bg-accent-terracotta px-6 text-base text-white hover:bg-terracotta-strong"
+                className="h-12 bg-cta px-6 text-base text-white hover:bg-cta-strong"
                 nativeButton={false}
                 render={<Link href="/listing" />}
               >

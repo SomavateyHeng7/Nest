@@ -65,7 +65,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${kantumruy.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      {/* Browser extensions inject attributes (e.g. __processed_*) into <body> before hydration. */}
+      <body suppressHydrationWarning className="flex min-h-full flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <LocaleProvider initialLocale={locale} initialCurrency={currency} khrRate={rate}>
             <ActivityProvider>

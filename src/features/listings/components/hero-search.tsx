@@ -83,7 +83,7 @@ export function HeroSearch() {
 
       <Button
         type="submit"
-        className="h-12 gap-2 rounded-xl bg-accent-terracotta px-6 text-base text-white hover:bg-terracotta-strong sm:col-span-2"
+        className="h-12 gap-2 rounded-xl bg-cta px-6 text-base text-white hover:bg-cta-strong sm:col-span-2"
       >
         <Search className="size-4.5" />
         {d.search.submit}

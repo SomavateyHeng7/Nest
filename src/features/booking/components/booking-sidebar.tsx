@@ -129,7 +129,7 @@ export function BookingSidebar() {
         )}
 
         <Button
-          className="mt-4 h-12 w-full bg-accent-terracotta text-base text-white hover:bg-terracotta-strong"
+          className="mt-4 h-12 w-full bg-cta text-base text-white hover:bg-cta-strong"
           disabled={Boolean(problem)}
           onClick={handleRequest}
         >

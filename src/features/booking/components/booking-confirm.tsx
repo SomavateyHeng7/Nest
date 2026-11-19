@@ -213,7 +213,7 @@ export function BookingConfirm({
               </p>
             )}
             <Button
-              className="h-12 bg-accent-terracotta text-base text-white hover:bg-terracotta-strong sm:w-fit sm:px-8"
+              className="h-12 bg-cta text-base text-white hover:bg-cta-strong sm:w-fit sm:px-8"
               disabled={blocked}
               onClick={() => {
                 // Prototype: kept in this browser until booking requests go to the backend.

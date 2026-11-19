@@ -15,8 +15,11 @@
   --brand-forest: #294236;
   --brand-sage: #6b8f71;
   --brand-cream: #f7f3ea;
-  --brand-clay: #c9825a;
-  --brand-clay-strong: #b06c45;
+  --brand-clay: #a35f3a;
+  --brand-clay-strong: #874b29;
+  /* Fill behind white text (buttons, CTA panels): >=4.5:1 in both themes. */
+  --brand-cta: #9f5a35;
+  --brand-cta-strong: #824a29;
   --brand-surface: #ffffff;
   --brand-ink: #1f2a24;
 
@@ -63,6 +66,8 @@
   --brand-sage: #8fb596;
   --brand-clay: #d8956d;
   --brand-clay-strong: #e3a681;
+  --brand-cta: #9f5a35;
+  --brand-cta-strong: #b2663c;
 
   --background: #111915;
   --foreground: #eee9de;
@@ -106,6 +111,8 @@
   --color-surface-white: var(--brand-surface);
   --color-accent-terracotta: var(--brand-clay);
   --color-terracotta-strong: var(--brand-clay-strong);
+  --color-cta: var(--brand-cta);
+  --color-cta-strong: var(--brand-cta-strong);
   --color-text-charcoal: var(--brand-ink);
   --color-success: var(--success);
   --color-warning: var(--warning);

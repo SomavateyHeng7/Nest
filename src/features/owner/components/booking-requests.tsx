@@ -105,7 +105,7 @@ export function BookingRequests({ bookings }: { bookings: OwnerBooking[] }) {
                     {d.owner.decline}
                   </Button>
                   <Button
-                    className="h-9 gap-1.5 bg-accent-terracotta px-3.5 text-white hover:bg-terracotta-strong"
+                    className="h-9 gap-1.5 bg-cta px-3.5 text-white hover:bg-cta-strong"
                     onClick={() => setStatuses((s) => ({ ...s, [b.id]: "confirmed" }))}
                   >
                     <Check className="size-4" />

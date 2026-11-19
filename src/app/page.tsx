@@ -266,7 +266,7 @@ export default async function Home() {
 
       {/* Owner CTA */}
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl bg-accent-terracotta px-6 py-12 text-white sm:px-12">
+        <div className="relative overflow-hidden rounded-3xl bg-cta px-6 py-12 text-white sm:px-12">
           <HomeIcon className="absolute -right-8 -bottom-10 size-64 opacity-10" strokeWidth={1.2} />
           <div className="relative max-w-xl">
             <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">

@@ -21,7 +21,7 @@ export function MobileBookingBar() {
       </p>
       <a
         href="#book"
-        className="inline-flex h-12 shrink-0 items-center rounded-xl bg-accent-terracotta px-5 text-sm font-medium text-white hover:bg-terracotta-strong"
+        className="inline-flex h-12 shrink-0 items-center rounded-xl bg-cta px-5 text-sm font-medium text-white hover:bg-cta-strong"
       >
         {d.book.request}
       </a>

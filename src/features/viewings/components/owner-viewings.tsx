@@ -86,7 +86,7 @@ export function OwnerViewings({ viewings }: { viewings: OwnerViewing[] }) {
                     {v.suggest}
                   </Button>
                   <Button
-                    className="h-9 gap-1.5 bg-accent-terracotta px-3.5 text-white hover:bg-terracotta-strong"
+                    className="h-9 gap-1.5 bg-cta px-3.5 text-white hover:bg-cta-strong"
                     onClick={() => setOutcomes((o) => ({ ...o, [item.id]: { kind: "confirmed" } }))}
                   >
                     <Check className="size-4" />

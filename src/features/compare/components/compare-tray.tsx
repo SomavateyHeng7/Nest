@@ -33,7 +33,7 @@ export function CompareTray() {
       <span className="shrink-0 px-2 text-xs text-muted-foreground">{d.compare.trayAddMore}</span>
     ) : (
       <Button
-        className="h-9 shrink-0 gap-1.5 bg-accent-terracotta px-3.5 text-white hover:bg-terracotta-strong"
+        className="h-9 shrink-0 gap-1.5 bg-cta px-3.5 text-white hover:bg-cta-strong"
         nativeButton={false}
         render={<Link href="/compare" />}
       >

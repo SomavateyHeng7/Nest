@@ -60,7 +60,7 @@ export default async function ProfilePage() {
                 <Input defaultValue={currentUser.email} type="email" className="h-10" />
               </label>
             </div>
-            <Button className="mt-5 h-10 bg-accent-terracotta px-4 text-white hover:bg-terracotta-strong">
+            <Button className="mt-5 h-10 bg-cta px-4 text-white hover:bg-cta-strong">
               {d.common.saveChanges}
             </Button>
           </section>

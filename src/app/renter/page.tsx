@@ -87,7 +87,7 @@ export default async function RenterPage() {
                     {r.due(date(active.nextPaymentDue, "EEE, MMM d"))}
                   </p>
                   <ComingSoonButton
-                    className="h-8 bg-accent-terracotta px-3 text-white hover:bg-terracotta-strong"
+                    className="h-8 bg-cta px-3 text-white hover:bg-cta-strong"
                     title={r.paySoon.title}
                     description={r.paySoon.body}
                   >
@@ -174,7 +174,7 @@ export default async function RenterPage() {
           <p className="font-semibold">{r.nextTitle}</p>
           <p className="text-sm opacity-80">{r.nextBody}</p>
         </div>
-        <Button className="h-10 bg-accent-terracotta px-4 text-white hover:bg-terracotta-strong" nativeButton={false} render={<Link href="/listing" />}>
+        <Button className="h-10 bg-cta px-4 text-white hover:bg-cta-strong" nativeButton={false} render={<Link href="/listing" />}>
           {d.nav.findStay}
         </Button>
       </div>

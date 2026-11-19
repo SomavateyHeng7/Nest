@@ -69,7 +69,7 @@ export default async function HelpPage() {
           <p className="mt-1 text-background/75">{h.stillBody}</p>
         </div>
         <Button
-          className="h-12 shrink-0 gap-2 bg-accent-terracotta px-5 text-base text-white hover:bg-terracotta-strong"
+          className="h-12 shrink-0 gap-2 bg-cta px-5 text-base text-white hover:bg-cta-strong"
           nativeButton={false}
           render={<Link href="/contact" />}
         >

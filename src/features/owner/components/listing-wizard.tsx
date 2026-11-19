@@ -528,7 +528,7 @@ export function ListingWizard() {
               {d.common.continue}
             </Button>
           ) : (
-            <Button className="h-10 bg-accent-terracotta px-6 text-white hover:bg-terracotta-strong" disabled={!canContinue} onClick={() => setDone(true)}>
+            <Button className="h-10 bg-cta px-6 text-white hover:bg-cta-strong" disabled={!canContinue} onClick={() => setDone(true)}>
               {w.submit}
             </Button>
           )}

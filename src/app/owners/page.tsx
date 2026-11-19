@@ -32,7 +32,7 @@ export default async function OwnersPage() {
             {o.lede}
           </p>
           <div className="flex flex-wrap gap-3">
-            <Button className="h-12 bg-accent-terracotta px-6 text-base text-white hover:bg-terracotta-strong" nativeButton={false} render={<Link href="/host/new" />}>
+            <Button className="h-12 bg-cta px-6 text-base text-white hover:bg-cta-strong" nativeButton={false} render={<Link href="/host/new" />}>
               {o.cta}
             </Button>
             <Button variant="outline" className="h-12 px-6 text-base" nativeButton={false} render={<Link href="/host" />}>

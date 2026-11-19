@@ -178,7 +178,7 @@ export function CompareTable() {
                   {lt(l).text}
                 </Link>
                 <Button
-                  className="mt-auto h-9 bg-accent-terracotta text-white hover:bg-terracotta-strong"
+                  className="mt-auto h-9 bg-cta text-white hover:bg-cta-strong"
                   nativeButton={false}
                   render={<Link href={`/listing/${l.id}`} />}
                 >
