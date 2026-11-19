@@ -182,19 +182,30 @@
    * letter-spacing/italic treatments that only make sense for Latin.
    */
   html:lang(km) {
-    line-height: 1.7;
+    line-height: 1.6;
   }
   html:lang(km) :is(h1, h2, h3, p, span, a, button, label, li, dt, dd, td, th) {
     letter-spacing: normal !important;
   }
   html:lang(km) :is(h1, h2, h3) {
     line-height: 1.4 !important;
+    /* Khmer glyphs run larger than Latin at the same size; shrink headings so they wrap like English. */
+    zoom: 0.86;
   }
+  /* Khmer has no spaces, so browsers split short chip labels mid-word ("ទាំង / អស់"). Keep pills on one line. */
+  html:lang(km) [class*="rounded-full"] {
+    white-space: nowrap;
+  }
+  /* Khmer is hard to read at 12px; nudge the smallest utility size up one step. */
+  html:lang(km) .text-xs {
+    font-size: 0.8125rem !important;
+  }
+  /* !important: utilities layer would otherwise win over this base-layer rule. */
   html:lang(km) .italic {
-    font-style: normal;
+    font-style: normal !important;
   }
   html:lang(km) .uppercase {
-    text-transform: none;
+    text-transform: none !important;
   }
 }
 
@@ -257,4 +268,23 @@
 }
 .leaflet-popup-content {
   margin: 10px;
+}
+
+/* Smooth page + language transitions. Fade only (opacity/transform); disabled for reduced motion. */
+@keyframes nest-page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.nest-page-in {
+  animation: nest-page-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+main {
+  transition: opacity 180ms ease;
+}
+html[data-switching] main {
+  opacity: 0.55;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nest-page-in { animation: none; }
+  main { transition: none; }
 }

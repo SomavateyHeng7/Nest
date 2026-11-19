@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState, useTransition } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { CURRENCY_COOKIE, LOCALE_COOKIE, type Currency, type Locale } from "@/i18n/config";
@@ -41,9 +41,11 @@ export function LocaleProvider({
     (next: Locale) => {
       document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
       document.documentElement.lang = next;
-      setLocaleState(next);
-      // Re-render Server Components with the new cookie.
-      startTransition(() => router.refresh());
+      // One transition for state + refresh: old UI stays until the new Server Components arrive, so text swaps together.
+      startTransition(() => {
+        setLocaleState(next);
+        router.refresh();
+      });
     },
     [router]
   );
@@ -51,11 +53,18 @@ export function LocaleProvider({
   const setCurrency = useCallback(
     (next: Currency) => {
       document.cookie = `${CURRENCY_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
-      setCurrencyState(next);
-      startTransition(() => router.refresh());
+      startTransition(() => {
+        setCurrencyState(next);
+        router.refresh();
+      });
     },
     [router]
   );
+
+  // Drives the soft fade on <main> in globals.css while the switch is in flight.
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-switching", pending);
+  }, [pending]);
 
   const value = useMemo(
     () => ({ locale, setLocale, currency, setCurrency, khrRate, pending }),

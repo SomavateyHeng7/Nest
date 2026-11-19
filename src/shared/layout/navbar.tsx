@@ -92,13 +92,13 @@ export function Navbar() {
           </span>
           <Button
             variant="ghost"
-            className="hidden h-9 px-3 xl:inline-flex"
+            className="hidden h-9 min-w-36 justify-center px-3 xl:inline-flex"
             nativeButton={false}
             render={<Link href="/host" />}
           >
             {d.nav.ownerDashboard}
           </Button>
-          <Button className="hidden h-9 px-4 sm:inline-flex" nativeButton={false} render={<Link href="/login" />}>
+          <Button className="hidden h-9 min-w-20 justify-center px-4 sm:inline-flex" nativeButton={false} render={<Link href="/login" />}>
             {d.nav.logIn}
           </Button>
           <Button
