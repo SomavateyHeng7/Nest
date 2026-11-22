@@ -511,6 +511,11 @@ export const en = {
     list: "List",
     map: "Map",
     viewToggle: "Show results as",
+    searchArea: "Search this area",
+    searchAsMove: "Search as I move the map",
+    showAll: "Show all results",
+    inView: (n: number, total: number) => (n === total ? `${total} homes` : `${n} of ${total} homes in this area`),
+    nothingInArea: "No homes in this area. Move the map or show all results.",
   },
 
   browse: {
@@ -529,6 +534,11 @@ export const en = {
     bills: "All bills included",
     billsHint: "Electricity, water and wifi in the price",
     furnished: "Furnished",
+    pets: "Pets allowed",
+    stepFree: "Step-free access",
+    stepFreeHint: "No stairs to the front door, or a working lift",
+    quiet: "Quiet street",
+    quietHint: "Owner says it is quiet day and night",
     allOf: (city: string) => `All of ${city}`,
     results: (n: number, where: string | null) =>
       `${n} ${n === 1 ? "home" : "homes"}${where ? ` in ${where}` : " across Cambodia"}`,
@@ -590,6 +600,13 @@ export const en = {
     photo: (n: number) => `photo ${n}`,
     photoCount: (i: number, n: number) => `${i} / ${n}`,
     photos: "Photos",
+    showAllPhotos: (n: number) => `Show all ${n} photos`,
+    openPhoto: (n: number) => `Open photo ${n} full screen`,
+    photoViewer: "Photo viewer",
+    closeViewer: "Close photo viewer",
+    previousPhoto: "Previous photo",
+    nextPhoto: "Next photo",
+    viewerPhotos: "All photos",
     ownerText: {
       khmerByOwner: "Khmer version written by the owner",
       englishOnly: "The owner wrote this in English",
@@ -703,6 +720,8 @@ export const en = {
     emptyTitle: (n: number) => `Compare up to ${n} homes`,
     emptyBody: "Tap Compare on any listing to see total cost, bills, verification and amenities side by side.",
     browse: "Browse stays",
+    sharedBanner: "Someone shared this comparison with you.",
+    useAsMine: "Use as my comparison",
     stayLength: "Stay length",
     remove: (title: string) => `Remove ${title}`,
     viewBook: "View & book",
@@ -995,6 +1014,37 @@ export const en = {
     label: "Message",
     send: "Send",
     select: "Select a conversation",
+    leak: {
+      warning: "This looks like a phone number, link or chat handle. If you move the conversation or payment off Nest, you’re not covered by Nest’s protection.",
+      sendAnyway: "Send anyway",
+      edit: "Edit message",
+    },
+  },
+
+  livability: {
+    title: "Good to know",
+    pets: "Pets",
+    petsYes: "Allowed",
+    petsNo: "Not allowed",
+    stepFree: "Step-free access",
+    noise: "Noise",
+    noiseLevel: { quiet: "Quiet", moderate: "Some street noise", lively: "Lively area" },
+    flood: "Flooding in rainy season",
+    floodLevel: { low: "Unlikely", medium: "Sometimes on the street", high: "Often" },
+    backupPower: "Power during outages",
+    note: "Reported by the owner. Nest staff don’t check these during a visit yet, so ask the owner if one matters to you.",
+  },
+
+  recent: {
+    title: "Recently viewed",
+    clear: "Clear",
+  },
+
+  share: {
+    share: "Share",
+    copyLink: "Copy link",
+    copied: "Link copied",
+    copyFailed: "Couldn’t copy the link",
   },
 
   auth: {
@@ -1108,7 +1158,20 @@ export const en = {
       `${name} will review extending your stay to ${date}. You’ll only pay the extra rent once it’s approved.`,
     pending: (date: string) => `Extension to ${date} requested`,
     withdraw: "Withdraw",
+    declined: (date: string) => `Extension to ${date} declined`,
+    askAgain: "Ask again",
     done: "Done",
+  },
+
+  extensionOwner: {
+    title: "Extension requests",
+    note: "A renter wants to stay longer.",
+    from: (date: string) => `Now leaving ${date}`,
+    to: (date: string) => `asks to stay until ${date}`,
+    extraNights: (n: number) => `+${n} ${n === 1 ? "night" : "nights"}`,
+    extraRent: "Extra rent",
+    approvedToast: "Extension approved",
+    declinedToast: "Extension declined",
   },
 
   toast: {
@@ -1390,7 +1453,11 @@ export const en = {
       alert: (who: string, n: number) => `${who} opened ${n} private documents within one hour.`,
       alertAction: "Show them",
       categories: { all: "All", applications: "Applications", verifications: "Verifications", documents: "Documents", users: "Users", reports: "Reports", disputes: "Disputes", reviews: "Reviews" },
-      columns: { when: "When", staff: "Staff", action: "Action", target: "About" },
+      columns: { when: "When", staff: "Staff", action: "Action", target: "About", id: "ID", note: "Note" },
+      allStaff: "All staff",
+      staffFilter: "Filter by staff member",
+      clearFilters: "Clear all filters",
+      showMore: (n: number) => `Show ${n} more`,
       actions: {
         "host.approved": "Approved a host application",
         "host.rejected": "Rejected a host application",
@@ -1521,6 +1588,14 @@ export const en = {
     waiting: "Waiting for staff to check",
     allGood: "Both documents are approved.",
     allGoodVisit: "Next step: the in-person visit.",
+    progress: "Verification progress",
+    steps: {
+      docs: "Documents approved",
+      visit: "Visit to be booked",
+      visitBooked: (date: string, time: string) => `Visit ${date}, ${time}`,
+      visitDone: "Visit done",
+      ready: "Ready to go live",
+    },
   },
   disputes: {
     report: "Report a problem",

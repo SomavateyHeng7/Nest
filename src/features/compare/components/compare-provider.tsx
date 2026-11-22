@@ -2,7 +2,9 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-export const MAX_COMPARE = 3;
+import { MAX_COMPARE } from "@/features/compare/lib/limits";
+
+export { MAX_COMPARE };
 const STORAGE_KEY = "nest.compare";
 
 interface CompareContextValue {

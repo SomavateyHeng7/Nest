@@ -12,6 +12,8 @@ interface ActivityState {
   viewings: Viewing[];
   /** Stay id → requested new move-out date (ISO). */
   extensions: Record<string, string>;
+  /** Stay id → the owner's answer to an extension request. Approved ones carry the new move-out date. */
+  extensionDecisions: Record<string, { moveOut: string; status: "approved" | "declined" }>;
   /** Booking requests sent from checkout, newest first. */
   requests: Stay[];
 }
@@ -25,11 +27,15 @@ interface ActivityContextValue extends ActivityState {
   cancelViewing: (id: string) => void;
   requestExtension: (stayId: string, moveOut: string) => void;
   cancelExtension: (stayId: string) => void;
+  /** Owner answers a pending extension request. */
+  decideExtension: (stayId: string, status: "approved" | "declined") => void;
+  /** Renter dismisses a declined answer so they can ask again. */
+  clearExtensionDecision: (stayId: string) => void;
   addRequest: (request: Omit<Stay, "id" | "status">) => Stay;
   cancelRequest: (id: string) => void;
 }
 
-const empty: ActivityState = { saved: [], viewings: [], extensions: {}, requests: [] };
+const empty: ActivityState = { saved: [], viewings: [], extensions: {}, extensionDecisions: {}, requests: [] };
 
 const ActivityContext = createContext<ActivityContextValue | null>(null);
 
@@ -87,6 +93,24 @@ export function ActivityProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const decideExtension = useCallback((stayId: string, status: "approved" | "declined") => {
+    setState((s) => {
+      const moveOut = s.extensions[stayId];
+      if (!moveOut) return s;
+      const next = { ...s.extensions };
+      delete next[stayId];
+      return { ...s, extensions: next, extensionDecisions: { ...s.extensionDecisions, [stayId]: { moveOut, status } } };
+    });
+  }, []);
+
+  const clearExtensionDecision = useCallback((stayId: string) => {
+    setState((s) => {
+      const next = { ...s.extensionDecisions };
+      delete next[stayId];
+      return { ...s, extensionDecisions: next };
+    });
+  }, []);
+
   const addRequest = useCallback((r: Omit<Stay, "id" | "status">) => {
     const request: Stay = { ...r, id: `req-${Date.now()}`, status: "requested" };
     setState((s) => ({ ...s, requests: [request, ...s.requests] }));
@@ -107,10 +131,12 @@ export function ActivityProvider({ children }: { children: React.ReactNode }) {
       cancelViewing,
       requestExtension,
       cancelExtension,
+      decideExtension,
+      clearExtensionDecision,
       addRequest,
       cancelRequest,
     }),
-    [state, ready, toggleSaved, addViewing, cancelViewing, requestExtension, cancelExtension, addRequest, cancelRequest]
+    [state, ready, toggleSaved, addViewing, cancelViewing, requestExtension, cancelExtension, decideExtension, clearExtensionDecision, addRequest, cancelRequest]
   );
 
   return <ActivityContext.Provider value={value}>{children}</ActivityContext.Provider>;

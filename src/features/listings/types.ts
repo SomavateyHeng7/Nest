@@ -19,6 +19,21 @@ export interface Verification {
   verifiedOn: string;
 }
 
+export type NoiseLevel = "quiet" | "moderate" | "lively";
+export type FloodRisk = "low" | "medium" | "high";
+
+/** Day-to-day living details renters ask about. Owner-reported, not surveyed. */
+export interface Livability {
+  petsAllowed: boolean;
+  /** No steps between the street and the front door, or a working lift. */
+  stepFree: boolean;
+  noise: NoiseLevel;
+  /** Whether the street or building has flooded in the rainy season. */
+  floodRisk: FloodRisk;
+  /** Generator or battery that keeps lights, fans and wifi on during a power cut. */
+  backupPower: boolean;
+}
+
 export interface Pricing {
   /** USD per night, for stays under a week */
   nightly: number;
@@ -70,6 +85,7 @@ export interface Listing {
   electricity: string;
   amenities: string[];
   houseRules: string[];
+  livability: Livability;
   description: string;
   /** Optional Khmer description written by the owner. */
   descriptionKm?: string;

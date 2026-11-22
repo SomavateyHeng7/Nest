@@ -13,9 +13,12 @@ import type { Stay } from "@/features/booking/types";
 
 export function StayRow({ stay, action }: { stay: Stay; action?: React.ReactNode }) {
   const { d, t, range, lt, money } = useI18n();
+  const { extensionDecisions, ready } = useActivity();
   const listing = getListingById(stay.listingId);
   if (!listing) return null;
-  const nights = differenceInCalendarDays(parseISO(stay.moveOut), parseISO(stay.moveIn));
+  const approved = ready ? extensionDecisions[stay.id] : undefined;
+  const moveOut = approved?.status === "approved" ? approved.moveOut : stay.moveOut;
+  const nights = differenceInCalendarDays(parseISO(moveOut), parseISO(stay.moveIn));
 
   return (
     <div className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-3 transition-colors hover:border-foreground/25">
@@ -34,7 +37,7 @@ export function StayRow({ stay, action }: { stay: Stay; action?: React.ReactNode
             {t(listing.district)}, {t(listing.city)} · {d.renter.hostedBy(listing.owner.name.split(" ")[0])}
           </p>
           <p className="text-sm text-muted-foreground">
-            {range(stay.moveIn, stay.moveOut)} · {d.common.nights(nights)} · {d.common.guests(stay.guests)}
+            {range(stay.moveIn, moveOut)} · {d.common.nights(nights)} · {d.common.guests(stay.guests)}
           </p>
           <p className="mt-auto text-sm font-medium tabular">{d.renter.totalRent(money(stay.rentTotal))}</p>
         </div>

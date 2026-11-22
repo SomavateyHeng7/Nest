@@ -15,6 +15,8 @@ import {
   Zap,
 } from "lucide-react";
 
+import { RecentlyViewed, RecordView } from "@/features/listings/components/recently-viewed";
+import { ShareButton } from "@/features/listings/components/share-button";
 import { SaveButton } from "@/features/renter/components/save-button";
 import { AreaMap } from "@/features/listings/components/listing-map";
 import { AmenityIcon } from "@/features/listings/components/amenity-icon";
@@ -138,13 +140,17 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
         __html: JSON.stringify(listingJsonLd(listing, title.text, listingDescription(listing, locale).text)).replace(/</g, "\\u003c"),
       }}
     />
+    <RecordView listingId={listing.id} />
     <div className="mx-auto max-w-7xl px-4 pt-6 pb-28 sm:px-6 lg:pb-24">
       <div className="flex items-center justify-between gap-4">
         <Link href="/listing" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ChevronLeft className="size-4" />
           {d.listing.allStays}
         </Link>
-        <SaveButton listing={listing} variant="labelled" />
+        <div className="flex items-center gap-2">
+          <ShareButton path={`/listing/${listing.id}`} title={title.text} />
+          <SaveButton listing={listing} variant="labelled" />
+        </div>
       </div>
 
       <div className="mt-3 flex flex-col gap-2">
@@ -241,6 +247,24 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
             </ul>
           </Section>
 
+          <Section title={d.livability.title}>
+            <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {[
+                { label: d.livability.pets, value: listing.livability.petsAllowed ? d.livability.petsYes : d.livability.petsNo },
+                { label: d.livability.stepFree, value: listing.livability.stepFree ? d.common.yes : d.common.no },
+                { label: d.livability.noise, value: d.livability.noiseLevel[listing.livability.noise] },
+                { label: d.livability.flood, value: d.livability.floodLevel[listing.livability.floodRisk] },
+                { label: d.livability.backupPower, value: listing.livability.backupPower ? d.common.yes : d.common.no },
+              ].map((row) => (
+                <div key={row.label} className="flex items-center justify-between gap-3 rounded-xl bg-card px-4 py-3 text-sm ring-1 ring-border">
+                  <dt className="text-muted-foreground">{row.label}</dt>
+                  <dd className="font-medium">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="text-xs text-muted-foreground">{d.livability.note}</p>
+          </Section>
+
           <Section title={d.listing.neighbourhood}>
             <AreaMap location={listing.location} className="aspect-video max-h-80 w-full" />
             <p className="text-sm text-muted-foreground">{d.listing.addressHidden}</p>
@@ -307,6 +331,8 @@ export default async function ListingPage(props: PageProps<"/listing/[id]">) {
           <BookingSidebar />
         </aside>
       </div>
+
+      <RecentlyViewed excludeId={listing.id} className="mt-16" />
 
       <MobileBookingBar />
     </div>

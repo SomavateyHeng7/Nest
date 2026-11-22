@@ -83,6 +83,7 @@ export const listings: Listing[] = [
     electricity: "$0.25 / kWh, metered",
     amenities: ["Wifi", "Air conditioning", "Pool", "Gym", "Kitchen", "Washer", "Workspace", "24h security", "Elevator"],
     houseRules: ["No smoking indoors", "Quiet hours 10pm–7am", "Registered guests only"],
+    livability: { petsAllowed: false, stepFree: true, noise: "moderate", floodRisk: "low", backupPower: true },
     description:
       "A calm, sun-filled condo on a leafy street in BKK1, made for people staying a few weeks to a year. Fast fibre wifi and a proper desk for remote work, a full kitchen, and a rooftop pool with city views. The building has 24h reception, key-card access and a small gym.",
     descriptionKm:
@@ -114,6 +115,7 @@ export const listings: Listing[] = [
     electricity: "EDC rate, billed monthly",
     amenities: ["Wifi", "Air conditioning", "Kitchen", "Washer", "Free parking", "Garden", "Workspace", "Pet friendly"],
     houseRules: ["Pets considered on request", "No parties", "Shoes off indoors"],
+    livability: { petsAllowed: true, stepFree: false, noise: "quiet", floodRisk: "medium", backupPower: false },
     description:
       "A quiet three-storey villa-style house with a private garden and parking for two cars — ideal for families relocating to Phnom Penh. Close to international schools and Toul Kork's restaurants. Each bedroom has its own bathroom and air-con.",
     descriptionKm:
@@ -145,6 +147,7 @@ export const listings: Listing[] = [
     electricity: "Included",
     amenities: ["Wifi", "Air conditioning", "Kitchenette", "Washer", "Rooftop access", "River view"],
     houseRules: ["No smoking indoors", "Quiet hours 10pm–7am"],
+    livability: { petsAllowed: false, stepFree: true, noise: "lively", floodRisk: "medium", backupPower: true },
     description:
       "A compact studio a block from the riverfront promenade. All bills are included, so the price you see is the price you pay. Great for travellers and new arrivals who want a few days or a few months in the heart of the old city.",
     descriptionKm:
@@ -176,6 +179,7 @@ export const listings: Listing[] = [
     electricity: "$0.22 / kWh, metered",
     amenities: ["Wifi", "Air conditioning", "Pool", "Gym", "Kitchen", "Daily housekeeping", "24h security", "Elevator", "Free parking"],
     houseRules: ["No smoking indoors", "Visitors register at reception"],
+    livability: { petsAllowed: false, stepFree: true, noise: "moderate", floodRisk: "low", backupPower: true },
     description:
       "Hotel-style service with the space of a real home. Daily housekeeping, laundry and a 25m pool, a short walk from Aeon Mall. Popular with professionals on 3–6 month assignments.",
     descriptionKm:
@@ -207,6 +211,7 @@ export const listings: Listing[] = [
     electricity: "Split equally between 4 housemates",
     amenities: ["Wifi", "Air conditioning", "Shared kitchen", "Washer", "Workspace", "Motorbike parking"],
     houseRules: ["Students & young professionals", "No overnight guests", "Clean up shared spaces"],
+    livability: { petsAllowed: false, stepFree: false, noise: "quiet", floodRisk: "medium", backupPower: false },
     description:
       "A furnished private room with its own bathroom in a friendly four-room house near RUPP. Desk, air-con and fast wifi included. Shared kitchen and a rooftop for studying in the evening breeze.",
     descriptionKm:
@@ -237,6 +242,7 @@ export const listings: Listing[] = [
     electricity: "$0.25 / kWh, metered",
     amenities: ["Wifi", "Air conditioning", "Pool", "Gym", "Kitchen", "Washer", "River view", "24h security", "Elevator"],
     houseRules: ["No smoking indoors", "No pets"],
+    livability: { petsAllowed: true, stepFree: true, noise: "quiet", floodRisk: "medium", backupPower: true },
     description:
       "Wake up to sunrise over the Mekong from the 24th floor. Infinity pool, gym and co-working lounge in the building, with the city centre a short ride across the bridge.",
     images: [img("1512917774080-9991f1c4c750"), img("1560448204-e02f11c3d0e2"), img("1505691938895-1758d7feb511")],
@@ -265,6 +271,7 @@ export const listings: Listing[] = [
     electricity: "EDC rate, billed monthly",
     amenities: ["Wifi", "Air conditioning", "Kitchen", "Washer", "Free parking", "Balcony"],
     houseRules: ["Monthly stays only", "No smoking indoors"],
+    livability: { petsAllowed: true, stepFree: false, noise: "moderate", floodRisk: "low", backupPower: false },
     description:
       "A spacious, newly-built apartment in a quiet borey near Aeon Mall Sen Sok. Monthly stays only — ideal for families or couples settling in for a while.",
     images: [img("1600607687939-ce8a6c25118c"), img("1484154218962-a197022b5858"), img("1554995207-c18c203602cb")],
@@ -294,6 +301,7 @@ export const listings: Listing[] = [
     electricity: "$0.25 / kWh, metered",
     amenities: ["Wifi", "Air conditioning", "Kitchen", "Garden", "Bicycle", "Free parking"],
     houseRules: ["No smoking indoors", "Quiet hours 10pm–7am"],
+    livability: { petsAllowed: true, stepFree: false, noise: "quiet", floodRisk: "medium", backupPower: false },
     description:
       "A traditional stilted wooden house restored with modern bathrooms and air-con, set in a tropical garden in the Wat Bo neighbourhood. A favourite for researchers, artists and slow travellers.",
     descriptionKm:
@@ -324,6 +332,7 @@ export const listings: Listing[] = [
     electricity: "Included",
     amenities: ["Wifi", "Fan cooling", "River view", "Breakfast", "Bicycle"],
     houseRules: ["Quiet hours 10pm–7am"],
+    livability: { petsAllowed: true, stepFree: false, noise: "quiet", floodRisk: "high", backupPower: false },
     description:
       "A simple, spotless room with a river-facing balcony in a family-run guesthouse. Everything is included, from breakfast to bikes. Perfect for a slow week or a quiet month by the water.",
     images: [img("1583608205776-bfd35f0d9f83"), img("1595526114035-0d45ed16cfbf"), img("1560184897-ae75f418493e")],

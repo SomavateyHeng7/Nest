@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, SendHorizontal, ShieldCheck } from "lucide-react";
+import { ChevronLeft, SendHorizontal, ShieldAlert, ShieldCheck } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
+import { hasContactDetails } from "@/features/messaging/lib/contact-detect";
 import { getListingById } from "@/features/listings/data";
 import { useI18n } from "@/i18n/client";
 import { cn } from "@/shared/lib/utils";
@@ -19,6 +20,8 @@ export function Inbox({ initialThreads }: { initialThreads: Thread[] }) {
   const [activeId, setActiveId] = useState<string | null>(initialThreads[0]?.id ?? null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [draft, setDraft] = useState("");
+  /** Set when the draft holds contact details and the person has not yet confirmed sending it. */
+  const [needsConfirm, setNeedsConfirm] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   const active = threads.find((th) => th.id === activeId);
@@ -34,9 +37,14 @@ export function Inbox({ initialThreads }: { initialThreads: Thread[] }) {
     setThreads((ts) => ts.map((th) => (th.id === id ? { ...th, unread: 0 } : th)));
   }
 
-  function send(body: string) {
+  function send(body: string, confirmed = false) {
     const text = body.trim();
     if (!text || !active) return;
+    if (!confirmed && hasContactDetails(text)) {
+      setNeedsConfirm(true);
+      return;
+    }
+    setNeedsConfirm(false);
     setThreads((ts) =>
       ts.map((th) =>
         th.id === active.id
@@ -153,6 +161,18 @@ export function Inbox({ initialThreads }: { initialThreads: Thread[] }) {
                 </button>
               ))}
             </div>
+            {needsConfirm && (
+              <div role="alert" className="mb-2 flex flex-wrap items-center gap-2 rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs">
+                <ShieldAlert className="size-4 shrink-0 text-warning" aria-hidden />
+                <p className="min-w-0 flex-1">{m.leak.warning}</p>
+                <Button type="button" variant="outline" className="h-8 px-3" onClick={() => setNeedsConfirm(false)}>
+                  {m.leak.edit}
+                </Button>
+                <Button type="button" variant="outline" className="h-8 px-3" onClick={() => send(draft, true)}>
+                  {m.leak.sendAnyway}
+                </Button>
+              </div>
+            )}
             <form
               className="flex items-end gap-2"
               onSubmit={(e) => {
@@ -162,7 +182,10 @@ export function Inbox({ initialThreads }: { initialThreads: Thread[] }) {
             >
               <textarea
                 value={draft}
-                onChange={(e) => setDraft(e.target.value)}
+                onChange={(e) => {
+                  setDraft(e.target.value);
+                  setNeedsConfirm(false);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();

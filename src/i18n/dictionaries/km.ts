@@ -568,6 +568,11 @@ export const km: Dictionary = {
     list: "បញ្ជី",
     map: "ផែនទី",
     viewToggle: "បង្ហាញលទ្ធផលជា",
+    searchArea: "ស្វែងរកក្នុងតំបន់នេះ",
+    searchAsMove: "ស្វែងរកនៅពេលខ្ញុំផ្លាស់ទីផែនទី",
+    showAll: "បង្ហាញលទ្ធផលទាំងអស់",
+    inView: (n, total) => (n === total ? `ផ្ទះ ${total}` : `ផ្ទះ ${n} ក្នុងចំណោម ${total} នៅតំបន់នេះ`),
+    nothingInArea: "គ្មានផ្ទះនៅតំបន់នេះទេ។ ផ្លាស់ទីផែនទី ឬបង្ហាញលទ្ធផលទាំងអស់។",
   },
 
   browse: {
@@ -586,6 +591,11 @@ export const km: Dictionary = {
     bills: "រួមបញ្ចូលថ្លៃទឹកភ្លើងទាំងអស់",
     billsHint: "អគ្គិសនី ទឹក និងវ៉ាយហ្វាយ រួមក្នុងតម្លៃ",
     furnished: "មានគ្រឿងសង្ហារិម",
+    pets: "អនុញ្ញាតសត្វចិញ្ចឹម",
+    stepFree: "ចូលដោយគ្មានជណ្តើរ",
+    stepFreeHint: "គ្មានជណ្តើរដល់ទ្វារមុខ ឬមានជណ្តើរយន្តដំណើរការ",
+    quiet: "ផ្លូវស្ងាត់",
+    quietHint: "ម្ចាស់ផ្ទះថាស្ងាត់ទាំងថ្ងៃទាំងយប់",
     allOf: (city) => `ទាំងអស់ក្នុង${city}`,
     results: (n, where) => `ផ្ទះ ${n}${where ? ` នៅ${where}` : " ទូទាំងប្រទេសកម្ពុជា"}`,
     pricesFor: (stay, from) => `តម្លៃសម្រាប់ ${stay}${from ? ` ចាប់ពី ${from}` : ""} · អ្នកជួលមិនបង់កម្រៃ Nest`,
@@ -645,6 +655,13 @@ export const km: Dictionary = {
     photo: (n) => `រូបភាពទី ${n}`,
     photoCount: (i, n) => `${i} / ${n}`,
     photos: "រូបភាព",
+    showAllPhotos: (n) => `មើលរូបភាពទាំង ${n}`,
+    openPhoto: (n) => `បើករូបភាពទី ${n} ពេញអេក្រង់`,
+    photoViewer: "កម្មវិធីមើលរូបភាព",
+    closeViewer: "បិទកម្មវិធីមើលរូបភាព",
+    previousPhoto: "រូបភាពមុន",
+    nextPhoto: "រូបភាពបន្ទាប់",
+    viewerPhotos: "រូបភាពទាំងអស់",
     ownerText: {
       khmerByOwner: "កំណែភាសាខ្មែរ សរសេរដោយម្ចាស់ផ្ទះ",
       englishOnly: "ម្ចាស់ផ្ទះបានសរសេរជាភាសាអង់គ្លេស",
@@ -756,6 +773,8 @@ export const km: Dictionary = {
     emptyTitle: (n) => `ប្រៀបធៀបផ្ទះរហូតដល់ ${n}`,
     emptyBody: "ចុច «ប្រៀបធៀប» លើការផ្សាយណាមួយ ដើម្បីមើលតម្លៃសរុប ថ្លៃទឹកភ្លើង ការផ្ទៀងផ្ទាត់ និងសេវាកម្ម ទន្ទឹមគ្នា។",
     browse: "មើលកន្លែងស្នាក់នៅ",
+    sharedBanner: "មានគេចែករំលែកការប្រៀបធៀបនេះជូនអ្នក។",
+    useAsMine: "ប្រើជាការប្រៀបធៀបរបស់ខ្ញុំ",
     stayLength: "រយៈពេលស្នាក់នៅ",
     remove: (title) => `ដកចេញ ${title}`,
     viewBook: "មើល និងកក់",
@@ -1047,6 +1066,37 @@ export const km: Dictionary = {
     label: "សារ",
     send: "ផ្ញើ",
     select: "ជ្រើសរើសការសន្ទនា",
+    leak: {
+      warning: "នេះហាក់ដូចជាលេខទូរស័ព្ទ តំណ ឬឈ្មោះគណនីជជែក។ ប្រសិនបើអ្នកផ្លាស់ការសន្ទនា ឬការទូទាត់ចេញពី Nest អ្នកនឹងមិនត្រូវបានការពារដោយ Nest ទេ។",
+      sendAnyway: "ផ្ញើដដែល",
+      edit: "កែសម្រួលសារ",
+    },
+  },
+
+  livability: {
+    title: "ព័ត៌មានគួរដឹង",
+    pets: "សត្វចិញ្ចឹម",
+    petsYes: "អនុញ្ញាត",
+    petsNo: "មិនអនុញ្ញាត",
+    stepFree: "ចូលដោយគ្មានជណ្តើរ",
+    noise: "សំឡេង",
+    noiseLevel: { quiet: "ស្ងាត់", moderate: "មានសំឡេងផ្លូវខ្លះ", lively: "តំបន់ឆ្អែតឆ្អៀត" },
+    flood: "ទឹកជន់ក្នុងរដូវភ្លៀង",
+    floodLevel: { low: "ស្ទើរតែមិនកើតមាន", medium: "ជួនកាលលើផ្លូវ", high: "ញឹកញាប់" },
+    backupPower: "អគ្គិសនីពេលដាច់ភ្លើង",
+    note: "ព័ត៌មានពីម្ចាស់ផ្ទះ។ បុគ្គលិក Nest មិនទាន់ពិនិត្យចំណុចទាំងនេះពេលទស្សនាទេ ដូច្នេះសូមសួរម្ចាស់ផ្ទះ ប្រសិនបើវាសំខាន់សម្រាប់អ្នក។",
+  },
+
+  recent: {
+    title: "បានមើលថ្មីៗ",
+    clear: "សម្អាត",
+  },
+
+  share: {
+    share: "ចែករំលែក",
+    copyLink: "ចម្លងតំណ",
+    copied: "បានចម្លងតំណ",
+    copyFailed: "មិនអាចចម្លងតំណបានទេ",
   },
 
   auth: {
@@ -1159,6 +1209,19 @@ export const km: Dictionary = {
     pending: (date) => `បានស្នើបន្តដល់ ${date}`,
     withdraw: "ដកសំណើវិញ",
     done: "រួចរាល់",
+    declined: (date) => `ការពន្យារដល់ ${date} ត្រូវបានបដិសេធ`,
+    askAgain: "ស្នើម្តងទៀត",
+  },
+
+  extensionOwner: {
+    title: "សំណើពន្យារការស្នាក់នៅ",
+    note: "អ្នកជួលម្នាក់ចង់ស្នាក់នៅបន្ថែម។",
+    from: (date) => `ចាកចេញនៅ ${date}`,
+    to: (date) => `ស្នើស្នាក់នៅរហូតដល់ ${date}`,
+    extraNights: (n) => `+${n} យប់`,
+    extraRent: "ថ្លៃជួលបន្ថែម",
+    approvedToast: "បានអនុម័តការពន្យារ",
+    declinedToast: "បានបដិសេធការពន្យារ",
   },
 
   toast: {
@@ -1440,7 +1503,11 @@ export const km: Dictionary = {
       alert: (who, n) => `${who} បានបើកឯកសារឯកជន ${n} ក្នុងរយៈពេលមួយម៉ោង។`,
       alertAction: "បង្ហាញ",
       categories: { all: "ទាំងអស់", applications: "ពាក្យសុំ", verifications: "ការផ្ទៀងផ្ទាត់", documents: "ឯកសារ", users: "អ្នកប្រើប្រាស់", reports: "របាយការណ៍", disputes: "វិវាទ", reviews: "មតិយោបល់" },
-      columns: { when: "ពេលវេលា", staff: "បុគ្គលិក", action: "សកម្មភាព", target: "អំពី" },
+      columns: { when: "ពេលវេលា", staff: "បុគ្គលិក", action: "សកម្មភាព", target: "អំពី", id: "លេខសម្គាល់", note: "កំណត់ចំណាំ" },
+      allStaff: "បុគ្គលិកទាំងអស់",
+      staffFilter: "ចម្រាញ់តាមបុគ្គលិក",
+      clearFilters: "សម្អាតតម្រងទាំងអស់",
+      showMore: (n) => `បង្ហាញបន្ថែម ${n}`,
       actions: {
         "host.approved": "បានអនុម័តពាក្យសុំធ្វើជាម្ចាស់ផ្ទះ",
         "host.rejected": "បានបដិសេធពាក្យសុំធ្វើជាម្ចាស់ផ្ទះ",
@@ -1571,6 +1638,14 @@ export const km: Dictionary = {
     waiting: "កំពុងរង់ចាំបុគ្គលិកពិនិត្យ",
     allGood: "ឯកសារទាំងពីរត្រូវបានអនុម័ត។",
     allGoodVisit: "ជំហានបន្ទាប់៖ ការចុះពិនិត្យផ្ទាល់។",
+    progress: "ដំណើរការផ្ទៀងផ្ទាត់",
+    steps: {
+      docs: "ឯកសារត្រូវបានអនុម័ត",
+      visit: "រង់ចាំកក់ពេលទស្សនា",
+      visitBooked: (date, time) => `ទស្សនា ${date} ម៉ោង ${time}`,
+      visitDone: "ការទស្សនារួចរាល់",
+      ready: "ត្រៀមខ្លួនដាក់ផ្សាយ",
+    },
   },
   disputes: {
     report: "រាយការណ៍បញ្ហា",

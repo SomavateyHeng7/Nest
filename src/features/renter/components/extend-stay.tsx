@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { addDays, addMonths, differenceInCalendarDays, isAfter, isBefore, isWithinInterval, parseISO, startOfDay } from "date-fns";
 import { enUS, km } from "react-day-picker/locale";
-import { CalendarPlus, Check, Clock } from "lucide-react";
+import { CalendarPlus, Check, CircleX, Clock } from "lucide-react";
 
 import { useActivity } from "@/features/renter/components/activity-provider";
 import { toISODate } from "@/features/stays/components/stay-draft";
@@ -24,7 +24,7 @@ const pickerLocales = { en: enUS, km };
 export function ExtendStay({ stay, listing }: { stay: Stay; listing: Listing }) {
   const { d, date, locale, money } = useI18n();
   const x = d.extend;
-  const { extensions, requestExtension, cancelExtension, ready } = useActivity();
+  const { extensions, extensionDecisions, requestExtension, cancelExtension, clearExtensionDecision, ready } = useActivity();
   const ownerFirst = listing.owner.name.split(" ")[0];
 
   const [open, setOpen] = useState(false);
@@ -32,7 +32,9 @@ export function ExtendStay({ stay, listing }: { stay: Stay; listing: Listing }) 
   const [sent, setSent] = useState(false);
 
   const moveIn = parseISO(stay.moveIn);
-  const currentOut = parseISO(stay.moveOut);
+  const decision = ready ? extensionDecisions[stay.id] : undefined;
+  const approved = decision?.status === "approved" ? decision : undefined;
+  const currentOut = parseISO(approved ? approved.moveOut : stay.moveOut);
   const pending = ready ? extensions[stay.id] : undefined;
 
   // You can extend up to the next stay's first night (moving out that morning)
@@ -46,12 +48,20 @@ export function ExtendStay({ stay, listing }: { stay: Stay; listing: Listing }) 
 
   const extraNights = picked ? differenceInCalendarDays(picked, currentOut) : 0;
   const totalNights = picked ? differenceInCalendarDays(picked, moveIn) : 0;
-  const extraRent = picked ? Math.max(0, quoteStay(listing.pricing, totalNights).rentTotal - stay.rentTotal) : 0;
+  const extraRent = picked ? Math.max(0, quoteStay(listing.pricing, totalNights).rentTotal - (approved ? quoteStay(listing.pricing, differenceInCalendarDays(currentOut, moveIn)).rentTotal : stay.rentTotal)) : 0;
 
   return (
     <>
       {/* Keep the dialog mounted after sending so its confirmation can show. */}
-      {pending && !open ? (
+      {decision?.status === "declined" && !open ? (
+        <span className="inline-flex h-9 items-center gap-2 rounded-lg bg-destructive/10 px-3 text-sm">
+          <CircleX className="size-4 text-destructive" />
+          {x.declined(date(decision.moveOut, "MMM d"))}
+          <button type="button" onClick={() => clearExtensionDecision(stay.id)} className="font-medium underline underline-offset-4">
+            {x.askAgain}
+          </button>
+        </span>
+      ) : pending && !open ? (
         <span className="inline-flex h-9 items-center gap-2 rounded-lg bg-warning/10 px-3 text-sm">
           <Clock className="size-4 text-warning" />
           {x.pending(date(pending, "MMM d"))}

@@ -14,6 +14,9 @@ export interface BrowserFilters {
   billsIncluded: boolean;
   fullyVerifiedOnly: boolean;
   furnishedOnly: boolean;
+  petsOnly: boolean;
+  stepFreeOnly: boolean;
+  quietOnly: boolean;
   /** Lowest guest rating to show; 0 means any. */
   minRating: number;
 }
@@ -59,6 +62,9 @@ export function parseBrowseParams(params: Params): { filters: BrowserFilters; so
       billsIncluded: firstParam(params.bills) === "1",
       fullyVerifiedOnly: firstParam(params.visited) === "1",
       furnishedOnly: firstParam(params.furnished) === "1",
+      petsOnly: firstParam(params.pets) === "1",
+      stepFreeOnly: firstParam(params.stepfree) === "1",
+      quietOnly: firstParam(params.quiet) === "1",
       minRating: (RATING_STEPS as readonly number[]).includes(rating) ? rating : 0,
     },
     sort: sort && SORTS.includes(sort) ? sort : "recommended",
@@ -80,6 +86,9 @@ export function serializeBrowseParams(f: BrowserFilters, sort: Sort, view: Brows
   if (f.billsIncluded) q.set("bills", "1");
   if (f.fullyVerifiedOnly) q.set("visited", "1");
   if (f.furnishedOnly) q.set("furnished", "1");
+  if (f.petsOnly) q.set("pets", "1");
+  if (f.stepFreeOnly) q.set("stepfree", "1");
+  if (f.quietOnly) q.set("quiet", "1");
   if (f.minRating > 0) q.set("rating", String(f.minRating));
   if (sort !== "recommended") q.set("sort", sort);
   if (view === "map") q.set("view", "map");

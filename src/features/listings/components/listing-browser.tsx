@@ -134,6 +134,9 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
       if (filters.billsIncluded && l.electricity !== "Included") return false;
       if (filters.fullyVerifiedOnly && !isFullyVerified(l)) return false;
       if (filters.furnishedOnly && !l.furnished) return false;
+      if (filters.petsOnly && !l.livability.petsAllowed) return false;
+      if (filters.stepFreeOnly && !l.livability.stepFree) return false;
+      if (filters.quietOnly && l.livability.noise !== "quiet") return false;
       if (filters.minRating > 0 && reviews.summary(l.id).average < filters.minRating) return false;
       return fitsDates(l, filters.moveIn, nights);
     });
@@ -157,6 +160,9 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
     Number(filters.billsIncluded) +
     Number(filters.fullyVerifiedOnly) +
     Number(filters.furnishedOnly) +
+    Number(filters.petsOnly) +
+    Number(filters.stepFreeOnly) +
+    Number(filters.quietOnly) +
     Number(filters.minRating > 0) +
     Number(Boolean(filters.district));
 
@@ -170,6 +176,9 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
       billsIncluded: false,
       fullyVerifiedOnly: false,
       furnishedOnly: false,
+      petsOnly: false,
+      stepFreeOnly: false,
+      quietOnly: false,
       minRating: 0,
     }));
   }
@@ -252,6 +261,9 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
           hint={d.browse.billsHint}
         />
         <Toggle checked={filters.furnishedOnly} onChange={(v) => set("furnishedOnly", v)} label={d.browse.furnished} />
+        <Toggle checked={filters.petsOnly} onChange={(v) => set("petsOnly", v)} label={d.browse.pets} />
+        <Toggle checked={filters.stepFreeOnly} onChange={(v) => set("stepFreeOnly", v)} label={d.browse.stepFree} hint={d.browse.stepFreeHint} />
+        <Toggle checked={filters.quietOnly} onChange={(v) => set("quietOnly", v)} label={d.browse.quiet} hint={d.browse.quietHint} />
       </section>
     </div>
   );

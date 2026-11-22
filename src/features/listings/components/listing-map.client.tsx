@@ -2,13 +2,15 @@
 
 import "leaflet/dist/leaflet.css";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import L from "leaflet";
-import { Circle, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { Search } from "lucide-react";
+import { Circle, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 
 import { useI18n } from "@/i18n/client";
+import { cn } from "@/shared/lib/utils";
 
 import type { LatLng, Listing } from "@/features/listings/types";
 
@@ -42,20 +44,55 @@ function priceIcon(label: string) {
   });
 }
 
-/** Keeps every result in view when the result set changes. */
-function FitToResults({ points }: { points: LatLng[] }) {
+/**
+ * Keeps every result in view when the result set changes, or when `refit` changes
+ * (the "show all results" button). Moves without animation and inside `programmatic`,
+ * so `MoveWatcher` can tell these moves apart from the visitor's own.
+ */
+function FitToResults({ points, refit, programmaticRef }: { points: LatLng[]; refit: number; programmaticRef: RefObject<boolean> }) {
   const map = useMap();
   const key = points.map((p) => `${p.lat},${p.lng}`).join("|");
   useEffect(() => {
     if (points.length === 0) return;
-    if (points.length === 1) {
-      map.setView(points[0], 14);
-      return;
+    programmaticRef.current = true;
+    try {
+      if (points.length === 1) {
+        map.setView(points[0], 14, { animate: false });
+      } else {
+        map.fitBounds(L.latLngBounds(points.map((p) => [p.lat, p.lng])), {
+          padding: [48, 48],
+          maxZoom: 15,
+          animate: false,
+        });
+      }
+    } finally {
+      // Without animation Leaflet fires `moveend` before returning, so the flag is safe to drop here.
+      programmaticRef.current = false;
     }
-    map.fitBounds(L.latLngBounds(points.map((p) => [p.lat, p.lng])), { padding: [48, 48], maxZoom: 15 });
     // `key` captures the points; the array itself is new on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, key]);
+  }, [map, key, refit]);
+  return null;
+}
+
+/** How long after a popup opens its auto-pan can still be moving the map. */
+const POPUP_PAN_MS = 600;
+
+/** Reports the visible area after the visitor drags or zooms (not after our own fits or popup auto-pans). */
+function MoveWatcher({ onMove, programmaticRef }: { onMove: (bounds: L.LatLngBounds) => void; programmaticRef: RefObject<boolean> }) {
+  const popupPanRef = useRef(false);
+  const map = useMapEvents({
+    popupopen: () => {
+      popupPanRef.current = true;
+      setTimeout(() => {
+        popupPanRef.current = false;
+      }, POPUP_PAN_MS);
+    },
+    moveend: () => {
+      if (programmaticRef.current || popupPanRef.current) return;
+      onMove(map.getBounds());
+    },
+  });
   return null;
 }
 
@@ -70,19 +107,52 @@ export interface ResultsMapProps {
 export function ResultsMap({ listings, priceOf, className }: ResultsMapProps) {
   const { d, t, lt, money } = useI18n();
   const points = useMemo(() => listings.map((l) => l.location), [listings]);
+  const listingsKey = listings.map((l) => l.id).join("|");
+
+  const programmaticRef = useRef(false);
+  const [autoSearch, setAutoSearch] = useState(false);
+  const [refit, setRefit] = useState(0);
+  // The searched area belongs to one result set: when filters change the results, it stops applying.
+  const [applied, setApplied] = useState<{ key: string; bounds: L.LatLngBounds } | null>(null);
+  const [pending, setPending] = useState<{ key: string; bounds: L.LatLngBounds } | null>(null);
+  const area = applied?.key === listingsKey ? applied.bounds : null;
+  const waiting = pending?.key === listingsKey && !autoSearch ? pending.bounds : null;
+
+  function handleMove(bounds: L.LatLngBounds) {
+    if (autoSearch) setApplied({ key: listingsKey, bounds });
+    else setPending({ key: listingsKey, bounds });
+  }
+
+  function searchHere() {
+    if (!waiting) return;
+    setApplied({ key: listingsKey, bounds: waiting });
+    setPending(null);
+  }
+
+  function showAll() {
+    setApplied(null);
+    setPending(null);
+    setRefit((n) => n + 1);
+  }
+
+  const visible = useMemo(() => (area ? listings.filter((l) => area.contains(l.location)) : listings), [listings, area]);
+
   // One icon per listing, rebuilt only when results or prices change, so
   // re-renders don't replace every pin's element (and drop keyboard focus).
   const pins = useMemo(
     () =>
-      listings.map((l) => {
+      visible.map((l) => {
         const price = money(priceOf(l));
         return { listing: l, price, icon: priceIcon(price) };
       }),
-    [listings, priceOf, money]
+    [visible, priceOf, money]
   );
 
+  const chip =
+    "pointer-events-auto inline-flex items-center gap-2 rounded-full border border-border bg-background/95 px-3.5 py-2 text-sm font-medium text-foreground shadow-md backdrop-blur-sm";
+
   return (
-    <div className={className} role="region" aria-label={d.map.resultsLabel}>
+    <div className={cn("relative", className)} role="region" aria-label={d.map.resultsLabel}>
       <MapContainer
         center={points[0] ?? FALLBACK_CENTER}
         zoom={12}
@@ -91,7 +161,8 @@ export function ResultsMap({ listings, priceOf, className }: ResultsMapProps) {
         className="size-full"
       >
         <TileLayer url={TILE_URL} attribution={ATTRIBUTION} />
-        <FitToResults points={points} />
+        <FitToResults points={points} refit={refit} programmaticRef={programmaticRef} />
+        <MoveWatcher onMove={handleMove} programmaticRef={programmaticRef} />
         {pins.map(({ listing: l, price, icon }) => (
           <Marker
             key={l.id}
@@ -117,6 +188,42 @@ export function ResultsMap({ listings, priceOf, className }: ResultsMapProps) {
           </Marker>
         ))}
       </MapContainer>
+
+      {/* Overlays sit above Leaflet's panes (which go up to z-index 700) and let drags through elsewhere. */}
+      <div className="pointer-events-none absolute inset-x-3 top-3 z-[1000] flex flex-col items-center gap-2">
+        {waiting && (
+          <button type="button" onClick={searchHere} className={cn(chip, "hover:bg-background")}>
+            <Search className="size-4" aria-hidden />
+            {d.map.searchArea}
+          </button>
+        )}
+      </div>
+      <label className={cn(chip, "absolute top-3 right-3 z-[1000] cursor-pointer gap-2 text-xs sm:text-sm")}>
+        <input
+          type="checkbox"
+          checked={autoSearch}
+          onChange={(e) => setAutoSearch(e.target.checked)}
+          className="size-4 accent-[var(--color-dark-forest)]"
+        />
+        {d.map.searchAsMove}
+      </label>
+      <div className="pointer-events-none absolute bottom-6 left-3 z-[1000] flex flex-col items-start gap-2">
+        {visible.length === 0 && (
+          <p className={cn(chip, "max-w-xs font-normal")} role="status">
+            {d.map.nothingInArea}
+          </p>
+        )}
+        <div className="flex items-center gap-2">
+          <p className={chip} role="status" aria-live="polite">
+            {d.map.inView(visible.length, listings.length)}
+          </p>
+          {area && (
+            <button type="button" onClick={showAll} className={cn(chip, "hover:bg-background")}>
+              {d.map.showAll}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

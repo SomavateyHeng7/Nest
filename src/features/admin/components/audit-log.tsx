@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { Download, Search, ShieldAlert, X } from "lucide-react";
 
@@ -12,6 +12,8 @@ import { cn } from "@/shared/lib/utils";
 /** Opening this many private documents within one hour looks unusual and is flagged at the top. */
 const DOC_ALERT_COUNT = 5;
 const DOC_ALERT_WINDOW_MS = 60 * 60 * 1000;
+/** Rows shown at first, and added by each "show more". */
+const PAGE_SIZE = 25;
 
 /** The busiest one-hour stretch of document opening by one person, if it reaches the threshold. */
 function unusualDocAccess(entries: AuditEntry[]) {
@@ -49,6 +51,9 @@ export function AuditLog() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [ref, setRef] = useState("");
+  const [staff, setStaff] = useState("");
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  const staffNames = useMemo(() => [...new Set(entries.map((e) => e.actor))].sort(), [entries]);
   const alert = unusualDocAccess(entries);
 
   const needle = q.trim().toLowerCase();
@@ -60,11 +65,22 @@ export function AuditLog() {
     const day = format(parseISO(e.at), "yyyy-MM-dd");
     return (!from || day >= from) && (!to || day <= to);
   };
-  const shown = entries.filter((e) => inCategory(e) && matches(e) && inRange(e) && (!ref || e.ref === ref));
+  const shown = entries.filter((e) => inCategory(e) && matches(e) && inRange(e) && (!ref || e.ref === ref) && (!staff || e.actor === staff));
+  const visible = shown.slice(0, limit);
+  const filtered = category !== "all" || needle || from || to || ref || staff;
+  const resetFilters = () => {
+    setCategory("all");
+    setQ("");
+    setFrom("");
+    setTo("");
+    setRef("");
+    setStaff("");
+    setLimit(PAGE_SIZE);
+  };
   const countIn = (c: AuditCategory | "all") => entries.filter((e) => c === "all" || auditActions[e.action] === c).length;
 
   function exportCsv() {
-    const header = [a.columns.when, a.columns.staff, a.columns.action, a.columns.target, "ID", "Note"];
+    const header = [a.columns.when, a.columns.staff, a.columns.action, a.columns.target, a.columns.id, a.columns.note];
     const rows = shown.map((e) => [e.at, e.actor, a.actions[e.action], e.target, e.ref, e.detail]);
     const csv = [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
     const url = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
@@ -85,8 +101,9 @@ export function AuditLog() {
             variant="outline"
             className="h-9 px-3"
             onClick={() => {
+              resetFilters();
               setCategory("documents");
-              setQ(alert.actor);
+              setStaff(alert.actor);
             }}
           >
             {a.alertAction}
@@ -101,7 +118,7 @@ export function AuditLog() {
             type="button"
             role="tab"
             aria-selected={category === c}
-            onClick={() => setCategory(c)}
+            onClick={() => { setCategory(c); setLimit(PAGE_SIZE); }}
             className={cn(
               "flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
               category === c ? "border-dark-forest bg-dark-forest text-background" : "border-border bg-card hover:border-foreground/30"
@@ -118,7 +135,7 @@ export function AuditLog() {
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => { setQ(e.target.value); setLimit(PAGE_SIZE); }}
             placeholder={a.search}
             aria-label={a.search}
             className="h-10 w-full rounded-xl border border-input bg-card pr-3 pl-9 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -126,21 +143,32 @@ export function AuditLog() {
         </label>
         <label className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           {a.dateFrom}
-          <input type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} className="h-10 rounded-xl border border-input bg-card px-2 text-sm text-foreground" />
+          <input type="date" value={from} max={to || undefined} onChange={(e) => { setFrom(e.target.value); setLimit(PAGE_SIZE); }} className="h-10 rounded-xl border border-input bg-card px-2 text-sm text-foreground" />
         </label>
         <label className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           {a.dateTo}
-          <input type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} className="h-10 rounded-xl border border-input bg-card px-2 text-sm text-foreground" />
+          <input type="date" value={to} min={from || undefined} onChange={(e) => { setTo(e.target.value); setLimit(PAGE_SIZE); }} className="h-10 rounded-xl border border-input bg-card px-2 text-sm text-foreground" />
         </label>
+        <select
+          value={staff}
+          onChange={(e) => { setStaff(e.target.value); setLimit(PAGE_SIZE); }}
+          aria-label={a.staffFilter}
+          className="h-10 rounded-xl border border-input bg-card px-2 text-sm text-foreground"
+        >
+          <option value="">{a.allStaff}</option>
+          {staffNames.map((n) => (
+            <option key={n} value={n} lang="en">{n}</option>
+          ))}
+        </select>
         <Button variant="outline" className="h-10 gap-1.5 px-4" onClick={exportCsv} disabled={shown.length === 0}>
           <Download className="size-4" />
           {a.export}
         </Button>
       </div>
 
-      {(from || to) && (
-        <button type="button" onClick={() => { setFrom(""); setTo(""); }} className="w-fit text-xs font-medium text-muted-foreground underline underline-offset-4 hover:text-foreground">
-          {a.clear} {a.dateFrom}/{a.dateTo}
+      {filtered && (
+        <button type="button" onClick={resetFilters} className="w-fit text-xs font-medium text-muted-foreground underline underline-offset-4 hover:text-foreground">
+          {a.clearFilters}
         </button>
       )}
       {ref && (
@@ -166,7 +194,7 @@ export function AuditLog() {
               </tr>
             </thead>
             <tbody>
-              {shown.map((e) => (
+              {visible.map((e) => (
                 <tr key={e.id} className="border-b border-border align-top last:border-0">
                   <td className="px-4 py-3 whitespace-nowrap">
                     <p className="tabular">{date(e.at, "MMM d, HH:mm")}</p>
@@ -189,9 +217,8 @@ export function AuditLog() {
                       <button
                         type="button"
                         onClick={() => {
+                          resetFilters();
                           setRef(e.ref!);
-                          setCategory("all");
-                          setQ("");
                         }}
                         className="text-xs text-muted-foreground tabular underline-offset-4 hover:text-foreground hover:underline"
                       >
@@ -206,7 +233,14 @@ export function AuditLog() {
         </div>
       )}
 
-      <p className="text-sm text-muted-foreground tabular">{a.count(shown.length, entries.length)}</p>
+      <div className="flex flex-wrap items-center gap-3">
+        <p className="text-sm text-muted-foreground tabular">{a.count(shown.length, entries.length)}</p>
+        {visible.length < shown.length && (
+          <Button variant="outline" className="h-9 px-3" onClick={() => setLimit((n) => n + PAGE_SIZE)}>
+            {a.showMore(Math.min(PAGE_SIZE, shown.length - visible.length))}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

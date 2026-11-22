@@ -13,6 +13,7 @@ pnpm install
 pnpm dev        # http://localhost:3000
 pnpm build      # production build
 pnpm lint
+pnpm test       # pricing, availability and search-parameter tests
 ```
 
 This project uses a newer Next.js (16) than most documentation online. Before changing framework-level code, read the matching guide in `node_modules/next/dist/docs/` (see `AGENTS.md`).
@@ -32,14 +33,17 @@ All optional.
 ## What is in it
 
 **Renters** (`/`, `/listing`, `/compare`, `/booking`, `/renter`, `/messages`)
-- Search with filters kept in the URL: city, district, move-in date, stay length, type, budget, bedrooms, bills included, fully verified, furnished and guest rating. Sort by price, availability or rating. List and map views.
-- Compare homes side by side. Save homes. Request viewings.
+- Search with filters kept in the URL: city, district, move-in date, stay length, type, budget, bedrooms, bills included, fully verified, furnished and guest rating, pets allowed, step-free access and quiet street. Sort by price, availability or rating. List and map views.
+- Compare homes side by side and share a comparison by link. Save homes, see recently viewed homes, and share a listing by Telegram, WhatsApp, Line or link. Request viewings.
+- A "Good to know" section on each listing: pets, step-free access, noise, flooding and power cuts (reported by the owner).
+- Messages warn before a phone number, link or chat handle is sent, because payments made off Nest aren't protected.
 - Book for any length of stay, with a transparent quote. Renters pay no Nest fees.
 - Review a finished stay (overall score plus accuracy, cleanliness, communication). Report a review.
 - Open a dispute from a stay, then follow staff replies and add messages or evidence.
 
 **Owners** (`/host`, `/host/new`, `/host/calendar`, `/earning`, `/owners`)
-- Dashboard with booking requests, viewings, earnings and a placement-fee calculator.
+- Dashboard with booking requests, extension requests (approve or decline), viewings, earnings and a placement-fee calculator.
+- A progress tracker for each listing's verification.
 - Listing wizard. Enter prices in dollars or riel.
 - Availability calendar.
 - Reply publicly to reviews. Upload a rejected verification document again. Open or follow a dispute.

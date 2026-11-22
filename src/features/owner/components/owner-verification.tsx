@@ -6,6 +6,7 @@ import { Check, CircleDashed, FileText, Upload, UserCheck, X } from "lucide-reac
 import { Button } from "@/shared/ui/button";
 import { toast } from "@/shared/ui/toast";
 import { currentUser } from "@/features/account/current-user";
+import type { VerificationItem } from "@/features/admin/data";
 import { useVerification, type DocKey } from "@/features/admin/verification-store";
 import { useI18n } from "@/i18n/client";
 import { cn } from "@/shared/lib/utils";
@@ -73,6 +74,37 @@ function DocRow({ itemId, docKey }: { itemId: string; docKey: DocKey }) {
   );
 }
 
+/** Where a listing is on the way to going live: documents, a visit booked, the visit done, ready for staff to publish. */
+function Progress({ item }: { item: VerificationItem }) {
+  const { d, date } = useI18n();
+  const o = d.ownerVerify;
+  const docsOk = item.docs.identity === "approved" && item.docs.ownership === "approved";
+  const steps = [
+    { label: o.steps.docs, done: docsOk },
+    { label: item.visit && !item.visit.done ? o.steps.visitBooked(date(item.visit.date, "MMM d"), item.visit.time) : o.steps.visit, done: Boolean(item.visit) },
+    { label: o.steps.visitDone, done: Boolean(item.visit?.done) },
+    { label: o.steps.ready, done: docsOk && Boolean(item.visit?.done) },
+  ];
+  const current = steps.findIndex((s) => !s.done);
+  return (
+    <ol className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label={o.progress}>
+      {steps.map((s, i) => (
+        <li key={i} className="flex items-start gap-2 text-xs" aria-current={i === current ? "step" : undefined}>
+          <span
+            className={cn(
+              "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border text-[10px] font-semibold",
+              s.done ? "border-success bg-success text-white" : i === current ? "border-dark-forest text-dark-forest" : "border-border text-muted-foreground"
+            )}
+          >
+            {s.done ? <Check className="size-3" aria-hidden /> : i + 1}
+          </span>
+          <span className={cn(s.done || i === current ? "font-medium text-foreground" : "text-muted-foreground")}>{s.label}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 /** The owner's own verification documents. Rejected ones can be uploaded again here. */
 export function OwnerVerification() {
   const { d } = useI18n();
@@ -91,7 +123,8 @@ export function OwnerVerification() {
             <p className="font-medium" lang="en">
               {item.title}
             </p>
-            <ul className="mt-3 flex flex-col gap-2">
+            <Progress item={item} />
+            <ul className="mt-4 flex flex-col gap-2">
               <DocRow itemId={item.id} docKey="identity" />
               <DocRow itemId={item.id} docKey="ownership" />
             </ul>

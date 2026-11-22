@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BedDouble, CalendarCheck, Inbox, Percent, Plus, Wallet } from "lucide-react";
 
 import { BookingRequests } from "@/features/owner/components/booking-requests";
+import { ExtensionRequests } from "@/features/owner/components/extension-requests";
 import { OwnerVerification } from "@/features/owner/components/owner-verification";
 import { OwnerShell } from "@/features/owner/components/owner-nav";
 import { MyDisputes } from "@/features/disputes/components/my-disputes";
@@ -12,7 +13,7 @@ import { OwnerViewings } from "@/features/viewings/components/owner-viewings";
 import { StatusBadge } from "@/features/booking/components/status-badge";
 import { StatTile } from "@/shared/ui/stat-tile";
 import { monthlyIncome, ownerListingIds, ownerListingStatus } from "@/features/owner/data";
-import { ownerBookings } from "@/features/booking/data";
+import { ownerBookings, stays } from "@/features/booking/data";
 import { ownerViewings } from "@/features/viewings/data";
 import { getListingById } from "@/features/listings/data";
 import { getI18n } from "@/i18n/server";
@@ -60,6 +61,7 @@ export default async function HostPage() {
           </div>
           <BookingRequests bookings={[...pending, ...upcoming]} />
         </section>
+        <ExtensionRequests stays={stays} />
         <OwnerViewings viewings={ownerViewings} />
         <section className="mt-10">
           <OwnerReviews listingIds={ownerListingIds} />

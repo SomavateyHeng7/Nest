@@ -1,4 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getListingById } from "@/features/listings/data";
+
+function safeDecode(value: string) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
 
 /**
  * Maintenance mode. Set MAINTENANCE_MODE=true (and restart/redeploy) to serve
@@ -13,7 +22,16 @@ export function proxy(request: NextRequest) {
 
   if (!on) {
     // Don't leave a stale /maintenance URL reachable when the site is up.
-    return pathname === "/maintenance" ? NextResponse.redirect(new URL("/", request.url)) : NextResponse.next();
+    if (pathname === "/maintenance") return NextResponse.redirect(new URL("/", request.url));
+
+    // Unknown listing IDs: loading.tsx makes the page stream, so notFound() in the page can't
+    // change the 200 status. Answer here instead, with the normal not-found page and a real 404.
+    const listingId = pathname.match(/^\/listing\/([^/]+)\/?$/)?.[1];
+    if (listingId && !getListingById(safeDecode(listingId))) {
+      return NextResponse.rewrite(new URL("/listing-not-found", request.url), { status: 404 });
+    }
+
+    return NextResponse.next();
   }
 
   if (pathname === "/maintenance") return NextResponse.next();
