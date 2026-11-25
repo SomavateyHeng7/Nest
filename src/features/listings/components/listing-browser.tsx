@@ -315,7 +315,7 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
       </div>
 
       {districts.length > 0 && (
-        <div className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div role="group" aria-label={d.browse.allOf(t(filters.city))} className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           <Chip active={!filters.district} onClick={() => set("district", "")}>
             {d.browse.allOf(t(filters.city))}
           </Chip>
@@ -367,7 +367,7 @@ export function ListingBrowser({ listings }: { listings: Listing[] }) {
         <div>
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h1 className="font-heading text-2xl font-semibold tracking-tight text-dark-forest">
+              <h1 aria-live="polite" aria-atomic="true" className="font-heading text-2xl font-semibold tracking-tight text-dark-forest">
                 {d.browse.results(results.length, filters.city !== ANYWHERE ? t(filters.district || filters.city) : null)}
               </h1>
               <p className="text-sm text-muted-foreground">

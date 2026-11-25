@@ -178,11 +178,11 @@ export function CompareTable({ sharedIds }: { sharedIds?: string[] }) {
       )}
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-card">
-        <div className="min-w-fit">
-          <div className="grid border-b border-border" style={{ gridTemplateColumns: cols }}>
-            <div className="p-4" />
+        <div role="table" aria-label={c.title} className="min-w-fit">
+          <div role="row" className="grid border-b border-border" style={{ gridTemplateColumns: cols }}>
+            <div role="columnheader" aria-label={c.title} className="p-4" />
             {items.map((l) => (
-              <div key={l.id} className="flex flex-col gap-3 border-l border-border p-4">
+              <div key={l.id} role="columnheader" className="flex flex-col gap-3 border-l border-border p-4">
                 <div className="relative aspect-4/3 overflow-hidden rounded-xl">
                   <Image src={l.images[0]} alt={lt(l).text} fill sizes="300px" className="object-cover" />
                   {!shared && (
@@ -216,19 +216,20 @@ export function CompareTable({ sharedIds }: { sharedIds?: string[] }) {
           </div>
 
           {groups.map((g) => (
-            <div key={g.title}>
-              <div className="bg-muted/60 px-4 py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            <div key={g.title} role="rowgroup" aria-label={g.title}>
+              <div role="presentation" className="bg-muted/60 px-4 py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                 {g.title}
               </div>
               {g.rows.map((row) => (
                 <div
                   key={row.label}
+                  role="row"
                   className="grid border-b border-border text-sm last:border-0"
                   style={{ gridTemplateColumns: cols }}
                 >
-                  <div className="px-4 py-3 text-muted-foreground">{row.label}</div>
+                  <div role="rowheader" className="px-4 py-3 text-muted-foreground">{row.label}</div>
                   {items.map((l, i) => (
-                    <div key={l.id} className={cn("flex items-center border-l border-border px-4 py-3")}>
+                    <div key={l.id} role="cell" className={cn("flex items-center border-l border-border px-4 py-3")}>
                       {row.render(l, i)}
                     </div>
                   ))}
